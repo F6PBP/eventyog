@@ -3,6 +3,7 @@
 EventYog adalah aplikasi yang dirancang untuk memudahkan promosi event dan kegiatan menarik di Yogyakarta. Mulai dari konser musik, pameran seni, hingga acara budaya, EventYog menghubungkan masyarakat dengan berbagai acara lokal, memberikan informasi lengkap seperti waktu, lokasi, dan cara mengikuti setiap event. Dengan EventYog, menemukan dan mempromosikan kegiatan di Yogyakarta jadi lebih mudah dan menyenangkan!
 
 ## Tautan Deployment?
+http://andrew-devito-eventyog.pbp.cs.ui.ac.id/
 
 ## Nama Kelompok
 1. Andrew Devito Aryo (2306152494)
@@ -17,3 +18,6 @@ EventYog adalah aplikasi yang dirancang untuk memudahkan promosi event dan kegia
 ## Sumber Initial Dataset Kategori Utama Produk
 
 ## Role dan Peran Pengguna
+1. **Pengguna Biasa (User):** Pengguna yang memanfaatkan EventYog untuk menemukan dan mendaftar event di Yogyakarta, memberikan ulasan setelah mengikuti acara, serta berinteraksi dengan berbagai fitur aplikasi.
+2. **Penyelenggara Acara (Event Organizer):** Individu atau organisasi yang mengunggah informasi acara, mengelola pendaftaran peserta, dan memastikan acara berjalan sesuai rencana melalui aplikasi.
+3. **Administrator (Admin):** Personel yang mengelola aplikasi, memantau pengguna, mengatasi masalah teknis, serta memastikan aplikasi berjalan lancar dan up-to-date.
