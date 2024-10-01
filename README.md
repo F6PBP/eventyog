@@ -1,1 +1,1 @@
-# EventYog by HalfOfDozen -- PBP 2024/2025
+# EventYog by HalfOfDozen (F6) - PBP 2024/2025
