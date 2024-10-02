@@ -762,5 +762,95 @@
 		"category": "Musik",
 		"location": "Pelataran Candi Prambanan",
 		"description": "Perhelatan musik tahunan dengan musisi nasional dan internasional."
+	},
+	{
+		"name": "Yogyakarta Youth Strategic Forum",
+		"startDate": "2024-07-15",
+		"endDate": "2024-10-13",
+		"ticket": "Rp200.000",
+		"category": "Akademik",
+		"location": "Universitas Gadjah Mada, Yogyakarta",
+		"description": "Acara akademik yang diadakan oleh Korps Mahasiswa HI UGM ini akan mengangkat isu-isu penting terkait aspek sosial-politik Indonesia sebagai tema utama. YYSF, sebagai acara akademik, akan menghadirkan pembicara-pembicara yang kredibel dan relevan untuk bersama-sama mendiskusikan serta membahas urgensi topik di masing-masing panel."
+	},
+	{
+		"name": "Dental Project",
+		"startDate": "2024-08-14",
+		"endDate": "2024-09-15",
+		"ticket": "Rp95.000-210.000",
+		"category": "Hiburan, Kompetisi",
+		"location": "Lapangan Pancasila, UGM",
+		"description": "Acara pertama yang menyampaikan Edukasi Kesehatan Gigi melalui Musik diselenggarakan oleh Fakultas Kedokteran Gigi UGM."
+	},
+	{
+		"name": "Jogja International MUN 2024",
+		"startDate": "2024-09-26",
+		"endDate": "2024-09-29",
+		"ticket": "Rp1.800.000 - Rp2.950.000",
+		"category": "Akademik, Kompetisi",
+		"location": "Sheraton Mustika Yogyakarta",
+		"description": "Jogja International Model United Nations (JOINMUN) adalah rencana tahunan yang termasuk dalam kerangka kerja UGM MUN Community. Sebagai sebuah komunitas berbasis keilmuan di Universitas Gadjah Mada yang mendalami mengenai instrumen pelaksanaan sidang internasional."
+	},
+	{
+		"name": "Land of Leisure",
+		"startDate": "2024-09-05",
+		"endDate": "2024-09-08",
+		"ticket": "Gratis",
+		"category": "Festival, Hiburan",
+		"location": "The Roof Space, Plaza Ambarrukmo",
+		"description": "Land of Leisures merupakan event tahunan yang diselenggarakan oleh Plaza Ambarrukmo sebagai perayaan terbesar industri lokal kreatif di Yogyakarta dan dapat dikunjungi mulai pukul 10.00 hingga 22.00 setiap harinya."
+	},
+	{
+		"name": "Exposure 2024",
+		"startDate": "2024-07-19",
+		"endDate": "2024-07-21",
+		"ticket": "Gratis",
+		"category": "Festival, Hiburan",
+		"location": "Main Atrium Plaza Ambarrukmo & Alun-Alun Royal Ambarrukmo",
+		"description": "EXPOSURE lahir dari ide ambisius mahasiswa Manajemen yang ingin menciptakan pasar tematik kurasi khas Yogyakarta. Terinspirasi oleh pasar tematik di kota besar lain di Indonesia, EXPOSURE awalnya dibuat untuk membantu pengusaha lokal menjangkau pasar yang lebih luas di Yogyakarta."
+	},
+	{
+		"name": "Wardah Beauty Class",
+		"startDate": "2024-10-05",
+		"endDate": null,
+		"ticket": "Rp150.000",
+		"category": "Workshop, Kecantikan",
+		"location": "Ambarukmo Plaza, Yogyakarta",
+		"description": "Kesempatan belajar makeup langsung dari ahlinya oleh Wardah Jogja."
+	},
+	{
+		"name": "HUMMAN FOR HUMANITY 2024",
+		"startDate": "2024-10-05",
+		"endDate": null,
+		"ticket": "Open Donasi",
+		"category": "Volunteer",
+		"location": "Yayasan Rumah Singgah Bumi Damai",
+		"description": "Sebagai wujud kepedulian dan tanggung jawab sosial, kami melaksanakan program kerja yang berfokus pada kegiatan bakti sosial, bernama Humman For Humanity (HFH)."
+	},
+	{
+		"name": "OLGENAS UGM",
+		"startDate": "2024-08-30",
+		"endDate": "TBA",
+		"ticket": "Rp630.000-Rp745.000",
+		"category": "Akademik",
+		"location": "D 105, Geografi UGM",
+		"description": "OLGENAS International Geolympiad is an annual event organized by the Faculty Of Geography Universitas Gadjah Mada (UGM). OLGENAS 2024 is competing in geography, this competition is present to provide opportunities for middle school and high school students to increase their competitiveness, compete with each other healthily and more critically, and be able to raise a student affective, cognitive, and psychomotor abilities, remembering that this third parameter is used as a standard for the success of learning."
+	},
+	{
+		"name": "International Relations English Competition UGM 2024",
+		"startDate": "2024-09-13",
+		"endDate": "2024-09-15",
+		"ticket": "Rp400.000-Rp500.000",
+		"category": "Akademik",
+		"location": "FISIPOL, UGM",
+		"description": "IREC adalah kompetisi bahasa Inggris tahunan yang diselenggarakan oleh KOMAHI sejak tahun 2013 lalu."
+	},
+	{
+		"name": "Involuntir Yogyakarta",
+		"startDate": "2024-09-01",
+		"endDate": null,
+		"ticket": "Gratis",
+		"category": "Volunteer",
+		"location": "Museum Dirgantara, Yogyakarta",
+		"description": "Menjadi Relawan menemani teman-teman PA Jampi Ati berkunjung ke Museum Dirgantara."
 	}
 ]
