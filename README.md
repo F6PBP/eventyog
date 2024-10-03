@@ -16,11 +16,24 @@ http://andrew-devito-eventyog.pbp.cs.ui.ac.id/
 ## Daftar Modul
 
 ## Sumber Initial Dataset Kategori Utama Produk
-- https://www.goersapp.com/blog/jadwal-event-yogyakarta/
-- https://www.traveloka.com/id-id/explore/destination/pl-kalender-pariwisata-yogyakarta-2023/214597
-- https://ambarrukmo.com/kalender-event-jogja-2024/
-- https://jogjapolitan.harianjogja.com/read/2024/09/01/510/1186749/jadwal-event-di-jogja-dan-sekitarnya-sepanjang-september-2024-dari-konser-musik-hingga-lebarannya-pecinta-kopi
-- https://www.detik.com/jateng/wisata/d-5910619/cek-di-sini-kalender-event-wisata-jogja-2022
+- https://visitingjogja.jogjaprov.go.id/event-agenda-pariwisata-jogja/				
+- https://www.instagram.com/infoeventjogja/?hl=en				
+- https://ambarrukmo.com/event-jogja-agustus-2024/				
+- https://www.goersapp.com/blog/jadwal-event-yogyakarta/				
+- https://www.traveloka.com/id-id/explore/destination/pl-kalender-pariwisata-yogyakarta-2023/214597				
+- https://ambarrukmo.com/kalender-event-jogja-2024/				
+- https://jogjapolitan.harianjogja.com/read/2024/09/01/510/1186749/jadwal-event-di-jogja-dan-sekitarnya-sepanjang-september-2024-dari-konser-musik-hingga-lebarannya-pecinta-kopi				
+- https://www.detik.com/jateng/wisata/d-5910619/cek-di-sini-kalender-event-wisata-jogja-2022				
+- https://www.instagram.com/yysf_ugm/				
+- https://www.instagram.com/wardahbeauty.jogja?igsh=MXE0aWpnOWxzZmEzbA==				
+- https://www.instagram.com/involuntiryogyakarta/				
+- https://olgenas.geo.ugm.ac.id/				
+- https://www.instagram.com/irecugm/?hl=en				
+- https://www.instagram.com/dentalproject/?hl=en				
+- https://www.instagram.com/joinmun.ugm/?hl=en				
+- https://www.instagram.com/lol.yk/?hl=en				
+- https://www.instagram.com/exposure_yk/?hl=en				
+- https://www.instagram.com/p/C_mjHw3SOvl/?igsh=bXVxbWpqcjFpODFp				
 
 ## Role dan Peran Pengguna
 1. **Pengguna Biasa (User):** Pengguna yang memanfaatkan EventYog untuk menemukan dan mendaftar event di Yogyakarta, memberikan ulasan setelah mengikuti acara, serta berinteraksi dengan berbagai fitur aplikasi.
