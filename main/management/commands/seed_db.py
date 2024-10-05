@@ -6,7 +6,7 @@ class Command(BaseCommand):
     help = 'Seed data from json file'
     
     def handle(self, *args, **kwargs):
-        with open('dataset.json', 'r') as file:
+        with open('event-dataset.json', 'r') as file:
             data = json.load(file)
             for row in data:
                 # try:
