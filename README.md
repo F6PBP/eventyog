@@ -37,13 +37,7 @@ Dataset yang digunakan untuk memulai pengembangan kategori produk pada aplikasi 
    - Menggunakan EventYog untuk menelusuri dan menemukan berbagai acara menarik di Yogyakarta.
    - Mendaftar dan mengikuti acara yang mereka minati.
    - Memberikan ulasan setelah mengikuti acara, serta membeli merchandise eksklusif yang terkait dengan acara tersebut.
-
-2. **Penyelenggara Acara (Event Organizer):**
-   - Mengunggah informasi detail mengenai acara yang mereka kelola.
-   - Mengelola pendaftaran peserta dan memastikan acara berjalan sesuai rencana.
-   - Menambahkan dan menjual merchandise eksklusif terkait acara mereka, yang dapat dibeli melalui aplikasi.
-
-3. **Administrator (Admin):**
+2. **Administrator (Admin):**
    - Mengelola seluruh aplikasi, termasuk memantau aktivitas pengguna.
    - Menangani permasalahan teknis dan memberikan bantuan.
    - Memastikan aplikasi berfungsi dengan baik, selalu diperbarui, dan tetap aman digunakan.
