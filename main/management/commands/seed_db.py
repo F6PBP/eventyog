@@ -27,15 +27,15 @@ class Command(BaseCommand):
                     
                     event.save()
                     
-                    # Create ticket price
-                    for price in row['ticket']:
-                        if price is not None:
-                            price = TicketPrice.objects.create(
-                                name=price['name'],
-                                price=price['price'],
-                                event=event
-                            )
-                            price.save()
+                    # # Create ticket price
+                    # for price in row['ticket']:
+                    #     if price is not None:
+                    #         price = TicketPrice.objects.create(
+                    #             name=price['name'],
+                    #             price=price['price'],
+                    #             event=event
+                    #         )
+                    #         price.save()
                 # except Exception as e:
                 #     print('Error in row' + str(row))
                 #     pass
