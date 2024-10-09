@@ -11,7 +11,7 @@ Aplikasi EventYog dapat diakses melalui tautan berikut: [http://andrew-devito-ev
 ## Anggota Kelompok
 EventYog dikembangkan oleh kelompok HalfOfDozen (F6), yang terdiri dari enam mahasiswa:
 
-1. **Andrew Devito Aryo** (2306152494)
+1. **Andrew Devito Aryo** (2306152494) -
 2. **Luvenia Feodora Saragih** (2306228402)
 3. **Sezza Auraghaniya Winanda** (2306207291)
 4. **Allan Kwek** (2306152134)
