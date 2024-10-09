@@ -8,3 +8,4 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # Delete All Event data
         Event.objects.all().delete()     
+        TicketPrice.objects.all().delete()

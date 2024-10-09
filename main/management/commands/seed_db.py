@@ -9,7 +9,7 @@ class Command(BaseCommand):
         with open('event-dataset.json', 'r') as file:
             data = json.load(file)
             for row in data:
-                # try:
+                try:
                     category = EventCategory.LAINNYA
 
                     # Check if category exists
@@ -27,16 +27,17 @@ class Command(BaseCommand):
                     
                     event.save()
                     
-                    # # Create ticket price
-                    # for price in row['ticket']:
-                    #     if price is not None:
-                    #         price = TicketPrice.objects.create(
-                    #             name=price['name'],
-                    #             price=price['price'],
-                    #             event=event
-                    #         )
-                    #         price.save()
-                # except Exception as e:
-                #     print('Error in row' + str(row))
-                #     pass
+                    # Create ticket price
+                    if row['ticket'] is not None:    
+                        for price in row['ticket']:
+                            if price is not None:
+                                price = TicketPrice.objects.create(
+                                    name=price['type'],
+                                    price=price['price'],
+                                    event=event
+                                )
+                                price.save()
+                except Exception as e:
+                    print('Error in row' + str(row))
+                    pass
                 
