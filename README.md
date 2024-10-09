@@ -28,6 +28,7 @@ EventYog memiliki berbagai modul utama yang berperan penting dalam pengalaman pe
 6. **Merchandise Shop:** Fitur pembelian merchandise terkait acara.
 7. **My Cart:** Tempat pengguna melihat dan mengelola item yang akan dibeli.
 8. **Scheduled Event Page:** Halaman yang menampilkan acara-acara yang sudah dijadwalkan oleh pengguna.
+9. **Event Detail Page**: Halaman yang berisikan detail mengenai suatu event dan akan memperlihatkan review dan akan dihubungkan dengan merchandise page. Pada page ini, user dapat membeli tiket event (jika berbayar) dan membeli merchandise
 
 ## Sumber Dataset Awal Kategori Produk
 Dataset yang digunakan untuk memulai pengembangan kategori produk pada aplikasi ini dapat diakses melalui tautan berikut: [Dataset dan Link Sumbernya](https://docs.google.com/spreadsheets/d/1iP8eY44oMNFkbkmIzFSCkeFv99xC77yMKTMeYp2hoFs/edit?usp=sharing)
