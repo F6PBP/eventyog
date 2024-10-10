@@ -1,9 +1,9 @@
 # EventYog by HalfOfDozen (F6) - PBP 2024/2025
 
 ## Apa itu EventYog?
-EventYog adalah aplikasi inovatif yang dirancang untuk memudahkan promosi, penemuan, dan partisipasi dalam beragam event menarik di Yogyakarta. Mulai dari konser musik yang spektakuler, pameran seni yang menginspirasi, hingga acara budaya yang penuh makna, EventYog hadir sebagai jembatan yang menghubungkan masyarakat dengan aktivitas lokal. Aplikasi ini menyediakan informasi lengkap seperti waktu, lokasi, dan tata cara berpartisipasi dalam setiap event yang tersedia.
+EventYog adalah aplikasi inovatif berbasis web yang dirancang untuk memudahkan promosi, penemuan, dan partisipasi dalam beragam event menarik di Yogyakarta. Mulai dari konser musik yang spektakuler, pameran seni yang menginspirasi, hingga acara budaya. EventYog hadir sebagai jembatan yang menghubungkan masyarakat dengan aktivitas lokal. Aplikasi ini menyediakan informasi lengkap seperti waktu, lokasi, dan tata cara berpartisipasi dalam setiap event yang tersedia.
 
-EventYog tidak hanya fokus pada kemudahan akses acara, tetapi juga memperkaya pengalaman pengguna dengan fitur menarik, seperti pembelian merchandise eksklusif yang terkait dengan acara-acara tersebut. Pengguna dapat langsung memesan merchandise favorit mereka melalui aplikasi, menciptakan kenangan unik dari setiap acara yang mereka ikuti. Dengan EventYog, menemukan acara favoritmu kini lebih mudah, menyenangkan, dan mendalam!
+EventYog tidak hanya fokus pada kemudahan akses acara, tetapi juga memperkaya pengalaman pengguna dengan fitur menarik, seperti pembelian merchandise eksklusif yang terkait dengan acara-acara tersebut. Pengguna dapat langsung memesan merchandise favorit mereka melalui aplikasi, menciptakan kenangan unik dari setiap acara yang mereka ikuti. 
 
 ## Tautan Deployment
 Aplikasi EventYog dapat diakses melalui tautan berikut: [http://andrew-devito-eventyog.pbp.cs.ui.ac.id](http://andrew-devito-eventyog.pbp.cs.ui.ac.id)
@@ -11,7 +11,7 @@ Aplikasi EventYog dapat diakses melalui tautan berikut: [http://andrew-devito-ev
 ## Anggota Kelompok
 EventYog dikembangkan oleh kelompok HalfOfDozen (F6), yang terdiri dari enam mahasiswa:
 
-1. **Andrew Devito Aryo** (2306152494)
+1. **Andrew Devito Aryo** (2306152494) -
 2. **Luvenia Feodora Saragih** (2306228402)
 3. **Sezza Auraghaniya Winanda** (2306207291)
 4. **Allan Kwek** (2306152134)
@@ -19,22 +19,19 @@ EventYog dikembangkan oleh kelompok HalfOfDozen (F6), yang terdiri dari enam mah
 6. **Fransisca Ellya Bunaren** (2306152286)
 
 ## Modul Utama dalam Aplikasi
-EventYog memiliki berbagai modul utama yang berperan penting dalam pengalaman pengguna, meliputi:
-1. **Authentication Module:** Memungkinkan pengguna untuk mendaftar dan masuk ke dalam aplikasi.
-2. **Landing Page:** Menyambut pengguna dengan informasi umum dan fitur aplikasi.
-3. **Profile Page:** Menampilkan informasi pengguna dan pengaturan profil.
-4. **Homepage:** Pusat navigasi utama untuk menelusuri acara-acara terkini.
-5. **Exploring Events:** Modul pencarian dan penemuan acara di Yogyakarta.
-6. **Merchandise Shop:** Fitur pembelian merchandise terkait acara.
-7. **My Cart:** Tempat pengguna melihat dan mengelola item yang akan dibeli.
-8. **Scheduled Event Page:** Halaman yang menampilkan acara-acara yang sudah dijadwalkan oleh pengguna.
-9. **Event Detail Page**: Halaman yang berisikan detail mengenai suatu event dan akan memperlihatkan review dan akan dihubungkan dengan merchandise page. Pada page ini, user dapat membeli tiket event (jika berbayar) dan membeli merchandise
+EventYog memiliki berbagai modul utama (CRUD) yang berperan penting dalam pengalaman pengguna, meliputi:
+1. **Review Event**: Pada halaman ini, pengguna dapat menambahkan review tentang suatu event. Pengguna dan Admin memiliki akses untuk mengedit dan menghapus review. Selain itu, pengguna juga dapat berkomentar pada review yang diberikan oleh pengguna lain.
+2. **Explore Events**: Menu ini menampilkan daftar event di kota Jogja berdasarkan preferensi pengguna. Admin dapat menambahkan, mengedit, dan menghapus event.
+3. **View Merchandise**: Pengguna dapat melihat daftar merchandise yang dijual dalam satu event. Admin memiliki kemampuan untuk menambahkan, mengedit, dan menghapus merchandise tersebut.
+4. **My Cart**: Pengguna dapat membeli produk merchandise dari suatu event. Produk yang dibeli akan dimasukkan ke dalam keranjang (cart). Pengguna bisa menambahkan produk, mengubah kuantitas, atau menghapus produk dari keranjang.
+5. **View User**: Admin dapat melihat daftar pengguna, mendaftarkan pengguna baru, mengedit data pengguna, serta menghapus pengguna.
+6. **Scheduled Events**: Halaman ini menampilkan event yang telah didaftarkan oleh pengguna. Pengguna dapat menambah event dengan mendaftar pada event baru, membatalkan pendaftaran, atau mengganti jenis tiket (jika tersedia lebih dari satu jenis tiket).
 
 ## Sumber Dataset Awal Kategori Produk
 Dataset yang digunakan untuk memulai pengembangan kategori produk pada aplikasi ini dapat diakses melalui tautan berikut: [Dataset dan Link Sumbernya](https://docs.google.com/spreadsheets/d/1iP8eY44oMNFkbkmIzFSCkeFv99xC77yMKTMeYp2hoFs/edit?usp=sharing)
 
 ## Peran dan Fungsi Pengguna
-1. **Pengguna Biasa (User):**
+1. **Pengguna (User):**
    - Menggunakan EventYog untuk menelusuri dan menemukan berbagai acara menarik di Yogyakarta.
    - Mendaftar dan mengikuti acara yang mereka minati.
    - Memberikan ulasan setelah mengikuti acara, serta membeli merchandise eksklusif yang terkait dengan acara tersebut.
