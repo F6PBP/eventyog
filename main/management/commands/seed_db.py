@@ -4,9 +4,10 @@ from main.models import *
 
 class Command(BaseCommand):
     help = 'Seed data from json file'
+    path = 'dataset/'
     
-    def handle(self, *args, **kwargs):
-        with open('event-dataset.json', 'r') as file:
+    def seed_event(self):
+        with open(f'{self.path}event-dataset.json', 'r') as file:
             data = json.load(file)
             for row in data:
                 try:
@@ -40,4 +41,23 @@ class Command(BaseCommand):
                 except Exception as e:
                     print('Error in row' + str(row))
                     pass
-                
+        
+    def seed_merch(self):
+        with open(f'{self.path}product-dataset.json', 'r') as file:
+            data = json.load(file)
+            for row in data:
+                try:
+                    merch = Merchandise.objects.create(
+                        image_url=row['image_url'],
+                        name=row['name'],
+                        description=row['description'],
+                        price=row['price'],
+                    )
+                    merch.save()
+                except Exception as e:
+                    print('Error in row' + str(row))
+                    pass
+        
+    def handle(self, *args, **kwargs):
+        self.seed_event()
+        self.seed_merch()

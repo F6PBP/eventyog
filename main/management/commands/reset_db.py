@@ -9,3 +9,6 @@ class Command(BaseCommand):
         # Delete All Event data
         Event.objects.all().delete()     
         TicketPrice.objects.all().delete()
+        
+        # Delete All Merchandise data
+        Merchandise.objects.all().delete()
