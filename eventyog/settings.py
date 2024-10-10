@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'whitenoise.runserver_nostatic'
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,5 @@ if DEBUG:
     ]
 else:
     STATIC_ROOT = BASE_DIR / 'static' 
+    
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
