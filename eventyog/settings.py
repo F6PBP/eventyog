@@ -28,6 +28,7 @@ PRODUCTION = os.getenv('PRODUCTION', False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
