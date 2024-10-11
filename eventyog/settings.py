@@ -124,14 +124,15 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Static files (CSS, JavaScript, Images)
-# Dokumentasi: https://docs.djangoproject   .com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
-if DEBUG:
-    STATICFILES_DIRS = [
-        BASE_DIR / 'static' # merujuk ke /static root project pada mode development
-    ]
-else:
-    STATIC_ROOT = BASE_DIR / 'static' 
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Use this for development to serve static files from a directory
+]
+
+# Set STATIC_ROOT regardless of the environment
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Set a different folder for production collectstatic
+
+# In production, 'collectstatic' will gather files into STATIC_ROOT folder
     
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
