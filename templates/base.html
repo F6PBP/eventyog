@@ -4,7 +4,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Eventyog</title>
         
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,9 +15,10 @@
         <script src="{% static "js/index.js " %}"></script>
 
         {% block meta %}{% endblock meta %}
+        <title>Eventyog</title>
     </head>
     <body class="font-Poppins">
-        <main class="p-20 flex flex-col">
+        <main class="flex flex-col">
             {% include "ds/navbar.html" %}
             {% block content %}{% endblock content%} 
             {% include "ds/footer.html" %}

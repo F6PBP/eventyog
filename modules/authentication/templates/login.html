@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Login</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="flex items-center justify-center w-screen h-screen px-5 ">
+  <div
+    class="shadow-xl bg-white p-5 sm:p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5"
+  >    
+    <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
+    <h1
+      class="font-bold text-xl sm:text-2xl text-center"
+    >Welcome to EventYog!</h1>
+    <form method="POST" action="" class="flex flex-col gap-5 bg-white">
+      {% csrf_token %}
+      <input type="hidden" name="remember" value="true">
+      <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-5">
+        <div>
+          <label for="username" class="sr-only">Username</label>
+          <input id="username" name="username" type="text" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-semibold placeholder:font-normal rounded-3xl justify-center" placeholder="Username">
+        </div>
+        <div>
+          <label for="password" class="sr-only">Password</label>
+          <input id="password" name="password" type="password" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-semibold placeholder:font-normal rounded-3xl justify-center" placeholder="Password">
+        </div>
+      </div>
+      <button 
+        type="submit"
+        value="Login"
+        class="bg-[#003FE2] w-full py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300">
+        Login
+      </button>
+    </form>
+  
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} font-semibold">*{{ message }}!</li>
+      {% endfor %}
+    </ul>
+    {% endif %} 
+    
+    <p
+      class="text-center text-[#737373] text-sm"
+    >
+      Don't have an account yet?
+      <a
+        class="text-[#003FE2] font-semibold"
+        href="{% url 'auth:register' %}">Register Now</a>
+    </p>
+  </div>
+</main>
+{% endblock content %}

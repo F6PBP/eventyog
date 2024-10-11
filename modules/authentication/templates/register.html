@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Register</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="flex items-center justify-center w-screen h-screen px-5 border-[2px] border-black/5">
+  <div
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center"
+  >    
+    <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
+    <h1
+      class="font-bold text-xl sm:text-2xl text-center"
+    >Register to EventYog!</h1>
+    <form method="POST" action="" class="flex flex-col gap-5 bg-white">
+      {% csrf_token %}
+      <input type="hidden" name="remember" value="true">
+      <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-5">
+        {% for field in form %}
+          <div class="{% if not forloop.first %}mt-4{% endif %}">
+            <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-black">
+            {{ field.label }}
+            </label>
+            <div class="relative">
+              {{ field }}
+            </div>
+            {% if field.errors %}
+              {% for error in field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <button 
+        type="submit"
+        value="Login"
+        class="bg-[#003FE2] w-full py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300">
+        Register
+      </button>
+    </form>
+  
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} 
+    
+    <p
+      class="text-center text-[#737373] text-sm"
+    >
+      Already have an account?
+      <a
+        class="text-[#003FE2] font-semibold"
+        href="{% url 'auth:login' %}">Login Now</a>
+    </p>
+  </div>
+</main>
+{% endblock content %}
