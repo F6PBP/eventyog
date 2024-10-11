@@ -86,6 +86,9 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 
 load_dotenv()  # Load environment variables from a .env file
 
+
+DATABASES = {}
+
 if (os.getenv('PROD') != 'True'):
     DATABASES = {
         'default': {
