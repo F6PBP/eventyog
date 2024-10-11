@@ -85,8 +85,7 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 
 load_dotenv()  # Load environment variables from a .env file
 
-if PRODUCTION:
-    DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DB_NAME', 'eventyog'),
@@ -97,15 +96,6 @@ if PRODUCTION:
     }
 }
     
-else:
-    DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
