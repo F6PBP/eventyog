@@ -13,24 +13,11 @@
         <link rel="stylesheet" href="{% static "styles/main.css" %}">
         <link rel="shortcut icon" type="image/png" href="{% static 'assets/icon.png' %}" >
         <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                        extend: {
-                            fontFamily: {
-                                'Manrope'   : ['Manrope', 'sans-serif'],
-                                'Poppins'   : ['Poppins', 'sans-serif'],
-                                'Inter'     : ['Inter', 'sans-serif'],
-                            },
-                    }
-                }3
-            }
-        </script>
-        <script src="{% static "js/index.js" %}"></script>
+        <script src="{% static "js/index.js " %}"></script>
 
         {% block meta %}{% endblock meta %}
     </head>
-    <body class="font-Poppins">        
+    <body>
         <main class="p-20 flex flex-col">
             {% include "ds/navbar.html" %}
             {% block content %}{% endblock content%} 
