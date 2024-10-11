@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,8 +80,25 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# Add these at the top of your settings.py
 
-DATABASES = {
+
+load_dotenv()  # Load environment variables from a .env file
+
+if PRODUCTION:
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'eventyog'),
+        'USER': os.getenv('DB_USER', 'pemilos24_owner'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
+        'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
+        'PORT': os.getenv('DB_PORT', 5432),
+    }
+}
+    
+else:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
