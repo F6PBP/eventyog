@@ -12,7 +12,7 @@
   >    
     <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
     <h1
-      class="font-bold text-xl sm:text-2xl text-center"
+      class="font-semibold text-xl text-center"
     >Welcome to EventYog!</h1>
     <form method="POST" action="" class="flex flex-col gap-5 bg-white">
       {% csrf_token %}
@@ -20,11 +20,11 @@
       <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-5">
         <div>
           <label for="username" class="sr-only">Username</label>
-          <input id="username" name="username" type="text" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-semibold placeholder:font-normal rounded-3xl justify-center" placeholder="Username">
+          <input id="username" name="username" type="text" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-normal rounded-3xl justify-center" placeholder="Username">
         </div>
         <div>
           <label for="password" class="sr-only">Password</label>
-          <input id="password" name="password" type="password" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-semibold placeholder:font-normal rounded-3xl justify-center" placeholder="Password">
+          <input id="password" name="password" type="password" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-normal rounded-3xl justify-center" placeholder="Password">
         </div>
       </div>
       <button 

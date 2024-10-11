@@ -22,12 +22,10 @@ def login_user(request):
             return response
         else:
             messages.error(request, "Invalid username or password")
-        
-
     else:
         form = AuthenticationForm(request)
 
-    context = {'form': form}
+    context = {'form': form, 'show_navbar': False, 'show_footer': False}
     return render(request, 'login.html', context)
 
 def logout_user(request):

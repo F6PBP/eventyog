@@ -18,10 +18,17 @@
         <title>Eventyog</title>
     </head>
     <body class="font-Poppins">
-        <main class="flex flex-col">
-            {% include "ds/navbar.html" %}
-            {% block content %}{% endblock content%} 
-            {% include "ds/footer.html" %}
+        <main class="flex flex-col min-h-screen">
+            {% if show_navbar %}
+                {% include "ds/navbar.html" %}
+            {% endif %}
+            <div class="container h-full min-h-screen">
+                {% block content %}{% endblock content%} 
+            </div>
+
+            {% if show_footer %}
+                {% include "ds/footer.html" %}
+            {% endif %}
         </main>
     </body>
 </main>

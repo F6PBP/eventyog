@@ -1,3 +1,17 @@
-<nav>
-    <h1>Ini Navbar</h1>
+{% load static %}
+<nav class="px-10 flex items-center py-5 justify-between border-b-[1px] border-black/10">
+    <img src={% static "assets/icon.png" %} alt="icon" class="w-16 object-contain">
+    <div
+        class="flex items-center gap-5"
+    >
+        <p class="text-sm">Hello, {{user.username}}!</p>
+        <div class="w-10 h-10 bg-black rounded-full overflow-hidden">
+        </div>
+        <a href="{% url 'auth:logout'%}">
+            <button 
+                class="bg-[#003FE2] text-white text-sm font-semibold rounded-2xl h-full hover:scale-105 duration-300 ml-auto px-5 py-2">
+                Logout
+            </button>
+        </a>
+    </div>
 </nav>

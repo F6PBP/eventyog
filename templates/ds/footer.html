@@ -1,3 +1,16 @@
-<footer>
-    <h1>Ini Footer</h1>
+{% load static %}
+<footer class="px-10 py-10 bg-[#003FE2] text-white flex flex-col gap-5">
+    <div
+        class="flex gap-6 items-center justify-center"
+    >
+        <img 
+            src="{% static 'assets/eventyog-white.png' %}" 
+            alt="icon" 
+            class="w-16 object-contain"
+        />
+        <h1 class="font-semibold text-xl">EventYog</h1>
+    </div>
+    <div class="w-full flex justify-center">
+        <h3 class="text-xs">&copy; 2024 EventYog!</h3>
+    </div>
 </footer>
