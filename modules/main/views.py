@@ -1,6 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile
 from eventyog.decorators import check_user_profile
 
 # Create your views here.

@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from modules.main.models import UserProfile
+from django.contrib.auth.decorators import login_required
+from eventyog.decorators import check_user_profile
+
 import datetime
 
 from .forms import UserProfileForm
@@ -97,14 +100,69 @@ def onboarding(request):
     
     return render(request, 'onboarding.html', context)
 
+@login_required(login_url='auth:login')
+@check_user_profile
 def profile(request):
-    user = request.user
-    
+    print(request.user_profile.categories)
+    categories = request.user_profile.categories.split(',')
+    print(categories)
     context = {
-        'user': user
+        'user': request.user,
+        'user_profile': request.user_profile,
+        'image_url': request.image_url,
+        'show_navbar': True,
+        'show_footer': True,
+        'categories': categories
     }
     
     return render(request, 'profile.html', context)
 
+@login_required(login_url='auth:login')
+@check_user_profile
 def edit_profile(request):
-    pass
+    form = UserProfileForm(instance=request.user_profile)
+    
+    if request.method == 'POST':
+        print(form.data)
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('auth:profile')
+        else:
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+
+    context = {
+        'user': request.user,
+        'user_profile': request.user_profile,
+        'image_url': request.image_url,
+        'categories': request.user_profile.categories,
+        'form': form,
+        'show_navbar': True,
+        'show_footer': True
+    }
+
+    return render(request, 'edit_profile.html', context)
+
+def delete_profile(request):
+    try:
+        if request.method == 'POST':
+            request.user_profile.delete()
+            request.user.delete()
+            print('Profile deleted successfully.')
+            logout(request)
+            response = HttpResponseRedirect(reverse('auth:login'))
+            response.delete_cookie('last_login')
+            messages.success(request, 'Profile deleted successfully.')
+            return response
+    except Exception as e:
+        request.user.delete()
+        logout(request)
+        response = HttpResponseRedirect(reverse('auth:login'))
+        response.delete_cookie('last_login')
+        print(e)
+        return redirect('auth:login')
+        
+    print("TETSSS")
+    return redirect('auth:login')
