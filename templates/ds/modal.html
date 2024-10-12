@@ -1,0 +1,52 @@
+<div class="fixed inset-0 flex items-center justify-center z-50" id="{{ modal_id }}" role="dialog" aria-labelledby="{{ modal_label_id }}" aria-hidden="true" style="display: none;">
+    <div class="fixed inset-0 bg-black opacity-50" id="{{ modal_id }}-overlay"></div> <!-- Add id to the dark background -->
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto text-black relative z-10"> <!-- Add relative and z-10 classes -->
+        <div class="border-b px-4 py-2 flex justify-between items-center">
+            <h5 class="text-lg font-semibold" id="{{ modal_label_id }}">{{ modal_title }}</h5>
+            <button type="button" class="text-gray-500 hover:text-gray-700" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="p-4">
+            {{ modal_body }}
+        </div>
+        <div class="border-t px-4 py-2 flex justify-end gap-2">
+            <button type="button" 
+            class="flex items-center justify-center gap-2 bg-red-500 py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300"
+             data-dismiss="modal">Close</button>
+            <button type="button" 
+            class="flex items-center justify-center gap-2 bg-[#003FE2] py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300"
+
+             id="save-changes-button">{{ modal_primary_button_text }}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('{{ modal_id }}');
+    const overlay = document.getElementById('{{ modal_id }}-overlay');
+    const closeModal = () => {
+        modal.style.display = 'none';
+    };
+
+    // Close modal when clicking the overlay
+    overlay.onclick = closeModal;
+
+    // Close modal when clicking the close button
+    modal.querySelectorAll('[data-dismiss="modal"]').forEach(button => {
+        button.onclick = closeModal;
+    });
+
+    // Close modal when clicking the save changes button
+    document.getElementById('save-changes-button').onclick = closeModal;
+
+    // Function to open the modal
+    const openModal = () => {
+        modal.style.display = 'flex';
+    };
+
+    // Example: Open the modal when a button is clicked
+    document.getElementById('open-modal-button').onclick = openModal;
+});
+</script>
