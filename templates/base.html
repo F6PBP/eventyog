@@ -25,7 +25,9 @@
             {% if show_navbar %}
                 {% include "ds/navbar.html" %}
             {% endif %}
-            <div class="h-full min-h-screen w-full">
+            {% include "ds/toast.html" %}
+            <div class="h-full min-h-screen w-full my-32">
+                {% include "ds/fileinput.html" with name="test" input_id="hello" %}
                 {% block content %}{% endblock content%} 
             </div>
 

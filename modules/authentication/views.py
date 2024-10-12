@@ -130,15 +130,12 @@ def edit_profile(request):
             print(form.data)
             print(request.FILES)
             form.save(commit=True)
-            messages.success(request, 'Profile updated successfully.')
             return redirect('auth:profile')
         else:
             print("HELLO 2")
             print(form.errors)
             print(form.data)
             
-            messages.error(request, 'Please correct the error below.')
-
     context = {
         'user': request.user,
         'user_profile': request.user_profile,

@@ -28,8 +28,8 @@
                 <label for="bio" class="text-sm text-gray-500">Bio</label>
                 {% include "ds/textarea.html" with id="bio" name="bio" value=user_profile.bio class="border rounded p-2 min-h-[200px]"%}
             </div>
-            <div class="font-semibold flex flex-col gap-2">
-                <h3>Event Types</h3>
+            <div class="flex flex-col gap-2">
+                <h3 class="font-semibold">Event Types</h3>
                 <div class="relative">
                     <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown()">Select Categories</button>
                     <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden transition-all duration-500 ease-in-out max-h-0 overflow-hidden">

@@ -1,0 +1,22 @@
+{% include "ds/input.html" with id="queryInput" oninput="updateQueryParam()" placeholder="Type to change query" %}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+        if (query) {
+            document.getElementById('queryInput').value = query;
+        }
+    });
+
+    function updateQueryParam() {
+        const query = '{{ query }}';
+        const input = document.getElementById('queryInput').value;
+        const url = new URL(window.location);
+        if (input) {
+            url.searchParams.set(query, input);
+        } else {
+            url.searchParams.delete(query);
+        }
+        window.history.pushState({}, '', url);
+    }
+</script>
