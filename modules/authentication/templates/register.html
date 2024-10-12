@@ -39,13 +39,7 @@
           </div>
         {% endfor %}
       </div>
-      <button 
-        type="submit"
-        value="Login"
-        class="flex justify-center items-center gap-2 bg-[#003FE2] w-full py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300">
-        <i class="fas fa-sign-in-alt"></i>
-        <span>Register</span>
-      </button>
+      {% include "ds/button.html" with text="Register" icon="fas fa-sign-in-alt"  props="{'value': 'Register', 'type': 'submit'}" %}
     </form>
   
     {% if messages %}
@@ -57,7 +51,7 @@
     {% endif %} 
     
     <p
-      class="text-center text-[#737373] text-sm"
+      class="text-center text-[#737373] text-xs"
     >
       Already have an account?
       <a

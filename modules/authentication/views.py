@@ -3,9 +3,12 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from modules.main.models import UserProfile
 import datetime
+
+from .forms import UserProfileForm
 
 # Create your views here.
 def login_user(request):
@@ -44,13 +47,52 @@ def register(request):
             form.save()
             messages.success(request, 'Account created successfully.')
             
-            return redirect('auth:login')
+            # Authenticate the newly registered user
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            
+            # Log in the user
+            if user is not None:
+                login(request, user)  # Automatically log in the user
+            
+            return redirect('auth:onboarding')
         
     context = {
         'form': form
     }
     
     return render(request, 'register.html', context)
+
+def onboarding(request):
+    print(request.user)
+    
+    profile = UserProfile.objects.filter(user=request.user)
+    
+    if profile:
+        return redirect('main:main')
+    
+    if request.method == 'POST':
+        # Process the form data here
+        form = UserProfileForm(request.POST, request.FILES)
+        print(form.data)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user  # Associate profile with logged-in user
+            profile.save()
+            return redirect('main:main')
+        else:
+            print(form.errors)
+    else:
+        form = UserProfileForm()
+
+    context = {
+        'form': form
+    }
+    
+    print(context)
+    
+    return render(request, 'onboarding.html', context)
 
 def profile(request):
     user = request.user

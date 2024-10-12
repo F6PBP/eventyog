@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <main class="flex justify-center items-center min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="border border-gray-300/50 rounded-2xl p-6 sm:p-10 shadow-xl max-w-md w-full">
+            <h1 class="text-center text-xl font-bold mb-5">We need to know about you!</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <div class="w-full flex items-center justify-center relative">
+                        <img 
+                            name="profile_picture"
+                            src="{% static 'assets/profile-pic-placeholder.png' %}" 
+                            id="image_preview" class="mt-4 w-28 h-28 object-cover rounded-full" />
+                        <label for="profile_picture" class="absolute bottom-0 right-32 bg-white p-1 rounded-full shadow cursor-pointer w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-pencil-alt text-gray-700"></i>
+                        </label>
+                    </div>
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewImage(event)">
+                </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
+                    {% include "ds/input.html" with id="name" name="name" type="text" props="{'required': True}" placeholder="Name" %}
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                    {% include "ds/input.html" with id="email" name="email" type="email" props="{'required': True}" placeholder="Email" %}
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Tell us About Yourself:</label>
+                    {% include "ds/textarea.html" with class="w-full" id="bio" name="bio" props="{'required': True}" placeholder="Tell us about yourself" %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="categories" class="block text-sm font-medium text-gray-700">Preferable Event Categories:</label>
+                    <div class="relative">
+                        <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown()">Select Categories</button>
+                        <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden transition-all duration-500 ease-in-out max-h-0 overflow-hidden">
+                            <ul class="max-h-60 overflow-auto" id='category-dropdown'>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="selected-categories" class="mt-2 flex flex-wrap gap-2"></div>
+                </div>
+
+                <script>
+                    function toggleDropdown() {
+                        var dropdown = document.getElementById('dropdown');
+                        if (dropdown.classList.contains('hidden')) {
+                            dropdown.classList.remove('hidden');
+                            setTimeout(() => {
+                                dropdown.classList.remove('max-h-0');
+                                dropdown.classList.add('max-h-60');
+                            }, 10);
+                        } else {
+                            dropdown.classList.remove('max-h-60');
+                            dropdown.classList.add('max-h-0');
+                            setTimeout(() => {
+                                dropdown.classList.add('hidden');
+                            }, 500);
+                        }
+                    }
+
+                    document.addEventListener('click', function(event) {
+                        var dropdown = document.getElementById('dropdown');
+                        var button = dropdown.previousElementSibling;
+                        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                            dropdown.classList.remove('max-h-60');
+                            dropdown.classList.add('max-h-0');
+                            setTimeout(() => {
+                                dropdown.classList.add('hidden');
+                            }, 500);
+                        }
+                    });
+
+                    const categories = ['yoga', 'meditation', 'fitness', 'wellness', 'tst'];
+                    const categoryDropdown = document.getElementById('category-dropdown');
+                    const selectedCategoriesDiv = document.getElementById('selected-categories');
+
+                    categories.forEach(category => {
+                        const li = document.createElement('li');
+                        li.classList.add('px-4', 'py-2', 'text-sm', 'text-gray-700', 'hover:bg-gray-100');
+                        const label = document.createElement('label');
+                        label.classList.add('flex', 'items-center', 'cursor-pointer');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = category;
+                        checkbox.classList.add('mr-2');
+                        checkbox.addEventListener('change', function() {
+                            updateSelectedCategories();
+                        });
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(category));
+                        li.appendChild(label);
+                        categoryDropdown.appendChild(li);
+                    });
+
+                    function updateSelectedCategories() {
+                        selectedCategoriesDiv.innerHTML = '';
+                        const selectedCategories = [];
+                        categoryDropdown.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                            selectedCategories.push(checkbox.value);
+                            const chip = document.createElement('div');
+                            chip.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full', 'text-sm', 'flex', 'items-center');
+                            chip.textContent = checkbox.value;
+                            const removeButton = document.createElement('button');
+                            removeButton.classList.add('ml-2', 'text-blue-500', 'hover:text-blue-700');
+                            removeButton.innerHTML = '<i class="fas fa-times"></i>';
+                            removeButton.addEventListener('click', function() {
+                                checkbox.checked = false;
+                                updateSelectedCategories();
+                            });
+                            chip.appendChild(removeButton);
+                            selectedCategoriesDiv.appendChild(chip);
+                        });
+
+                        // Update hidden input with CSV string
+                        const form = document.querySelector('form');
+                        let hiddenInput = form.querySelector('input[name="categories"]');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'categories';
+                            form.appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = selectedCategories.join(',');
+                    }
+
+                    function previewImage(event) {
+                        const reader = new FileReader();
+                        reader.onload = function() {
+                            const imagePreview = document.getElementById('image_preview');
+                            imagePreview.src = reader.result;
+                            imagePreview.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(event.target.files[0]);
+                    }
+                </script>
+
+                {% include "ds/button.html" with text="Submit" button_type="primary"  props="{'type': 'submit'}"%}
+            </form>
+        </div>
+    </main>
+{% endblock content %}

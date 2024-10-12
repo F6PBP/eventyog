@@ -1,11 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from cloudinary.models import CloudinaryField
 import uuid
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField()
+    name = models.CharField(max_length=200)
     email = models.EmailField()
+    bio = models.TextField()
+    profile_picture = CloudinaryField('image')
+    categories = models.CharField(max_length=200)
     
     registeredEvent = models.ManyToManyField('Event', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)

@@ -8,7 +8,7 @@
 {% block content %}
 <main class="flex items-center justify-center w-screen h-screen px-5 ">
   <div
-    class="shadow-xl bg-white p-5 sm:p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5"
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5"
   >    
     <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
     <h1
@@ -20,35 +20,29 @@
       <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-2">
         <div>
           <label for="username" class="sr-only">Username</label>
-          <input id="username" name="username" type="text" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-normal rounded-3xl justify-center" placeholder="Username">
+          {% include "ds/input.html" with id="username" name="username" type="text" props="{'required': True}" placeholder="Username" %}
         </div>
         <div class="relative">
           <label for="password" class="sr-only">Password</label>
-          <input id="password" name="password" type="password" required class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-normal rounded-3xl justify-center" placeholder="Password">
+          {% include "ds/input.html" with id="password" name="password" type="password" props="{'required': True}" placeholder="Password" %}
           <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-5 flex items-center text-sm leading-5">
             <i id="eye-icon" class="fas fa-eye"></i>
           </button>
         </div>
       </div>
-      <button 
-        type="submit"
-        value="Login"
-        class="flex items-center justify-center gap-2 bg-[#003FE2] w-full py-3 px-10 text-white text-sm font-semibold rounded-3xl h-full hover:scale-105 duration-300">
-        <i class="fas fa-sign-in-alt"></i>
-        <span>Login</span>
-      </button>
+      {% include "ds/button.html" with text="Login" icon="fas fa-sign-in-alt"  props="{'value': 'Login', 'type': 'submit'}" %}
     </form>
   
     {% if messages %}
     <ul>
       {% for message in messages %}
-      <li class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} font-semibold">*{{ message }}!</li>
+      <li class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} font-semibold text-sm">*{{ message }}!</li>
       {% endfor %}
     </ul>
     {% endif %} 
     
     <p
-      class="text-center text-[#737373] text-sm"
+      class="text-center text-[#737373] text-xs"
     >
       Don't have an account yet?
       <a

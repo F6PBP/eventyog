@@ -1,0 +1,9 @@
+<!-- /home/andrew/pbp/eventyog/templates/ds/textarea.html -->
+<textarea 
+    class="bg-[#F2F2F2] py-3 px-10 text-black placeholder:text-[#C9C9C9] focus:outline-none font-normal rounded-xl text-sm justify-center {{ class }}" 
+    id="{{ id }}" name="{{ name }}" placeholder="{{ placeholder }}" 
+    required
+    {% for key, value in props.items %}
+        {{ key }}="{{ value }}"
+    {% endfor %}
+>{{ value }}</textarea>
