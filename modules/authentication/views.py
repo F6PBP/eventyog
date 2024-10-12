@@ -123,14 +123,20 @@ def edit_profile(request):
     form = UserProfileForm(instance=request.user_profile)
     
     if request.method == 'POST':
-        print(form.data)
+        print(form.errors)
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
-            form.save()
+            print("HELLO 1")
+            print(form.data)
+            print(request.FILES)
+            form.save(commit=True)
             messages.success(request, 'Profile updated successfully.')
             return redirect('auth:profile')
         else:
+            print("HELLO 2")
             print(form.errors)
+            print(form.data)
+            
             messages.error(request, 'Please correct the error below.')
 
     context = {
@@ -157,11 +163,11 @@ def delete_profile(request):
             messages.success(request, 'Profile deleted successfully.')
             return response
     except Exception as e:
+        print(e)
         request.user.delete()
         logout(request)
         response = HttpResponseRedirect(reverse('auth:login'))
         response.delete_cookie('last_login')
-        print(e)
         return redirect('auth:login')
         
     print("TETSSS")
