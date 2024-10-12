@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 
@@ -6,6 +6,10 @@ from .models import UserProfile
 @login_required(login_url='auth:login')
 def main(request):
     user = request.user
+    
+    if not user.is_authenticated:
+        return redirect('auth:login')
+    
     user_profile = UserProfile.objects.get(user=user)
         
     image_url = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
