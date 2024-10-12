@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block meta %}
+<title>About Us</title>
+{% endblock meta %}
+{% block content %}
+<main class="p-4 md:p-20 flex items-center justify-center min-h-screen w-full flex flex-col gap-4 my-16 md:my-32">
+    <img 
+        src="{% static 'assets/icon.png' %}" 
+        alt="icon" 
+        class="w-24 md:w-32 object-contain"
+    />
+    <h1 class="text-3xl md:text-5xl font-bold text-center">
+        About Us
+    </h1>
+    <p class="w-full md:w-[800px] text-center px-4 md:px-0">
+        EventYog is a platform that helps you to organize and manage your events. We provide a wide range of services
+        that help you to organize your events in a more efficient way. Our services include event management, ticket
+        booking, and many more. We are here to help you to make your events successful.
+    </p>
+
+    <section class="flex flex-col items-center gap-6">
+        <h2 class="text-2xl md:text-3xl font-semibold">Our Team</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 justify-center gap-8">
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/andrew.jpg' %}" alt="Andrew" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Andrew Devito Aryo</h3>
+                <p class="text-gray-600 text-center">NPM: 2306152494</p>
+            </div>
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/luvenia.jpg' %}" alt="Luvenia" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Luvenia Feodora Saragih</h3>
+                <p class="text-gray-600 text-center">NPM: 2306228402</p>
+            </div>
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/allan.jpg' %}" alt="Allan" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Allan Kwek</h3>
+                <p class="text-gray-600 text-center">NPM: 2306152134</p>
+            </div>
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/ica.jpg' %}" alt="Ica" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Fransisca Ellya Bunaren</h3>
+                <p class="text-gray-600 text-center">NPM: 2306152286</p>
+            </div>
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/ghia.jpg' %}" alt="Ghia" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Sezza Auraghaniya Winanda</h3>
+                <p class="text-gray-600 text-center">NPM: 2306207291</p>
+            </div>
+            <div class="flex flex-col items-center transition-transform transform hover:scale-105">
+                <img src="{% static 'assets/developers/arief.jpg' %}" alt="Arief" class="w-24 h-24 rounded-full object-cover">
+                <h3 class="mt-2 text-lg md:text-xl font-medium text-center">Arief Ridzki Darmawan</h3>
+                <p class="text-gray-600 text-center">NPM: 2306210115</p>
+            </div>
+            <!-- Add more developers as needed -->
+        </div>
+    </section>
+</main>
+{% endblock content %}

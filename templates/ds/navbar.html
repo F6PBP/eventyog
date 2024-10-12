@@ -1,17 +1,64 @@
 {% load static %}
-<nav class="px-10 flex items-center py-5 justify-between border-b-[1px] border-black/10">
-    <img src={% static "assets/icon.png" %} alt="icon" class="w-16 object-contain">
-    <div
-        class="flex items-center gap-5"
-    >
-        <p class="text-sm">Hello, {{user.username}}!</p>
-        <div class="w-10 h-10 bg-black rounded-full overflow-hidden">
+<nav class="fixed top-0 left-0 right-0 z-50 px-4 sm:px-10 flex items-center py-5 justify-between border-b-[1px] border-black/10 bg-white">
+    <a href="/">
+        <img src={% static "assets/icon.png" %} alt="icon" class="w-12 sm:w-16 object-contain">
+    </a>
+    <div class="flex items-center gap-3 sm:gap-5">
+        <p class="text-xs sm:text-sm">Hello, {{user.username}}!</p>
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-full overflow-hidden">
         </div>
-        <a href="{% url 'auth:logout'%}">
-            <button class="flex items-center gap-2 bg-[#003FE2] text-white text-sm font-semibold rounded-2xl h-full hover:scale-105 duration-300 ml-auto px-5 py-2">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
+        <div class="relative">
+            <button id="dropdownButton" class="flex items-center gap-1 sm:gap-2 text-black text-xs sm:text-sm font-semibold rounded-2xl h-full hover:scale-105 duration-300 px-3 sm:px-5 py-2">
+                <i id="chevronIcon" class="fas fa-chevron-down transition-transform duration-300"></i>
             </button>
-        </a>
+            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg transition-all duration-300 opacity-0 transform scale-95">
+                <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Help</a>
+                <a href="">
+                    <form action="{% url 'auth:logout'%}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="block w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 font-semibold flex gap-2 items-center justify-center text-red-500">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </a>
+            </div>
+        </div>
+        <script>
+            document.getElementById('dropdownButton').addEventListener('click', function(event) {
+                event.stopPropagation();
+                var menu = document.getElementById('dropdownMenu');
+                var chevron = document.getElementById('chevronIcon');
+                menu.classList.toggle('hidden');
+                setTimeout(function() {
+                    menu.classList.toggle('opacity-0');
+                    menu.classList.toggle('scale-95');
+                }, 10); // Small delay to ensure the transition is applied
+                chevron.classList.toggle('fa-chevron-down');
+                chevron.classList.toggle('fa-chevron-up');
+                chevron.classList.toggle('rotate-180');
+            });
+
+            document.addEventListener('click', function(event) {
+                var menu = document.getElementById('dropdownMenu');
+                var chevron = document.getElementById('chevronIcon');
+                if (!menu.classList.contains('hidden') && !event.target.closest('#dropdownButton')) {
+                    menu.classList.add('hidden');
+                    menu.classList.add('opacity-0');
+                    menu.classList.add('scale-95');
+                    chevron.classList.add('fa-chevron-down');
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.remove('rotate-180');
+                }
+            });
+        </script>
+        <style>
+            .rotate-180 {
+                transform: rotate(180deg);
+                duration: 100ms;
+            }
+        </style>
     </div>
 </nav>
