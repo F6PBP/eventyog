@@ -67,10 +67,10 @@ def register(request):
 def onboarding(request):
     print(request.user)
     
-    try:
-        profile = UserProfile.objects.filter(user=request.user)
-    except UserProfile.DoesNotExist:
-        profile = None
+    if not request.user.is_authenticated:
+        return redirect('auth:login')    
+    
+    profile = UserProfile.objects.filter(user=request.user)
     
     if profile:
         return redirect('main:main')
