@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand
-from main.models import *
+from modules.main.models import *
 
 class Command(BaseCommand):
     help = 'Seed data from json file'
