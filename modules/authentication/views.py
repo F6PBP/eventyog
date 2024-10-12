@@ -67,7 +67,10 @@ def register(request):
 def onboarding(request):
     print(request.user)
     
-    profile = UserProfile.objects.filter(user=request.user)
+    try:
+        profile = UserProfile.objects.filter(user=request.user)
+    except UserProfile.DoesNotExist:
+        profile = None
     
     if profile:
         return redirect('main:main')
