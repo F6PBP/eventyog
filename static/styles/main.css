@@ -9,7 +9,7 @@ div > input {
     padding-left: 2.5rem;  /* px-10 */
     padding-right: 2.5rem;
     color: black;
-    font-weight: 600;  /* font-semibold */
+    font-weight: 300;  /* font-semibold */
     border-radius: 20px;  /* rounded-3xl */
     display: flex;
     justify-content: center;
