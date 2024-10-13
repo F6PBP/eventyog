@@ -1,4 +1,4 @@
-{% include "ds/input.html" with id="queryInput" oninput="updateQueryParam()" placeholder="Type to change query" %}
+{% include "ds/input.html" with id="queryInput" oninput="updateQueryParam()" placeholder=placeholder %}
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
         const urlParams = new URLSearchParams(window.location.search);
