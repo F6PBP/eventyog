@@ -4,7 +4,23 @@
     function showToast(message, type = 'error') {
         const toastContainer = document.getElementById('toast-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white p-3 px-5 rounded-lg mb-2`;
+        let bgColor;
+        
+        switch (type) {
+            case 'error':
+                bgColor = 'bg-red-500 text-white';
+                break;
+            case 'success':
+                bgColor = 'bg-green-500 text-white';
+                break;
+            case 'info':
+                bgColor = 'bg-white text-black';
+                break;
+            default:
+                bgColor = 'bg-white text-black';
+        }
+
+        toast.className = `toast ${bgColor} p-3 px-5 rounded-lg mb-2`;
         toast.textContent = message;
         toastContainer.appendChild(toast);
 
