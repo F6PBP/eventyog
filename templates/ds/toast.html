@@ -16,6 +16,9 @@
             case 'info':
                 bgColor = 'bg-white text-black';
                 break;
+            case 'loading':
+                bgColor = 'bg-[#F6E43A] text-black';
+                break;
             default:
                 bgColor = 'bg-white text-black';
         }
@@ -24,9 +27,20 @@
         toast.textContent = message;
         toastContainer.appendChild(toast);
 
-        setTimeout(() => {
-            toast.remove();
-        }, 3000); // Remove toast after 3 seconds
+        if (type !== 'loading') {
+            setTimeout(() => {
+                toast.remove();
+            }, 3000); // Remove toast after 3 seconds
+        } else {
+            toast.id = 'loading-toast';
+        }
+    }
+
+    function hideToast() {
+        const loadingToast = document.getElementById('loading-toast');
+        if (loadingToast) {
+            loadingToast.remove();
+        }
     }
 </script>
 

@@ -11,10 +11,10 @@ def main(request):
         'user_profile': request.user_profile,
         'image_url': request.image_url,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
     }
     
-    return render(request, 'base.html', context)
+    return render(request, 'landing.html', context)
 
 @check_user_profile
 def about(request):
@@ -23,6 +23,6 @@ def about(request):
         'user_profile': request.user_profile,
         'image_url': request.image_url,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
     }
     return render(request, 'about-us.html', context)

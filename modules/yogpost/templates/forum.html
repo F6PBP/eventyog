@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <main class="w-full mb-20 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center gap-4 text-left">
+            <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#003FE2]">Yog Post!</h1>
+            <p class="text-left text-sm sm:text-base">Post The Joyfulness of Your Events!</p>
+        </div>
+        {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="w-fit h-fit fixed right-10 bottom-10 z-50" id="openModalButton" specify="open-modal-1" %}
+        {% include "components/add_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]"%}
+
+        <section class="mt-6 flex flex-col gap-10">
+            {% include "components/post.html" with post_id="19900209" %}
+            {% include "components/post.html" with post_id="19900201" %}
+        </section>
+    </main>
+
+{% endblock content %}

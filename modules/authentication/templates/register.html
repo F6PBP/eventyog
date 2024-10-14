@@ -62,6 +62,9 @@
 </main>
 
 <script>
+  function show() {
+    showToast('Loading ...', 'loading');
+  }
   function togglePasswordVisibility(fieldId) {
     const passwordField = document.getElementById(fieldId);
     const toggleIcon = document.getElementById('togglePasswordIcon-' + fieldId);

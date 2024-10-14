@@ -42,6 +42,24 @@ class Rating(models.Model):
     review = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+class PostImage(models.Model):
+    image = CloudinaryField('image')
+    
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    images = models.ManyToManyField(PostImage, blank=True)
+    related_event = models.ForeignKey('Event', on_delete=models.CASCADE, null=True)
+    last_update = models.DateTimeField(auto_now=True)
+    like = models.IntegerField(default=0)
+    description = models.TextField(null=True, blank=True)
+    comments = models.ManyToManyField('PostComment', blank=True)
+    
+class PostComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_update = models.DateTimeField(auto_now=True)
+    like = models.IntegerField(default=0)
+    reply_to = models.ForeignKey('PostComment', on_delete=models.CASCADE, null=True)
 
 class Event(models.Model):
     uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -74,14 +92,3 @@ class Merchandise(models.Model):
     stock = models.IntegerField(default=10)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-class Post (models.Model):
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey('Event', on_delete=models.CASCADE)
-    
-    reply = models.ManyToManyField('Post', blank=True)

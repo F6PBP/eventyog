@@ -1,0 +1,74 @@
+<div class="swiper mySwiper {{ class }}" id="{{carousel_id}}">
+    <div class="swiper-wrapper h-full ">
+        {% for image in images %}
+        <div class="swiper-slide overflow-hidden">
+            <img src="{{ image.url }}" alt="Post Image" class="min-h-[300px] w-full object-cover {{ image_class }}"
+                style="object-fit: cover; height: {{ image_height }};" />
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Custom Swiper Navigation Buttons -->
+    <div class="swiper-button-next custom-next"></div>
+    <div class="swiper-button-prev custom-prev"></div>
+    
+    <!-- Swiper Pagination Dots -->
+    <div class="swiper-pagination"></div>
+</div>
+
+<style>
+    .custom-next, .custom-prev {
+        border-radius: 50%;
+        width: 20px; /* Adjusted size */
+        height: 20px; /* Adjusted size */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transform: scale(0.5);
+    }
+
+    .custom-next:hover, .custom-prev:hover {
+        transform: scale(0.6);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .swiper-pagination-bullet {
+        background: black;
+        opacity: 1;
+    }
+
+    .swiper-pagination-bullet-active {
+        background: white;
+    }
+
+    @media (max-width: 640px) {
+        .swiper-slide img {
+            height: 200px;
+        }
+
+        .custom-next, .custom-prev {
+            transform: scale(0.3);
+            width: 15px; /* Adjusted size for smaller screens */
+            height: 15px; /* Adjusted size for smaller screens */
+        }
+    }
+</style>
+
+<!-- Ensure Swiper JS is included -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+    new Swiper('.mySwiper', {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+</script>

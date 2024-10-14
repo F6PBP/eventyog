@@ -1,0 +1,62 @@
+<div class="border-[1px] border-black/10 w-full max-w-lg rounded-xl overflow-hidden mx-auto shadow-sm post">
+    <div class="flex gap-4 items-center p-5 py-3">
+        <div class="overflow-hidden border-[1px] rounded-full">
+            <img src="{{ image_url }}" alt="Profile Picture" class="w-8 h-8 sm:w-10 sm:h-10">
+        </div>
+        <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-sm">{{ user_profile.name }}</h3>
+            -
+            <h3 class="text-xs text-gray-500">3h ago</h3>
+        </div>
+    </div>
+
+    {% include "ds/carousel.html" with class="w-full" carousel_id=post_id %}
+
+    <div class="flex flex-col px-5 py-2 pb-5 gap-2">
+        <div class="flex gap-2 justify-start">
+            <button class="flex items-center gap-2 p-2 text-black rounded-md hover:bg-gray-200 transition duration-300 hover:text-[#00E94F]">
+                <i class="fa fa-thumbs-up"></i>
+            </button>
+            <button class="flex items-center gap-2 p-2 text-black rounded-md hover:bg-gray-200 transition duration-300">
+                <i class="fa fa-comment"></i>
+            </button>
+            <button class="flex items-center gap-2 p-2 text-black rounded-md hover:bg-gray-200 transition duration-300">
+                <i class="fa fa-share"></i>
+            </button>
+        </div>
+        <span class="text-sm text-left">20 Likes</span>
+        <p class="text-xs text-gray-500 leading-5" id="description">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        </p>
+        <button id="show-more" class="text-blue-500 text-xs">Show more</button>
+    </div>
+</div>  
+<script>
+    document.getElementById('show-more').addEventListener('click', function() {
+        var description = document.getElementById('description');
+        if (description.classList.contains('expanded')) {
+            description.classList.remove('expanded');
+            this.textContent = 'Show more';
+        } else {
+            description.classList.add('expanded');
+            this.textContent = 'Show less';
+        }
+    });
+</script>
+
+<style>
+    #description {
+        max-height: 3em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: max-height 0.5s ease-in-out;
+    }
+    #description.expanded {
+        max-height: 1000px; /* Large enough to show all content */
+    }
+    .post > button {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+</style>

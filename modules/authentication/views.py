@@ -96,8 +96,6 @@ def onboarding(request):
         'form': form
     }
     
-    print(context)
-    
     return render(request, 'onboarding.html', context)
 
 @login_required(login_url='auth:login')

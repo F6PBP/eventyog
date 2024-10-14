@@ -12,6 +12,8 @@
         
         <link rel="stylesheet" href="{% static "styles/main.css" %}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
         
         <script src="https://cdn.tailwindcss.com"></script>        
         {% block meta %}{% endblock meta %}
@@ -26,16 +28,8 @@
                 {% include "ds/navbar.html" %}
             {% endif %}
             {% include "ds/toast.html" %}
-            <div class="h-full min-h-screen w-full">
-                {% comment %} File Input {% endcomment %}
-                {% comment %} {% include "ds/fileinput.html" with name="test" input_id="hello" %} {% endcomment %}
 
-                {% comment %} Button {% endcomment %}
-                {% comment %} {% include "ds/button.html" with button_type="primary" text="Open Modal" id="openModalButton" specify="open-modal-1" class="w-fit" %} {% endcomment %}
-
-                {% comment %} Modal {% endcomment %}
-                {% comment %} {% include "testmodal.html" with modal_id="open-modal-1" modal_title="Test Modal" modal_label="modal-label" onsubmit='alert("HELLO WORLD")' %} {% endcomment %}
-
+            <div class="h-full min-h-screen w-full py-32 px-10 flex flex-col gap-10">                
                 {% block content %}{% endblock content%} 
             </div>
 

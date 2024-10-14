@@ -30,7 +30,7 @@
           </button>
         </div>
       </div>
-      {% include "ds/button.html" with text="Login" icon="fas fa-sign-in-alt"  props="{'value': 'Login', 'type': 'submit'}" %}
+      {% include "ds/button.html" with text="Login" icon="fas fa-sign-in-alt"  props="{'value': 'Login', 'type': 'submit'}" onclick="show()" %}
     </form>
   
     {% if messages %}
@@ -66,5 +66,12 @@
       eyeIcon.classList.add("fa-eye");
     }
   }
+
+  function show() {
+    if (document.querySelector('form').checkValidity()) {
+      showToast('Loading...', 'loading');
+    }
+  }
+
 </script>
 {% endblock content %}
