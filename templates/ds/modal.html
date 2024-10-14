@@ -73,6 +73,16 @@
         }
         closeModal(modalId);
     }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            document.querySelectorAll('[id^="{{ modal_id }}"]').forEach(modal => {
+                if (!modal.classList.contains('hidden')) {
+                    closeModal(modal.id);
+                }
+            });
+        }
+    });
 </script>
 
 <style>
