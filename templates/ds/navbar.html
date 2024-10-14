@@ -34,7 +34,7 @@
                 <i id="chevronIcon" class="fas fa-chevron-down transition-transform duration-300"></i>
             </button>
             <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg transition-all duration-300 opacity-0 transform scale-95">
-                <a href="#"     class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Home</a>
+                <a href="{% url 'main:main' %}"     class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Home</a>
                 <a href="about" class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">About</a>
                 <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                 <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 flex md:hidden">Cart</a>
