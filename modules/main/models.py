@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
 import uuid
 
+class UserRoles(models.TextChoices):
+    ADMIN='AD', 'Admin',
+    USER='US', 'User',
+    
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
@@ -13,6 +17,14 @@ class UserProfile(models.Model):
     
     registeredEvent = models.ManyToManyField('Event', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
+    
+    friends = models.ManyToManyField('UserProfile', blank=True)
+    
+    role = models.CharField(
+        choices=UserRoles.choices,
+        default=UserRoles.USER,
+        max_length=2
+    )
     
     def __str__(self):
         return self.user.username

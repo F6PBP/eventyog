@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('modules.main.urls')),
     path('auth/', include('modules.authentication.urls')),
-    path("yogpost/", include('modules.yogpost.urls'))
+    path("yogpost/", include('modules.yogpost.urls')),
+    path("admin-dashboard/", include('modules.admin_dashboard.urls')),
 ]

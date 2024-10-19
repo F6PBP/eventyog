@@ -1,10 +1,10 @@
-{% include "ds/input.html" with id=id oninput="updateQueryParam()" placeholder=placeholder %}
+{% include "ds/input.html" with id=id oninput="updateQueryParam()" placeholder=placeholder class=class %}
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
         const urlParams = new URLSearchParams(window.location.search);
-        const query = urlParams.get('query');
+        const query = urlParams.get('{{ query }}');
         if (query) {
-            document.getElementById('queryInput').value = query;
+            document.getElementById('{{ id }}').value = query;
         }
     });
 

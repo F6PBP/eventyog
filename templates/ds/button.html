@@ -16,5 +16,7 @@
     {% if icon %}
         <i class="{{ icon }}"></i>
     {% endif %}
-    <span>{{ text }}</span>
+    {% if text %}
+        <span>{{ text }}</span>
+    {% endif %}
 </button>

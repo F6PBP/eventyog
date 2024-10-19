@@ -12,6 +12,7 @@ def main(request):
         'image_url': request.image_url,
         'show_navbar': True,
         'show_footer': True,
+        'is_admin': request.user_profile.role == 'AD',
     }
     
     return render(request, 'landing.html', context)
@@ -24,5 +25,6 @@ def about(request):
         'image_url': request.image_url,
         'show_navbar': True,
         'show_footer': True,
+        'is_admin': request.user_profile.role == 'AD',
     }
     return render(request, 'about-us.html', context)

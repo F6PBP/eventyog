@@ -15,6 +15,7 @@ def check_user_profile(view_func):
             image_url = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
             request.image_url = image_url
             request.user_profile = user_profile
+            request.role = user_profile.role
         except UserProfile.DoesNotExist:
             return redirect('auth:onboarding')
 

@@ -32,7 +32,7 @@ PRODUCTION = os.getenv('PRODUCTION', False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
-# DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'modules.main',
     'modules.authentication',
+    'modules.yogpost',
+    'modules.admin_dashboard',
     'whitenoise.runserver_nostatic',
     'cloudinary',
 ]
@@ -93,24 +95,24 @@ load_dotenv()  # Load environment variables from a .env file
 
 DATABASES = {}
 
-if (os.getenv('PROD') != 'True'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# if (os.getenv('PROD') != 'True'):
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'eventyog'),
-            'USER': os.getenv('DB_USER', 'pemilos24_owner'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
-            'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
-            'PORT': os.getenv('DB_PORT', 5432),
-        }
-    } 
+}
+# else:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME', 'eventyog'),
+#         'USER': os.getenv('DB_USER', 'pemilos24_owner'),
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
+#         'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
+#         'PORT': os.getenv('DB_PORT', 5432),
+#     }
+# } 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
