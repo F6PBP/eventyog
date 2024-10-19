@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from eventyog.decorators import check_user_profile
 from django.contrib.auth.models import User
@@ -36,9 +36,9 @@ def search_users(request):
     return HttpResponse(data, content_type='application/json')
 
 def see_user(request, user_id):
-    user = User.objects.get(id=user_id)
+    user = get_object_or_404(User, pk=user_id)
     
-    user_profile = UserProfile.objects.filter(user=user)
+    user_profile = UserProfile.objects.get(user=user)
     
     context = {
         'user_profile': user_profile,

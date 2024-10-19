@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="my-32 px-4 md:my-32">
+    <main class="px-4 md:px-48 my-32">
         <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-2" onsubmit="updateHiddenInput()">
             {% csrf_token %}
             <div class="flex w-32 h-32 rounded-full shadow-sm border-[1px] shadow-sm mx-auto md:mx-0 relative">
