@@ -101,7 +101,7 @@ def onboarding(request):
     return render(request, 'onboarding.html', context)
 
 @login_required(login_url='auth:login')
-@check_user_profile(is_redirect=False)
+@check_user_profile(is_redirect=True)
 def profile(request):
     try:
         categories = request.user_profile.categories.split(',')
@@ -121,7 +121,7 @@ def profile(request):
         return redirect('auth:onboarding')
 
 @login_required(login_url='auth:login')
-@check_user_profile
+@check_user_profile(is_redirect=True)
 def edit_profile(request):
     form = UserProfileForm(instance=request.user_profile)
     

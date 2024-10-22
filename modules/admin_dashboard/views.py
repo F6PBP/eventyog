@@ -9,7 +9,7 @@ from django.core import serializers
 
 # Create your views here.
 @login_required(login_url='auth:login')
-@check_user_profile
+@check_user_profile(is_redirect=True)
 def show_main(request):
     user_profiles = UserProfile.objects.all()
     
