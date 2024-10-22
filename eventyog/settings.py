@@ -28,7 +28,7 @@ import cloudinary.api
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zob1=r7z=fjniwac*ljo#^o*uiv201#xke*1#4+=m7xxdjx$pv'
 
-PRODUCTION = os.getenv('PRODUCTION', False)
+PRODUCTION = os.getenv('PROD', False) == "True"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
@@ -96,25 +96,27 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 
 load_dotenv()  # Load environment variables from a .env file
 
-
 DATABASES = {}
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'eventyog'),
-        'USER': os.getenv('DB_USER', 'pemilos24_owner'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
-        'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
-        'PORT': os.getenv('DB_PORT', 5432),
+if not PRODUCTION:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-} 
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'eventyog'),
+            'USER': os.getenv('DB_USER', 'pemilos24_owner'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
+            'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
+            'PORT': os.getenv('DB_PORT', 5432),
+        }
+    }
+    
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
