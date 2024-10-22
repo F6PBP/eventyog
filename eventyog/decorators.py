@@ -6,6 +6,11 @@ def check_user_profile(is_redirect = True):
     def check_redirect(view_func):
         def wrapper(request, *args, **kwargs):
             user = request.user
+            
+            request.image_url = None
+            request.user_profile = None
+            request.role = None
+            request.is_admin = False
 
             if not user.is_authenticated and is_redirect:
                 return redirect('auth:login')
