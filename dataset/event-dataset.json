@@ -832,7 +832,7 @@
 		"endDate": null,
 		"ticket": [
 			{
-				"type": "General",
+				"type": null,
 				"price": 150000
 			}
 		],
