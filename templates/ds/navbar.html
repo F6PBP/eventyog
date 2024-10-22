@@ -22,7 +22,8 @@
             </li>
         {% endif %}
     </ul>
-    <div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
+    {% if user_profile %}
+        <div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
         <a href="#" class="hidden md:flex">
             <i class="fas fa-shopping-cart text-black text-xs sm:text-sm cursor-pointer hover:text-[#003FE2] transition-colors duration-300 hover:scale-110 transform origin-center"></i>        
         </a>
@@ -91,4 +92,13 @@
             }
         </style>
     </div>
+    {% else %}
+        <div class="md:w-[400px] flex justify-end">
+            <a href="{% url 'auth:login' %}">
+                {% include "ds/button.html" with text="Login" class="max-w-[150px]"%}
+            </a>
+        </div>
+    {% endif %}
+
+
 </nav>

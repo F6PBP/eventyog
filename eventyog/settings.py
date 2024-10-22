@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'modules.merchandise',
     'modules.yogevent',
     'modules.admin_dashboard',
+    'modules.yogforum',
     'whitenoise.runserver_nostatic',
     'cloudinary',
 ]
