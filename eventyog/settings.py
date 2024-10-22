@@ -34,7 +34,7 @@ PRODUCTION = os.getenv('PRODUCTION', False)
 DEBUG = not PRODUCTION
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app']
 
 # Application definition
 
@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'modules.main',
     'modules.authentication',
     'modules.yogpost',
+    'modules.cart',
+    'modules.merchandise',
+    'modules.yogevent',
     'modules.admin_dashboard',
     'whitenoise.runserver_nostatic',
     'cloudinary',
@@ -95,14 +98,12 @@ load_dotenv()  # Load environment variables from a .env file
 
 DATABASES = {}
 
-# if (os.getenv('PROD') != 'True'):
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-# else:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
