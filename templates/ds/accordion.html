@@ -1,17 +1,17 @@
 <div class="space-y-4 {{class}}">
     <div class="border border-gray-200 rounded-2xl">
-        <h2 class="bg-[#0047FE] rounded-2xl text-white font-semibold p-4 cursor-pointer duration-300 hover:text-[17px]" onclick="toggleItem()">
+        <h2 class="bg-[#0047FE] rounded-2xl text-white font-semibold p-4 cursor-pointer duration-300 hover:text-[17px]" onclick="toggleItem({{id}})">
             {{title}}
         </h2>
-        <div id="content-1" class="p-4 hidden text-sm text-gray-500">
+        <div id="content-{{id}}" class="p-4 hidden text-sm text-gray-500">
             {{content}}
         </div>
     </div>
 </div>
 
 <script>
-    function toggleItem() {
-        const content = document.getElementById('content-1');
+    function toggleItem(id) {
+        const content = document.getElementById(`content-${id}`);
         const isVisible = content.classList.contains('hidden');
         if (isVisible) {
             content.classList.remove('hidden');
