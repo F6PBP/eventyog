@@ -34,7 +34,7 @@ PRODUCTION = os.getenv('PROD', False) == "True"
 DEBUG = not PRODUCTION
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1:8000']
+ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1']
 
 # Application definition
 

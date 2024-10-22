@@ -29,6 +29,13 @@
         <p class="w-full md:w-[700px] text-center leading-7">
             <b>EventYog</b> is your go-to platform for discovering and joining exciting events in Yogyakarta! From concerts to cultural festivals, find all the details in one place. Plus, shop exclusive event merchandise and create lasting memories with ease!
         </p>
+
+        {% comment %} Button {% endcomment %}
+        {% include "ds/button.html" with button_type="primary" text="Open Modal" id="openModalButton" specify="open-modal-1" class="w-fit h-fit" %}
+
+        {% comment %} Modal {% endcomment %}
+        {% include "testmodal.html" with modal_id="open-modal-1" modal_title="Test Modal" modal_label="modal-label" onsubmit='sayHello' %}
+
         {% include "ds/button.html" with text="Learn More" class="w-fit h-fit" icon="fa fa-arrow-down" id="learnMoreButton" %}
     </section>
     <section id="whatWeOffer" class="w-full flex flex-col justify-center items-center gap-2 px-4 md:px-10 fade-in mb-20">
@@ -64,5 +71,9 @@
                 behavior: 'smooth'
             });
         });
+
+        function sayHello() {
+            alert('HELLO WORLD');
+        }
     </script>
 {% endblock content %}
