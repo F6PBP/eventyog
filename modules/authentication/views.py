@@ -68,10 +68,11 @@ def register(request):
     return render(request, 'register.html', context)
 
 def onboarding(request):
-    print(request.user)
-    
-    if not request.user.is_authenticated:
-        return redirect('auth:login')    
+    # Check if user has profile
+    user_profile = UserProfile.objects.filter(user=request.user)
+    if (len(user_profile) > 0):
+        print('User has profile')
+        return redirect('main:main')
     
     profile = UserProfile.objects.filter(user=request.user)
     
@@ -88,6 +89,7 @@ def onboarding(request):
             profile.save()
             return redirect('main:main')
         else:
+            messages.error(request, 'Please pick a profile picture')
             print(form.errors)
     else:
         form = UserProfileForm()
@@ -99,21 +101,24 @@ def onboarding(request):
     return render(request, 'onboarding.html', context)
 
 @login_required(login_url='auth:login')
-@check_user_profile
+@check_user_profile(is_redirect=False)
 def profile(request):
-    print(request.user_profile.categories)
-    categories = request.user_profile.categories.split(',')
-    print(categories)
-    context = {
-        'user': request.user,
-        'user_profile': request.user_profile,
-        'image_url': request.image_url,
-        'show_navbar': True,
-        'show_footer': True,
-        'categories': categories
-    }
-    
-    return render(request, 'profile.html', context)
+    try:
+        categories = request.user_profile.categories.split(',')
+        context = {
+            'user': request.user,
+            'user_profile': request.user_profile,
+            'image_url': request.image_url,
+            'show_navbar': True,
+            'show_footer': True,
+            'categories': categories
+        }
+        
+        return render(request, 'profile.html', context)
+
+    except Exception as e:
+        print(e)
+        return redirect('auth:onboarding')
 
 @login_required(login_url='auth:login')
 @check_user_profile

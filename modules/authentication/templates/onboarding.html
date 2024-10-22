@@ -42,6 +42,13 @@
                         </div>
                     </div>
                     <div id="selected-categories" class="mt-2 flex flex-wrap gap-2"></div>
+                    {% if messages %}
+                        <ul>
+                        {% for message in messages %}
+                            <li class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} font-semibold text-sm">*{{ message }}!</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %} 
                 </div>
 
                 <script>
