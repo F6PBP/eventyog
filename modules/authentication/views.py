@@ -69,20 +69,19 @@ def register(request):
 
 def onboarding(request):
     # Check if user has profile
-    user_profile = UserProfile.objects.filter(user=request.user)
-    if (len(user_profile) > 0):
-        print('User has profile')
-        return redirect('main:main')
-    
     profile = UserProfile.objects.filter(user=request.user)
-    
-    if profile:
+    if (len(profile) > 0):
+        print('User has profile')
+        print(profile)
         return redirect('main:main')
-    
+    elif (len(profile) == 0):
+        print('User does not have profile')
+        
+    print("HELLOOOO")
+        
     if request.method == 'POST':
         # Process the form data here
         form = UserProfileForm(request.POST, request.FILES)
-        print(form.data)
         if form.is_valid():
             profile = form.save(commit=False)
             profile.user = request.user  # Associate profile with logged-in user
@@ -104,7 +103,11 @@ def onboarding(request):
 @check_user_profile(is_redirect=True)
 def profile(request):
     try:
-        categories = request.user_profile.categories.split(',')
+        if (request.user_profile.categories == None):
+            categories = []
+        else:
+            categories = request.user_profile.categories.split(',')
+            
         context = {
             'user': request.user,
             'user_profile': request.user_profile,
@@ -118,6 +121,7 @@ def profile(request):
 
     except Exception as e:
         print(e)
+        print('User profile not found.')
         return redirect('auth:onboarding')
 
 @login_required(login_url='auth:login')
@@ -126,13 +130,14 @@ def edit_profile(request):
     form = UserProfileForm(instance=request.user_profile)
     
     if request.method == 'POST':
-        print(form.errors)
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
-            print("HELLO 1")
-            print(form.data)
+            profile = form.save(commit=False)
+            profile.user = request.user  # Associate profile with logged-in user
+            profile.save()
+
             print(request.FILES)
-            form.save(commit=True)
+                        
             return redirect('auth:profile')
         else:
             print("HELLO 2")

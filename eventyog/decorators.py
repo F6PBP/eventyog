@@ -30,6 +30,7 @@ def check_user_profile(is_redirect = True):
             except UserProfile.DoesNotExist:
                 return redirect('auth:onboarding')
             except Exception as e:
+                print('Error in check_user_profile')
                 print(e)
                 
             return view_func(request, *args, **kwargs)

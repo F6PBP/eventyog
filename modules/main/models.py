@@ -13,7 +13,7 @@ class UserProfile(models.Model):
     email = models.EmailField()
     bio = models.TextField()
     profile_picture = CloudinaryField('image', null=True, default=None, blank=True)
-    categories = models.CharField(max_length=200)
+    categories = models.CharField(max_length=200, null=True, blank=True)
     
     registeredEvent = models.ManyToManyField('Event', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
