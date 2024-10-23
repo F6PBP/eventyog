@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+    <main class="mt-32 px-10 flex flex-col gap-4">
+        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+        {% include "ds/input.html" with id="queryInput" placeholder="Search User" %}
+        
+        <section id="userList" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-10">
+        </section>
+    </main>
+
+    <script>
+        async function fetchUser(query) {
+                fetch(`search-users?search=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';  // Clear the existing user list
+                    console.log(data);
+                    data.forEach(user => {
+                        // Create a new user card
+                        const userLink = document.createElement('a');
+                        const url = window.location.href;
+                        userLink.href = `${url}user/${user.pk}`;
+                        userLink.classList.add('user-item', 'flex', 'flex-col', 'items-center', 'max-w-[200px]', 'bg-gray-100', 'p-10', 'gap-2', 'rounded-xl', 'hover:scale-105', 'duration-300', 'cursor-pointer');
+                        
+                        const img = document.createElement('img');
+                        img.src = `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}`;
+                        img.alt = user.name;
+                        img.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover');
+                        
+                        const name = document.createElement('p');
+                        name.textContent = user.fields.name;
+                        name.classList.add('text-center', 'text-sm', 'font-semibold', 'text-gray-800', 'mt-2');
+                        
+                        const username = document.createElement('p');
+                        username.textContent = user.fields.email;
+                        username.classList.add('w-full', 'text-center', 'text-sm', 'font-medium', 'text-gray-500', 'break-words');
+                        
+                        const buttonDiv = document.createElement('div');
+                        buttonDiv.classList.add('flex', 'gap-2');
+                        // Add button HTML here
+                        
+                        userLink.appendChild(img);
+                        userLink.appendChild(name);
+                        userLink.appendChild(username);
+                        userLink.appendChild(buttonDiv);
+                        
+                        userList.appendChild(userLink);
+                    });
+                })
+                .catch(error => console.error('Error fetching users:', error));
+        }
+        document.getElementById('queryInput').oninput = function() {
+            const query = this.value;
+            fetchUser(query);   
+        };
+
+        fetchUser('');
+    </script>
+{% endblock content %}

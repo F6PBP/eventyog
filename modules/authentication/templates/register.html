@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Register</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="flex items-center justify-center w-screen h-screen px-5 border-[2px] border-black/5">
+  <div
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center"
+  >    
+    <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
+    <h1
+      class="font-semibold text-xl text-center"
+    >Register to EventYog!</h1>
+    <form method="POST" action="" class="flex flex-col gap-5 bg-white">
+      {% csrf_token %}
+      <input type="hidden" name="remember" value="true">
+      <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-5">
+        {% for field in form %}
+          <div class="{% if not forloop.first %}mt-4{% endif %}">
+            <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-black text-sm">
+            {{ field.label }}
+            </label>
+            <div class="relative">
+              {{ field }}
+              {% if field.field.widget.input_type == "password" %}
+                <button type="button" onclick="togglePasswordVisibility('{{ field.id_for_label }}')" class="absolute inset-y-0 right-0 pr-5 flex items-center text-sm leading-5">
+                  <i class="fas fa-eye" id="togglePasswordIcon-{{ field.id_for_label }}"></i>
+                </button>
+              {% endif %}
+            </div>
+            {% if field.errors %}
+              {% for error in field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% include "ds/button.html" with text="Register" icon="fas fa-sign-in-alt"  props="{'value': 'Register', 'type': 'submit'}" %}
+    </form>
+  
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} 
+    
+    <p
+      class="text-center text-[#737373] text-xs"
+    >
+      Already have an account?
+      <a
+        class="text-[#003FE2] font-semibold"
+        href="{% url 'auth:login' %}">Login Now</a>
+    </p>
+  </div>
+</main>
+
+<script>
+  function show() {
+    showToast('Loading ...', 'loading');
+  }
+  function togglePasswordVisibility(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const toggleIcon = document.getElementById('togglePasswordIcon-' + fieldId);
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleIcon.classList.remove('fa-eye');
+      toggleIcon.classList.add('fa-eye-slash');
+    } else {
+      passwordField.type = "password";
+      toggleIcon.classList.remove('fa-eye-slash');
+      toggleIcon.classList.add('fa-eye');
+    }
+  }
+</script>
+{% endblock content %}

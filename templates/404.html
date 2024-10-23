@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content%}
+    <main class="p-20 flex items-center justify-center h-screen w-full flex flex-col gap-4">
+        <h1 class="text-5xl font-bold">
+            404
+        </h1>
+        <p>
+            Sorry, the page you are looking for could not be found.
+        </p>
+        <a href="{% url 'main:main' %}">
+            <button
+                class="bg-[#003FE2] text-white py-3 px-10 text-sm font-semibold rounded-3xl hover:scale-105 duration-300"
+            >
+                Go back to home
+            </button>
+        </a>
+    </main>
+{% endblock content%}

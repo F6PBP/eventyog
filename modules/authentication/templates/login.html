@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Login</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="flex items-center justify-center w-screen h-screen px-5 ">
+  <div
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5"
+  >    
+    <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
+    <h1
+      class="font-semibold text-xl text-center"
+    >Welcome to EventYog!</h1>
+    <form method="POST" action="" class="flex flex-col gap-5 bg-white">
+      {% csrf_token %}
+      <input type="hidden" name="remember" value="true">
+      <div class="rounded-md shadow-sm -space-y-px flex flex-col gap-2">
+        <div>
+          <label for="username" class="sr-only">Username</label>
+          {% include "ds/input.html" with id="username" name="username" type="text" props="{'required': True}" placeholder="Username" %}
+        </div>
+        <div class="relative">
+          <label for="password" class="sr-only">Password</label>
+          {% include "ds/input.html" with id="password" name="password" type="password" props="{'required': True}" placeholder="Password" %}
+          <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-5 flex items-center text-sm leading-5">
+            <i id="eye-icon" class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      {% include "ds/button.html" with text="Login" icon="fas fa-sign-in-alt"  props="{'value': 'Login', 'type': 'submit'}" onclick="show()" %}
+    </form>
+  
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} font-semibold text-sm">*{{ message }}!</li>
+      {% endfor %}
+    </ul>
+    {% endif %} 
+    
+    <p
+      class="text-center text-[#737373] text-xs"
+    >
+      Don't have an account yet?
+      <a
+        class="text-[#003FE2] font-semibold"
+        href="{% url 'auth:register' %}">Register Now</a>
+    </p>
+  </div>
+</main>
+
+<script>
+  function togglePassword() {
+    var passwordField = document.getElementById("password");
+    var eyeIcon = document.getElementById("eye-icon");
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      eyeIcon.classList.remove("fa-eye");
+      eyeIcon.classList.add("fa-eye-slash");
+    } else {
+      passwordField.type = "password";
+      eyeIcon.classList.remove("fa-eye-slash");
+      eyeIcon.classList.add("fa-eye");
+    }
+  }
+
+  function show() {
+    if (document.querySelector('form').checkValidity()) {
+      showToast('Loading...', 'loading');
+    }
+  }
+
+</script>
+{% endblock content %}

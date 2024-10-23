@@ -1,0 +1,66 @@
+* {
+    font-family: "Poppins", sans-serif;
+}
+
+div > input {
+    background-color: #F2F2F2;
+    padding-top: 0.75rem;  /* py-3 */
+    padding-bottom: 0.75rem;
+    padding-left: 2.5rem;  /* px-10 */
+    padding-right: 2.5rem;
+    color: black;
+    font-weight: 500;  /* font-semibold */
+    border-radius: 20px;  /* rounded-3xl */
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-style form input, form textarea, form select {
+    background-color: #F2F2F2;
+    padding-top: 0.75rem;  /* py-3 */
+    padding-bottom: 0.75rem;
+    padding-left: 2.5rem;  /* px-10 */
+    padding-right: 2.5rem;
+    color: black;
+    font-weight: 600;  /* font-semibold */
+    border-radius: 1.5rem;  /* rounded-3xl */
+    display: flex;
+    justify-content: center;
+}
+.form-style form input:focus, form textarea:focus, form select:focus {
+    outline: none;
+    border-color: #674ea7;
+    box-shadow: 0 0 0 3px #674ea7;
+}
+@keyframes shine {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.animate-shine {
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3));
+    background-size: 200% 100%;
+    animation: shine 3s infinite;
+}
+
+
+
+/* Custom scrollbar design */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #0047FE;
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}

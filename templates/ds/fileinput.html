@@ -1,0 +1,30 @@
+<div class="file-input-container font-normal">
+    <label for="{{ input_id }}" class="file-input-label font-normal mb-1">{{ label }}</label>
+    {% csrf_token %}
+    <div class="relative inline-block">
+        <input type="file" id="{{ input_id }}" name="{{ input_name }}" class="hidden" data-max-size="{{ max_size }}" onchange="updateFileName(this)">
+        <button type="button" onclick="document.getElementById('{{ input_id }}').click()" class="p-2 px-5 bg-blue-500 text-white rounded-lg transition duration-300 hover:bg-blue-600 focus:bg-blue-700">
+            <i class="fas fa-upload mr-2"></i> <span class="text-sm">Upload File</span>
+        </button>
+        <span id="file-name" class="ml-2 text-gray-600"></span>
+    </div>
+</div>
+<script>
+    function updateFileName(input) {
+        const file = input.files.length > 0 ? input.files[0] : null;
+        const fileName = file ? file.name : '';
+        const fileSize = file ? file.size : 0;
+        const maxSize = input.getAttribute('data-max-size') ? parseInt(input.getAttribute('data-max-size')) : 2 * 1024 * 1024; // Default to 2MB if not provided
+
+        if (file === null) {
+            document.getElementById('file-name').textContent = '';
+        } else if (fileSize > maxSize) {
+            showToast('File size exceeds the allowed limit. Please upload a smaller file.');
+            input.value = ''; // Clear the input
+            document.getElementById('file-name').textContent = '';
+        } else {
+            showToast(`File ${fileName} uploaded successfully.`, 'success');
+            document.getElementById('file-name').textContent = fileName;
+        }
+    }
+</script>

@@ -1,0 +1,23 @@
+{
+	"builds": [
+		{
+			"src": "eventyog/wsgi.py",
+			"use": "@vercel/python",
+			"config": { "maxLambdaSize": "15mb", "runtime": "python3.11.3" }
+		},
+		{
+			"src": "build_files.sh",
+			"use": "@vercel/static-build",
+			"config": {
+				"distDir": "staticfiles"
+			}
+		}
+	],
+	"routes": [
+		{
+			"src": "/(.*)",
+			"dest": "eventyog/wsgi.py"
+		}
+	],
+	"outputDirectory": "staticfiles"
+}

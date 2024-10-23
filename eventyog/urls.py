@@ -19,5 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls'))
+    path('', include('modules.main.urls')),
+    path('auth/', include('modules.authentication.urls')),
+    path("yogpost/", include('modules.yogpost.urls')),
+    path("admin-dashboard/", include('modules.admin_dashboard.urls')),
+    path("cart/", include('modules.cart.urls')),
+    path("merchandise/", include('modules.merchandise.urls')),
+    path("yogevent/", include('modules.yogevent.urls')),
+    path("yogforum/", include('modules.yogforum.urls')),
 ]

@@ -4,3 +4,6 @@ whitenoise
 psycopg2-binary
 requests
 urllib3
+python-dotenv
+pillow
+cloudinary

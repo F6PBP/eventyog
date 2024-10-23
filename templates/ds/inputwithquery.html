@@ -1,0 +1,23 @@
+{% include "ds/input.html" with id=id oninput="updateQueryParam()" placeholder=placeholder class=class %}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('{{ query }}');
+        if (query) {
+            document.getElementById('{{ id }}').value = query;
+        }
+    });
+
+    function updateQueryParam() {
+        const query = '{{ query }}';
+        const id = '{{ id }}';
+        const input = document.getElementById(`${id}`).value;
+        const url = new URL(window.location);
+        if (input) {
+            url.searchParams.set(query, input);
+        } else {
+            url.searchParams.delete(query);
+        }
+        window.history.pushState({}, '', url);
+    }
+</script>
