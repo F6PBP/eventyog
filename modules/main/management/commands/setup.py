@@ -12,7 +12,7 @@ class Command(BaseCommand):
     path = 'dataset/'
     
     def seed_event(self):
-        with open(f'{self.path}event-dataset.json', 'r') as file:
+        with open(f'{self.path}event-dataset.json', 'r', errors='ignore') as file:
             data = json.load(file)
             for row in data:
                 try:
@@ -54,7 +54,7 @@ class Command(BaseCommand):
         print('Seeding event done')
         
     def seed_merch(self):
-        with open(f'{self.path}product-dataset.json', 'r') as file:
+        with open(f'{self.path}product-dataset.json', 'r', errors='ignore') as file:
             data = json.load(file)
             for row in data:
                 try:
@@ -83,7 +83,7 @@ class Command(BaseCommand):
         
         try:
             data = []
-            with open(f'{self.path}user.json', 'r') as file:
+            with open(f'{self.path}user.json', 'r', errors='ignore') as file:
                 data = json.load(file)
             
             for row in data:
@@ -220,9 +220,9 @@ class Command(BaseCommand):
                 pass
             
             if not PRODUCTION:
-                os.system('python3 manage.py makemigrations main')
-                os.system('python3 manage.py migrate main')
-                os.system('python3 manage.py migrate')
+                os.system('python manage.py makemigrations main')
+                os.system('python manage.py migrate main')
+                os.system('python manage.py migrate')
             else:        
                 os.system('python manage.py makemigrations')
                 os.system('python manage.py migrate')
@@ -233,7 +233,7 @@ class Command(BaseCommand):
         try:
             print('Seeding data...')
             self.setup()
-            os.system('python3 manage.py reset_db')
+            os.system('python manage.py reset_db')
             self.seed_event()
             self.seed_merch()
             self.seed_user()
