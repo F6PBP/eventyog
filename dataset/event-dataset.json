@@ -33,7 +33,12 @@
 		],
 		"category": "SENI",
 		"location": "Jogja National Museum",
-		"description": "ARTJOG jadi pameran seni terbesar di Indonesia yang ditunggu-tunggu oleh banyak orang. Tahun 2024, ARTJOG mengambil tema 'Motif: Ramalan' yang berkolaborasi dengan Agus Suwage dan Titarubi sebagai comission artist mereka."
+		"description": "ARTJOG jadi pameran seni terbesar di Indonesia yang ditunggu-tunggu oleh banyak orang. Tahun 2024, ARTJOG mengambil tema 'Motif: Ramalan' yang berkolaborasi dengan Agus Suwage dan Titarubi sebagai comission artist mereka.",
+		"image": [
+			"https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p2/65/2024/06/29/IMG-20240629-WA0000-2239045316.jpg",
+			"https://eventguide.id/wp-content/uploads/2023/12/IMG-20231221-WA0074.jpg",
+			"https://gudeg.net/cni-content/uploads/modules/posts/20240701031539.jpg"
+		]
 	},
 	{
 		"name": "Art Exhibition | Homage to Home",
@@ -74,7 +79,14 @@
 		],
 		"category": "SENI",
 		"location": "Komplek Kedhaton Museum Yogyakarta",
-		"description": "Abhimantrana menjadi rangkaian acara dari kenaikan tahta Sri Sultan Hamengku Buwono X ke-35 tahun yang sudah berlangsung sejak 9 Maret hingga 24 Agustus nanti."
+		"description": "Abhimantrana menjadi rangkaian acara dari kenaikan tahta Sri Sultan Hamengku Buwono X ke-35 tahun yang sudah berlangsung sejak 9 Maret hingga 24 Agustus nanti.",
+		"image": [
+			"https://statik.tempo.co/data/2024/03/12/id_1286652/1286652_720.jpg",
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1sxj0LHAdOepGHbPTAMe-MMhw3gnKVlkcng&s",
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTskafya2LIKJwguI6zF0uW8TkRSKi7gNBGgQ&s",
+			"https://terasmalioboronews.com/wp-content/uploads/2024/04/Abhimantrana-1.jpg",
+			"https://visitingjogja.jogjaprov.go.id/webdinas/wp-content/uploads/2024/03/pameran-abhimantrana-1.jpg"
+		]
 	},
 	{
 		"name": "Bincang Raya #4",
@@ -110,7 +122,13 @@
 		],
 		"category": "SENI",
 		"location": "Gedung Saraswati, Museum Sonobudoyo",
-		"description": "Dinas Kebudayaan Daerah Istimewa Yogyakarta menyelenggarakan Jogja Museum Expo 2024 di Museum Sonobudoyo yang akan diisi dengan rangkaian pameran koleksi, seminar, tur daring, lokakarya, wicara kuratorial, hingga acara lainnya."
+		"description": "Dinas Kebudayaan Daerah Istimewa Yogyakarta menyelenggarakan Jogja Museum Expo 2024 di Museum Sonobudoyo yang akan diisi dengan rangkaian pameran koleksi, seminar, tur daring, lokakarya, wicara kuratorial, hingga acara lainnya.",
+		"image": [
+			"https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p2/65/2024/07/23/1-01-OK-FOTO-B-pameran-koleksi-museum-di-sonobudoyo-1998357842.jpg",
+			"https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p2/65/2024/07/23/IMG-20240723-WA0211-758324353.jpg",
+			"https://static.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/p1/40/2024/07/23/jogja-museum-expo-2024-3172408273.jpg",
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyIHM68ky3FYROISG9RO9wEgkrAQx1TH0P5A&s"
+		]
 	},
 	{
 		"name": "RamesArt",
@@ -156,7 +174,12 @@
 		],
 		"category": "SENI",
 		"location": "Tirtodipuran Link",
-		"description": "Timoteus Anggawan Kusno mempersembahkan sebuah pameran tunggal berjudul Fever Dream yang memantik rasa penasaran akan sejarah negara pasca-kolonial."
+		"description": "Timoteus Anggawan Kusno mempersembahkan sebuah pameran tunggal berjudul Fever Dream yang memantik rasa penasaran akan sejarah negara pasca-kolonial.",
+		"image": [
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJvNDZmIYlt8BqyX3bXXRLN2XSTuWG25YmKQ&s",
+			"https://mluruzqiu3ad.i.optimole.com/w:auto/h:auto/q:mauto/f:best/ig:avif/https://www.takusno.com/wp-content/uploads/2020/02/240602_EV_SE-Timoteus-Anggawan-Kusno_Ruang-G1D_-1-min.jpg",
+			"https://mluruzqiu3ad.i.optimole.com/w:auto/h:auto/q:mauto/f:best/ig:avif/https://www.takusno.com/wp-content/uploads/2020/02/240602_EV_SE-Timoteus-Anggawan-Kusno_Ruang-G1C_-15.jpg"
+		]
 	},
 	{
 		"name": "Ke Jalan, Ke Dalam KTFO#10",
@@ -179,7 +202,12 @@
 		],
 		"category": "Hiburan",
 		"location": "Ramayana Ballet Prambanan",
-		"description": "Dramatari The Legend of Roro Jonggrang akan membawakan kisah legenda Bandung Bondowoso dengan Roro Jonggrang yang tragis. Wisatawan bisa melihat pertunjukan ini di Ramayana Ballet Prambanan dan dimulai pukul 19.30 WIB."
+		"description": "Dramatari The Legend of Roro Jonggrang akan membawakan kisah legenda Bandung Bondowoso dengan Roro Jonggrang yang tragis. Wisatawan bisa melihat pertunjukan ini di Ramayana Ballet Prambanan dan dimulai pukul 19.30 WIB.",
+		"image": [
+			"https://borobudurpark.com/wp-content/uploads/2018/12/48380434_2337861912955796_7449992272403234816_n.jpg",
+			"https://www.javaheritagetour.com/wp-content/uploads/2015/11/The-Legend-of-Rara-Jonggrang.jpg",
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9NhXSKPg80sP6keEIa6SYtJJq6WYm7_578w&s"
+		]
 	},
 	{
 		"name": "The Story of Ramayana",
@@ -207,7 +235,12 @@
 		],
 		"category": "Hiburan",
 		"location": "Lapangan Panahan Kenari, Yogyakarta",
-		"description": "Cherrypop Festival merupakan sebuah konser tahunan yang akan menghadirkan berbagai musisi terbaik Indonesia seperti Maliq & D'Essentials, The Adams, FSTVLST, dan masih banyak lagi."
+		"description": "Cherrypop Festival merupakan sebuah konser tahunan yang akan menghadirkan berbagai musisi terbaik Indonesia seperti Maliq & D'Essentials, The Adams, FSTVLST, dan masih banyak lagi.",
+		"image": [
+			"https://pophariini.com/wp-content/uploads/2023/08/JE-Impromptu-scaled.jpg",
+			"https://cherrypop.id/wp-content/uploads/2023/12/MKS02050-1-scaled.jpg",
+			"https://imgsrv2.voi.id/bzMl-vfcKvood30rPP19vwKBX4AKx2OvILrFnRz4c8w/auto/1200/675/sm/1/bG9jYWw6Ly8vcHVibGlzaGVycy8zMDMxNzYvMjAyMzA4MjEwNzMyLW1vYmlsZS5jcm9wcGVkXzE2OTI1NzgwMTAuSlBH.jpg"
+		]
 	},
 	{
 		"name": "Pentas Teater Anne Boleyn",
