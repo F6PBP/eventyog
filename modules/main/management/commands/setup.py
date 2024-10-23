@@ -109,8 +109,17 @@ class Command(BaseCommand):
                     user_profile.registeredEvent.add(event)
                     
                 user.save()
+        
+                    
         except Exception as e:
             print('Error seeding user: ', e)
+            
+        dekdepe = UserProfile.objects.get(user__username='dekdepe')
+        
+        # Make dekdepe as admin
+        dekdepe.role = "AD"
+        
+        dekdepe.save()
         
         print('Seeding user done')
     
