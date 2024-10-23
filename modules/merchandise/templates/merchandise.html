@@ -1,1 +1,92 @@
-This is Merchandise
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="bg-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="text-center my-8">
+            <h1 class="text-3xl font-bold">Merchandise Shop</h1>
+        </div>
+
+        {% if is_admin %}
+        <a href="{% url 'merchandise:create_merchandise' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Merchandise
+        </a>
+        {% endif %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src="https://via.placeholder.com/300" alt="T-shirt Dummy" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h5 class="text-xl font-bold mb-2">T-shirt Dummy</h5>
+                    <p class="text-gray-700 mb-2">Deskripsi singkat tentang T-shirt keren ini yang cocok untuk semua kalangan.</p>
+                    <p class="text-lg font-semibold text-gray-900 mb-4">Rp 150,000</p>
+
+                    <!-- Quantity Selector & Buy Button -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-l hover:bg-gray-400 focus:outline-none" onclick="decrementQuantity(this)">-</button>
+                            <input type="number" class="w-12 text-center border-t border-b border-gray-300" value="1" min="1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-r hover:bg-gray-400 focus:outline-none" onclick="incrementQuantity(this)">+</button>
+                        </div>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Beli</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src="https://via.placeholder.com/300" alt="Cap Dummy" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h5 class="text-xl font-bold mb-2">Cap Dummy</h5>
+                    <p class="text-gray-700 mb-2">Deskripsi singkat tentang topi keren ini untuk gaya sehari-hari.</p>
+                    <p class="text-lg font-semibold text-gray-900 mb-4">Rp 80,000</p>
+
+                    <!-- Quantity Selector & Buy Button -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-l hover:bg-gray-400 focus:outline-none" onclick="decrementQuantity(this)">-</button>
+                            <input type="number" class="w-12 text-center border-t border-b border-gray-300" value="1" min="1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-r hover:bg-gray-400 focus:outline-none" onclick="incrementQuantity(this)">+</button>
+                        </div>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Beli</button>
+                        {% include "ds/button.html" with text="Save Changes" icon="fas fa-save" class="w-full md:w-fit" %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src="https://via.placeholder.com/300" alt="Jaket Dummy" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h5 class="text-xl font-bold mb-2">Jaket Dummy</h5>
+                    <p class="text-gray-700 mb-2">Jaket keren yang nyaman dipakai dan cocok untuk cuaca dingin.</p>
+                    <p class="text-lg font-semibold text-gray-900 mb-4">Rp 300,000</p>
+
+                    <!-- Quantity Selector & Buy Button -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-l hover:bg-gray-400 focus:outline-none" onclick="decrementQuantity(this)">-</button>
+                            <input type="number" class="w-12 text-center border-t border-b border-gray-300" value="1" min="1">
+                            <button class="bg-gray-300 text-gray-700 px-3 py-2 rounded-r hover:bg-gray-400 focus:outline-none" onclick="incrementQuantity(this)">+</button>
+                        </div>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Beli</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function incrementQuantity(button) {
+            var input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decrementQuantity(button) {
+            var input = button.nextElementSibling;
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+    </script>
+</div>
+{% endblock %}
