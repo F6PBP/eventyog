@@ -21,6 +21,8 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+load_dotenv()  # Load environment variables from a .env file
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -28,7 +30,7 @@ import cloudinary.api
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zob1=r7z=fjniwac*ljo#^o*uiv201#xke*1#4+=m7xxdjx$pv'
 
-PRODUCTION = os.getenv('PROD', False) == "True"
+PRODUCTION = os.getenv('PROD') == "True"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
@@ -95,7 +97,6 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 # Add these at the top of your settings.py
 
 
-load_dotenv()  # Load environment variables from a .env file
 
 DATABASES = {}
 
@@ -117,7 +118,7 @@ else:
             'PORT': int(os.getenv('DB_PORT')),
         }
     }
-
+    
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
