@@ -29,36 +29,48 @@
         <p class="w-full md:w-[700px] text-center leading-7">
             <b>EventYog</b> is your go-to platform for discovering and joining exciting events in Yogyakarta! From concerts to cultural festivals, find all the details in one place. Plus, shop exclusive event merchandise and create lasting memories with ease!
         </p>
-
-        {% comment %} Button {% endcomment %}
-        {% include "ds/button.html" with button_type="primary" text="Open Modal" id="openModalButton" specify="open-modal-1" class="w-fit h-fit" %}
-
-        {% comment %} Modal {% endcomment %}
-        {% include "testmodal.html" with modal_id="open-modal-1" modal_title="Test Modal" modal_label="modal-label" onsubmit='sayHello' %}
-
         {% include "ds/button.html" with text="Learn More" class="w-fit h-fit" icon="fa fa-arrow-down" id="learnMoreButton" %}
     </section>
     <section id="whatWeOffer" class="w-full flex flex-col justify-center items-center gap-2 px-4 md:px-10 fade-in mb-20">
         <h3 class="font-bold text-lg md:text-xl text-gray-500">Features</h3>
         <h1 class="text-2xl md:text-4xl font-bold text-center">Why Choose Us?</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full">
-            <div class="flex flex-col items-center p-4 border rounded-lg shadow-md min-h-[400px] pt-20 transition-transform duration-300 hover:scale-105 bg-white">
-                <img src="{% static 'assets/icon.png' %}" alt="Events" class="w-16 h-16 mb-4">
-                <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center">Exciting Events</h2>
-                <p class="text-center">Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.</p>
+            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
+                <div class="absolute w-full h-full top-0 bg-black/100">
+                    <img src="{% static 'assets/landing/event.jpg' %}" alt="Events" class="w-full h-full object-cover opacity-40">
+                </div>
+                <div class="relative z-10 text-white">
+                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Exciting <br/> Events</h2>
+                    <p class="text-center">Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.</p>
+                </div>
             </div>
-            <div class="flex flex-col items-center p-4 border rounded-lg shadow-md min-h-[400px] pt-20 transition-transform duration-300 hover:scale-105 bg-white">
-                <img src="{% static 'assets/icon.png' %}" alt="Merchandise" class="w-16 h-16 mb-4">
-                <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center">Exclusive Merchandise</h2>
-                <p class="text-center">Shop exclusive event merchandise and create lasting memories with unique items.</p>
+            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
+                <div class="absolute w-full h-full top-0 bg-black/100">
+                    <img src="{% static 'assets/landing/merch.jpg' %}" alt="Merchandise" class="w-full h-full object-cover opacity-40">
+                </div>
+                <div class="relative z-10 text-white">
+                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Exclusive Merchandise</h2>
+                    <p class="text-center">Shop exclusive event merchandise and create lasting memories with unique items.</p>
+                </div>
             </div>
-            <div class="flex flex-col items-center p-4 border rounded-lg shadow-md min-h-[400px] pt-20 transition-transform duration-300 hover:scale-105 bg-white">
-                <img src="{% static 'assets/icon.png' %}" alt="Community" class="w-16 h-16 mb-4">
-                <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center">Community Engagement</h2>
-                <p class="text-center">Join a vibrant community of event enthusiasts and make new friends with similar interests.</p>
+            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
+                <div class="absolute w-full h-full top-0 bg-black/100">
+                    <img src="{% static 'assets/landing/community.jpg' %}" alt="Community" class="w-full h-full object-cover opacity-40">
+                </div>
+                <div class="relative z-10 text-white">
+                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Community Engagement</h2>
+                    <p class="text-center">Join a vibrant community of event enthusiasts and make new friends with similar interests.</p>
+                </div>
             </div>
         </div>
     </section>
+    <section class="w-full flex flex-col justify-center items-center gap-2 px-4 md:px-10 fade-in mb-20">
+        <h1 class="text-2xl md:text-4xl font-bold text-center">Wanna ask some questions?</h1>
+        {% for qna in faq_qna  %}
+            {% include "ds/accordion.html" with title=qna.question content=qna.answer class="w-full" id=qna.id %}
+        {% endfor %}
+    </section>
+
     <script>
         document.getElementById('learnMoreButton').addEventListener('click', function() {
             const offset = 120; // Adjust this value to set the offset

@@ -1,0 +1,37 @@
+[
+    {
+        "username": "dekdepe",
+        "password": "dummy123",
+        "name": "Dek Depe",
+        "email": "dekdepe@gmail.com",
+        "bio": "I'm a dummy"
+    },
+    {
+        "username": "janedoe",
+        "password": "password456",
+        "name": "Jane Doe",
+        "email": "janedoe@example.com",
+        "bio": "Just another user"
+    },
+    {
+        "username": "johndoe",
+        "password": "password789",
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "bio": "Another dummy user"
+    },
+    {
+        "username": "alicewonder",
+        "password": "alice123",
+        "name": "Alice Wonderland",
+        "email": "alice@example.com",
+        "bio": "Curious and adventurous"
+    },
+    {
+        "username": "bobbuilder",
+        "password": "builder456",
+        "name": "Bob Builder",
+        "email": "bob@example.com",
+        "bio": "Can we fix it? Yes, we can!"
+    }
+]
