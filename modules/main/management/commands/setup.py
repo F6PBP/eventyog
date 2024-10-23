@@ -1,10 +1,11 @@
 import json
 from django.core.management.base import BaseCommand
 from modules.main.models import *
-from .reset_db import Command as ResetDbCommand
 import os
 import random
 import shutil
+from dotenv import load_dotenv
+
 
 class Command(BaseCommand):
     help = 'Seed data from json file'
@@ -47,6 +48,7 @@ class Command(BaseCommand):
                                 price.save()
                 except Exception as e:
                     print('Error in row' + str(row['name']))
+                    print(e)
                     pass
         
         print('Seeding event done')
@@ -199,12 +201,13 @@ class Command(BaseCommand):
                     
         print('Seeding forum done')
             
-    def handle(self, *args, **options):
-        try:
-            # Print os path
+    def setup(self):
+                    # Print os path
             print(os.getcwd())
             
-            os.system('pip install -r requirements.txt')
+            load_dotenv()
+            
+            PRODUCTION = os.getenv('PRODUCTION') == 'True'
             
             # Remove db sqlite3
             if os.path.exists('db.sqlite3'):
@@ -216,12 +219,21 @@ class Command(BaseCommand):
             except:
                 pass
             
-            os.system('python3 manage.py makemigrations main')
-            os.system('python3 manage.py migrate main')
-            os.system('python3 manage.py migrate')
+            if not PRODUCTION:
+                os.system('python3 manage.py makemigrations main')
+                os.system('python3 manage.py migrate main')
+                os.system('python3 manage.py migrate')
+            else:        
+                os.system('python manage.py makemigrations')
+                os.system('python manage.py migrate')
             
+            print('Migrate done')
             
-            ResetDbCommand.handle(self)
+    def handle(self, *args, **options):
+        try:
+            print('Seeding data...')
+            self.setup()
+            os.system('python3 manage.py reset_db')
             self.seed_event()
             self.seed_merch()
             self.seed_user()
@@ -232,4 +244,7 @@ class Command(BaseCommand):
             os.system('python manage.py runserver')
         except KeyboardInterrupt:
             print('Exiting...')
+            pass
+        except Exception as e:
+            print('Error: ', e)
             pass
