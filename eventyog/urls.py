@@ -27,4 +27,5 @@ urlpatterns = [
     path("merchandise/", include('modules.merchandise.urls')),
     path("yogevent/", include('modules.yogevent.urls')),
     path("yogforum/", include('modules.yogforum.urls')),
+    path("registered-event/", include('modules.registered_event.urls')),
 ]
