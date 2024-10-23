@@ -17,13 +17,16 @@ class Command(BaseCommand):
                     if row['category'] in dict(EventCategory.choices):
                         category = row['category']
                         
+                    image_urls = row.get('image_urls', [])
+                        
                     event = Event.objects.create(
                         title=row['name'],
                         description=row['description'],
                         category=category,
                         start_time=row['startDate'],
                         end_time=row['endDate'],
-                        location=row['location']
+                        location=row['location'],
+                        image_urls=image_urls
                     )
                     
                     event.save()
@@ -39,7 +42,7 @@ class Command(BaseCommand):
                                 )
                                 price.save()
                 except Exception as e:
-                    print('Error in row' + str(row))
+                    print('Error in row' + str(row['name']))
                     pass
         
     def seed_merch(self):
@@ -55,9 +58,9 @@ class Command(BaseCommand):
                     )
                     merch.save()
                 except Exception as e:
+                    print(e)
                     print('Error in row' + str(row))
-                    pass
         
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
         self.seed_event()
         self.seed_merch()

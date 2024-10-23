@@ -1,4 +1,3 @@
-import json
 from django.core.management.base import BaseCommand
 from modules.main.models import *
 
@@ -12,3 +11,7 @@ class Command(BaseCommand):
         
         # Delete All Merchandise data
         Merchandise.objects.all().delete()
+        
+        # Delete All User data
+        UserProfile.objects.all().delete()
+        User.objects.all().delete()

@@ -19,6 +19,8 @@ class UserProfile(models.Model):
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
     friends = models.ManyToManyField('UserProfile', blank=True)
     
+    wallet = models.DecimalField(max_digits=10, decimal_places=2, default=1000000)
+    
     role = models.CharField(
         choices=UserRoles.choices,
         default=UserRoles.USER,
@@ -37,6 +39,16 @@ class MerchCart(models.Model):
     
     def totalPrice(self):
         return self.merchandise.price * self.quantity
+
+class EventCart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    ticket = models.ForeignKey('TicketPrice', on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def totalPrice(self):
+        return self.event.price * self.quantity
 
 # Class for Event Category
 class EventCategory(models.TextChoices):
@@ -84,10 +96,9 @@ class Event(models.Model):
     merch = models.ManyToManyField('Merchandise', blank=True)
     
     user_rating = models.ManyToManyField(Rating, blank=True)
+    image_urls = models.JSONField(null=True, blank=True)
     
-
 class Merchandise(models.Model):
-    merchUuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     image_url = models.URLField()
     name = models.CharField(max_length=200)
     description = models.TextField()
