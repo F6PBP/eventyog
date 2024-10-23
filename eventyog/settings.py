@@ -21,6 +21,8 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+load_dotenv()  # Load environment variables from a .env file
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -28,7 +30,7 @@ import cloudinary.api
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zob1=r7z=fjniwac*ljo#^o*uiv201#xke*1#4+=m7xxdjx$pv'
 
-PRODUCTION = os.getenv('PROD', False) == "True"
+PRODUCTION = os.getenv('PROD') == "True"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
@@ -53,6 +55,7 @@ INSTALLED_APPS = [
     'modules.yogevent',
     'modules.admin_dashboard',
     'modules.yogforum',
+    'modules.registered_event',
     'whitenoise.runserver_nostatic',
     'cloudinary',
 ]
@@ -94,7 +97,6 @@ WSGI_APPLICATION = 'eventyog.wsgi.application'
 # Add these at the top of your settings.py
 
 
-load_dotenv()  # Load environment variables from a .env file
 
 DATABASES = {}
 
@@ -109,11 +111,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'eventyog'),
-            'USER': os.getenv('DB_USER', 'pemilos24_owner'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'DRzSsw7Pc2HE'),
-            'HOST': os.getenv('DB_HOST', 'ep-late-cloud-a1j1feg2-pooler.ap-southeast-1.aws.neon.tech'),
-            'PORT': os.getenv('DB_PORT', 5432),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': int(os.getenv('DB_PORT')),
         }
     }
     
