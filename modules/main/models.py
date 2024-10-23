@@ -71,7 +71,7 @@ class TicketPrice(models.Model):
 class Rating(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     rated_event = models.ForeignKey('Event', on_delete=models.CASCADE)
-    rating = models.IntegerField()
+    rating = models.IntegerField(max)
     review = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -105,3 +105,43 @@ class Merchandise(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+class Forum(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    like = models.ManyToManyField(UserProfile, related_name='forum_like', blank=True)
+    dislike = models.ManyToManyField(UserProfile, related_name='forum_dislike', blank=True)
+    
+    def __str__(self):
+        return self.title
+    
+    def totalLike(self):
+        return self.like.count()
+
+    def totalDislike(self):
+        return self.dislike.count()
+    
+class ForumReply(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    reply_to = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    
+    like = models.ManyToManyField(UserProfile, related_name='forum_reply_like', blank=True)
+    dislike = models.ManyToManyField(UserProfile, related_name='forum_reply_dislike', blank=True)
+    
+    def __str__(self):
+        return self.content
+
+        
+    def totalLike(self):
+        return self.like.count()
+
+    def totalDislike(self):
+        return self.dislike.count()

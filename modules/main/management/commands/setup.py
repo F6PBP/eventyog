@@ -3,6 +3,8 @@ from django.core.management.base import BaseCommand
 from modules.main.models import *
 from .reset_db import Command as ResetDbCommand
 import os
+import random
+import shutil
 
 class Command(BaseCommand):
     help = 'Seed data from json file'
@@ -147,23 +149,87 @@ class Command(BaseCommand):
             
         print('Seeding user merch and event done')
     
+    def seed_rating(self):
+        events = Event.objects.all()
+        dekdepe = UserProfile.objects.get(user__username='dekdepe')
+        
+        for event in events:
+            rating = Rating.objects.create(
+                user=dekdepe,
+                rated_event=event,
+                rating=random.randint(1, 5),
+                review='Good event for everyone'
+            )
+            rating.save()        
+        
+        print('Seeding rating done')
+            
+    def seed_forum(self):
+        dekdepe = UserProfile.objects.get(user__username='dekdepe')
+        users = UserProfile.objects.all()
+        
+        for i in range(10):
+            try:
+                forum = Forum.objects.create(
+                    user=users[random.randint(0, len(users) - 1)],
+                    title=f'Forum {i}',
+                    content=f'Description {i}',
+                )
+                forum.save()
+                
+                for j in range(10):
+                    comment = ForumReply.objects.create(
+                        user=users[random.randint(0, len(users) - 1)],                        
+                        forum=forum,
+                        content=f'Comment {j} in forum {i}'
+                    )
+                    comment.save()
+                    
+                    # Add Nested Comment
+                    for k in range(3):
+                        nested_comment = ForumReply.objects.create(
+                            user=users[random.randint(0, len(users) - 1)],                        
+                            forum=forum,
+                            content=f'Nested Comment {k} in comment {j} in forum {i}',
+                            reply_to=comment
+                        )
+                        nested_comment.save()
+            except Exception as e:
+                print('Error seeding forum: ', e)
+                    
+        print('Seeding forum done')
+            
     def handle(self, *args, **options):
-        # Print os path
-        print(os.getcwd())
-        
-        # Remove db sqlite3
-        if os.path.exists('db.sqlite3'):
-            os.remove('db.sqlite3')
-        
-        os.system('python manage.py makemigrations main')
-        os.system('python manage.py migrate main')
-        os.system('python manage.py migrate')
-        
-        
-        ResetDbCommand.handle(self)
-        self.seed_event()
-        self.seed_merch()
-        self.seed_user()
-        self.seed_user_merch_and_event()
-        
-        os.system('python manage.py runserver')
+        try:
+            # Print os path
+            print(os.getcwd())
+            
+            os.system('pip install -r requirements.txt')
+            
+            # Remove db sqlite3
+            if os.path.exists('db.sqlite3'):
+                os.remove('db.sqlite3')
+                
+            # Delete Migrations File
+            try:
+                shutil.rmtree('modules/main/migrations')
+            except:
+                pass
+            
+            os.system('python3 manage.py makemigrations main')
+            os.system('python3 manage.py migrate main')
+            os.system('python3 manage.py migrate')
+            
+            
+            ResetDbCommand.handle(self)
+            self.seed_event()
+            self.seed_merch()
+            self.seed_user()
+            self.seed_user_merch_and_event()
+            self.seed_rating()
+            self.seed_forum()
+            
+            os.system('python manage.py runserver')
+        except KeyboardInterrupt:
+            print('Exiting...')
+            pass
