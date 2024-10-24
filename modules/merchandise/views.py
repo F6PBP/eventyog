@@ -4,11 +4,16 @@ from .forms import MerchandiseForm
 from modules.main.models import Merchandise
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from eventyog.decorators import check_user_profile
 
+@check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
+    merchandise = Merchandise.objects.all()
+    # print(merchandise)
     context = {
         'show_navbar': True,
-        'is_admin': getattr(request, 'is_admin', True)
+        'is_admin': request.is_admin,
+        'merchandise': merchandise
     }
     return render(request, 'merchandise.html', context)
 
