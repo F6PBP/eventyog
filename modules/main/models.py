@@ -105,8 +105,9 @@ class Event(models.Model):
     image_urls = models.JSONField(null=True, blank=True)
     
 class Merchandise(models.Model):
-    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    image_url = models.URLField()
+    # id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    id = models.AutoField(primary_key=True)
+    image_url = models.URLField(max_length=500)
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
