@@ -1,0 +1,84 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto">
+        <form method="post">
+            {% csrf_token %}
+            <div class="p-5 w-full">
+                <!-- Title Input -->
+                <div class="mb-4 w-full md:w-auto">
+                    <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
+                    <input type="text" id="title" name="title" class="w-[200px]" value="{{ form.title.value }}" required placeholder="Title">
+                    <!-- Display field errors if any -->
+                    {% if form.title.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.title.errors }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Description Input -->
+                <div class="mb-4 w-full md:w-auto">
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+                    <textarea id="description" name="description" class="w-full" required placeholder="Description">{{ form.description.value }}</textarea>
+                    <!-- Display field errors if any -->
+                    {% if form.description.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Event Category Dropdown -->
+                <div class="mb-4">
+                    <label for="category" class="block text-gray-700 text-sm font-bold mb-2">Event Category</label>
+                    <select name="category" id="category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="OL">Olahraga</option>
+                        <option value="SN">Seni</option>
+                        <option value="MS">Musik</option>
+                        <option value="CP">Cosplay</option>
+                        <option value="LG">Lingkungan</option>
+                        <option value="VL">Volunteer</option>
+                        <option value="AK">Akademis</option>
+                        <option value="KL">Kuliner</option>
+                        <option value="PW">Pariwisata</option>
+                        <option value="FS">Festival</option>
+                        <option value="FM">Film</option>
+                        <option value="FN">Fashion</option>
+                        <option value="LN">Lainnya</option>
+                    </select>
+                    {% if form.category.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.category.errors }}</p>
+                    {% endif %}                                    
+                </div>
+
+                <!-- Event Start Time -->
+                <div class="mb-4">
+                    <label for="start_time" class="block text-gray-700 text-sm font-bold mb-2">Start Time</label>
+                    <input type="datetime-local" id="start_time" name="start_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+
+                <!-- Event End Time -->
+                <div class="mb-4">
+                    <label for="end_time" class="block text-gray-700 text-sm font-bold mb-2">End Time</label>
+                    <input type="datetime-local" id="end_time" name="end_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <!-- Location Input -->
+                <div class="mb-4">
+                    <label for="location" class="block text-gray-700 text-sm font-bold mb-2">Location</label>
+                    <input type="text" id="location" name="location" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Event Location">
+                </div>
+
+                <!-- Location Input -->
+                <div class="mb-4">
+                    <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">Image URL</label>
+                    <input type="url" name="image_url" id="image_url" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="https://example.com/image.jpg" required>
+                </div>
+            </div>
+            <input type="hidden" name="categories" id="hidden-categories">
+            <div>
+                {% include "ds/button.html" with text="Save Changes" icon="fas fa-save" class="w-full md:w-fit" %}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        
+      </script>
+{% endblock %}
