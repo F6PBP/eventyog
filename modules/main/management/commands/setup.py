@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 class Command(BaseCommand):
     help = 'Seed data from json file'
     path = 'dataset/'
+    events = Event.objects.all()
     
     def seed_event(self):
         with open(f'{self.path}event-dataset.json', 'r', errors='ignore') as file:
@@ -22,7 +23,7 @@ class Command(BaseCommand):
                     if row['category'] in dict(EventCategory.choices):
                         category = row['category']
                         
-                    image_urls = row.get('image_urls', [])
+                    image_urls = row.get('image', [])
                         
                     event = Event.objects.create(
                         title=row['name'],
@@ -89,7 +90,7 @@ class Command(BaseCommand):
             for row in data:
                 user = User.objects.filter(username=row['username'])
                 if len(user) == 0:
-                    print(f'Creating user {row['username']}')
+                    print(f'Creating user {row["username"]}')
                     user = User.objects.create_user(
                         username=row['username'],
                         password=row['password'],   
@@ -104,8 +105,7 @@ class Command(BaseCommand):
                     bio=row['bio'],
                     categories='',
                 )
-                events = Event.objects.all() [:10]
-                for event in events:
+                for event in self.events:
                     user_profile.registeredEvent.add(event)
                     
                 user.save()
@@ -127,11 +127,10 @@ class Command(BaseCommand):
         # Seed all user with 10 first event
         users = UserProfile.objects.all()
         
-        dekdepe = UserProfile.objects.get(user__username='dekdepe')
-        
+        merchs = Merchandise.objects.all()
         # Seed MerchCart
         for user in users:
-            for merch in Merchandise.objects.all()[:10]:
+            for merch in merchs[:10]:
                 merchcart = MerchCart.objects.create(
                     user=user.user,
                     merchandise=merch,
@@ -141,8 +140,9 @@ class Command(BaseCommand):
                 merchcart.save()
                 
         # Seed EventCart
+        tickets = TicketPrice.objects.all()
         for user in users:
-            for event in TicketPrice.objects.all()[:5]:
+            for event in tickets[:5]:
                 eventcart = EventCart.objects.create(
                     user=user.user,
                     ticket=event,
@@ -152,19 +152,18 @@ class Command(BaseCommand):
                 eventcart.save()
         
         for user in users:
-            for merch in Merchandise.objects.all()[:10]:
+            for merch in merchs[:10]:
                 user.boughtMerch.add(merch)
-            for event in Event.objects.all()[:10]:
+            for event in self.events[:10]:
                 user.registeredEvent.add(event)
             user.save()
             
         print('Seeding user merch and event done')
     
     def seed_rating(self):
-        events = Event.objects.all()
         dekdepe = UserProfile.objects.get(user__username='dekdepe')
         
-        for event in events:
+        for event in self.events:
             rating = Rating.objects.create(
                 user=dekdepe,
                 rated_event=event,
@@ -176,7 +175,6 @@ class Command(BaseCommand):
         print('Seeding rating done')
             
     def seed_forum(self):
-        dekdepe = UserProfile.objects.get(user__username='dekdepe')
         users = UserProfile.objects.all()
         
         for i in range(10):
@@ -211,9 +209,6 @@ class Command(BaseCommand):
         print('Seeding forum done')
             
     def setup(self):
-                    # Print os path
-            print(os.getcwd())
-            
             load_dotenv()
             
             PRODUCTION = os.getenv('PRODUCTION') == 'True'
