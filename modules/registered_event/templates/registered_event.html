@@ -1,6 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
     <main class="mt-32 px-10">
-        Hello
+        <h1 class="font-bold text-3xl mb-2">Event History</h1>
+        <h3 class="text-gray-500 text-lg mb-6">Relive your favorite events and memories</h3>
+
+        <!-- Filter Form -->
+        <form method="GET" class="flex items-center mb-10 space-x-4">
+            <div>
+                <label for="start_time" class="block text-sm font-medium text-gray-700">Filter by Start Time:</label>
+                <input type="date" id="start_time" name="start_time" 
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+            <button type="submit" 
+                    class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Apply Filter
+            </button>
+        </form>
+
+        <!-- No events message -->
+        {% if registered_events|length == 0 %}
+            <div class="text-center text-gray-600 py-10">
+                <p class="text-lg">No events found. Try a different filter!</p>
+            </div>
+        {% else %}
+            <!-- Events Grid -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for event in registered_events %}
+                    <div class="flex flex-col gap-4 p-6 border rounded-lg shadow-lg hover:shadow-xl transition-shadow bg-white">
+                        <!-- Event Images -->
+                        <div class="relative h-40 overflow-hidden rounded-lg">
+                            {% if event.image_urls %}
+                                {% for image in event.image_urls %}
+                                    <img src="{{ image }}" alt="Event Image" class="object-cover h-full w-full">
+                                {% endfor %}
+                            {% else %}
+                                <img src="https://youngontop.com/wp-content/uploads/2024/09/63ecdf6e6df724eab1f0e8ca_20230215T0132-25bece5c-5ab8-4c33-98c7-60ad2668054b.webp" alt="Event Image" class="object-cover h-full w-full">
+                            {% endif %}
+                        </div>
+                        <!-- Event Details -->
+                        <div class="flex flex-col gap-3">
+                            <h1 class="text-xl font-semibold text-gray-800">{{ event.title }}</h1>
+                            <p class="text-sm text-gray-500 line-clamp-3">{{ event.description }}</p>
+                            <div class="text-sm text-gray-600 flex items-center gap-2">
+                                <i class="fa fa-calendar text-blue-500 w-4"></i>
+                                <span>{{ event.start_time }}</span>
+                            </div>
+                            <div class="text-sm text-gray-600 flex items-center gap-2">
+                                <i class="fa fa-map-pin text-blue-500 w-4"></i>
+                                <span>{{ event.location }}</span>
+                            </div>
+                        </div>
+                        <!-- Action Buttons -->
+                        <div class="flex justify-between mt-4">
+                            <a href="" class="text-indigo-600 hover:underline text-sm">View Details</a>
+                            <div class="flex gap-2">
+                                <a href="" class="text-yellow-500 hover:underline text-sm">Edit</a>
+                                <a href="" class="text-red-500 hover:underline text-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </section>
+        {% endif %}
     </main>
 {% endblock content %}

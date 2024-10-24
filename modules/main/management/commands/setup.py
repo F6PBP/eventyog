@@ -23,7 +23,7 @@ class Command(BaseCommand):
                     if row['category'] in dict(EventCategory.choices):
                         category = row['category']
                         
-                    image_urls = row.get('image_urls', [])
+                    image_urls = row.get('image', [])
                         
                     event = Event.objects.create(
                         title=row['name'],
