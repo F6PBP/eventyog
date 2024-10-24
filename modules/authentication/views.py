@@ -103,8 +103,8 @@ def onboarding(request):
 @check_user_profile(is_redirect=True)
 def profile(request):
     try:
-        if (request.user_profile.categories == None):
-            categories = []
+        if (request.user_profile.categories == ''):
+            categories = None
         else:
             categories = request.user_profile.categories.split(',')
             
