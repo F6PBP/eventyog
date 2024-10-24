@@ -22,7 +22,7 @@
             </li>
         {% endif %}
     </ul>
-    {% if user %}
+    {% if user.is_authenticated %}
         <div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
         <a href="#" class="hidden md:flex">
             <i class="fas fa-shopping-cart text-black text-xs sm:text-sm cursor-pointer hover:text-[#003FE2] transition-colors duration-300 hover:scale-110 transform origin-center"></i>        
@@ -43,6 +43,7 @@
                 <a href="{% url 'main:main' %}"     class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Home</a>
                 <a href="about" class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">About</a>
                 <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                <a href="{% url 'registered_event:main' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Registered Event</a>
                 <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 flex md:hidden">Cart</a>
                 <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Settings</a>
                 <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Help</a>

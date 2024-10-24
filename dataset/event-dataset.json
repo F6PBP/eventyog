@@ -4,7 +4,7 @@
 		"startDate": "2024-06-21",
 		"endDate": "2024-08-02",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "ACE/CBD Ace House",
 		"description": "Salon Et Cetera adalah ruang para seniman yang digelar di ACE/CBD, Jalan Mangkuyudan, Yogyakarta. Pengunjung pameran bisa menyaksikan berbagai lukisan seni yang memiliki tema semangat kerumunan."
 	},
@@ -13,7 +13,7 @@
 		"startDate": "2024-06-22",
 		"endDate": "2024-08-07",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Balai Keseharian dan Pemajangan (BKdP)",
 		"description": "Merandai Pajang menjadi event Jogja Agustus 2024 yang memamerkan karya seniman anggota Sakato Art Community. Pengunjung bisa menemukan berbagai karya seni berkualitas dari seniman lokal Indonesia."
 	},
@@ -31,7 +31,7 @@
 				"price": 50000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Jogja National Museum",
 		"description": "ARTJOG jadi pameran seni terbesar di Indonesia yang ditunggu-tunggu oleh banyak orang. Tahun 2024, ARTJOG mengambil tema 'Motif: Ramalan' yang berkolaborasi dengan Agus Suwage dan Titarubi sebagai comission artist mereka.",
 		"image": [
@@ -45,7 +45,7 @@
 		"startDate": "2024-07-03",
 		"endDate": "2024-09-03",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "GRAMM by Ambarrukmo Hotel",
 		"description": "Pameran Homeage to Home adalah bagian dari rangkaian acara Anniversary GRAMM by Ambarrukmo ke-7. Kali ini, mereka menggandeng 10 seniman lokal Indonesia untuk memamerkan karya terbaiknya."
 	},
@@ -59,7 +59,7 @@
 				"price": 30000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "JNM Bloc",
 		"description": "Pipilaka Foundation menyelenggarakan pameran 3D 'Pipilaka is Calling' yang diinisiasi oleh Wahyadi Liem yang mengangkat tentang isu kesadaran lingkungan bagi anak-anak hingga orang dewasa."
 	},
@@ -77,7 +77,7 @@
 				"price": 25000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Komplek Kedhaton Museum Yogyakarta",
 		"description": "Abhimantrana menjadi rangkaian acara dari kenaikan tahta Sri Sultan Hamengku Buwono X ke-35 tahun yang sudah berlangsung sejak 9 Maret hingga 24 Agustus nanti.",
 		"image": [
@@ -93,7 +93,7 @@
 		"startDate": "2024-08-02",
 		"endDate": "2024-08-02",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Royal Ambarrukmo Yogyakarta",
 		"description": "Bincang Raya menjadi sebuah acara diskusi yang membahas peristiwa-peristiwa sejarah kemerdekaan Indonesia."
 	},
@@ -102,7 +102,7 @@
 		"startDate": "2024-08-03",
 		"endDate": "2024-08-03",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Royal Ambarrukmo Yogyakarta",
 		"description": "The Artistry of Punika Deli adalah momen peluncuran menu baru dari Punika Deli yang diisi dengan Chef Moment. Selain itu, terdapat promo diskon 50% dan akan ada special DJ live performance."
 	},
@@ -120,7 +120,7 @@
 				"price": 50000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Gedung Saraswati, Museum Sonobudoyo",
 		"description": "Dinas Kebudayaan Daerah Istimewa Yogyakarta menyelenggarakan Jogja Museum Expo 2024 di Museum Sonobudoyo yang akan diisi dengan rangkaian pameran koleksi, seminar, tur daring, lokakarya, wicara kuratorial, hingga acara lainnya.",
 		"image": [
@@ -135,7 +135,7 @@
 		"startDate": "2024-06-07",
 		"endDate": "2024-08-07",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Viavia Artisan Bakery",
 		"description": "ViaVia Artisan Bakery bekerja sama dengan Cosmos Street Art untuk menampilkan berbagai karya seni rupa dalam tajuk 'RamesArt'. Pengunjung bisa melihat karya-karya 20 seniman lokal yang mengekspresikan semangat dan kreativitas mereka."
 	},
@@ -144,7 +144,7 @@
 		"startDate": "2024-06-26",
 		"endDate": "2024-08-15",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Omah Budoyo",
 		"description": "Berkolaborasi dengan berbagai seniman, tersedia berbagai instalasi seni serta lukisan yang penuh akan makna. Tahun 2024 Whimsy Wisdom mengangkat tema 'Interplay of Realities'."
 	},
@@ -158,7 +158,7 @@
 				"price": 30000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Tirtodipuran Link",
 		"description": "Tears From Heaven adalah pameran seni solo dari Asmudjo J. Irianto yang sudah berlangsung sejak 29 Juni 2024 lalu."
 	},
@@ -172,7 +172,7 @@
 				"price": 30000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Tirtodipuran Link",
 		"description": "Timoteus Anggawan Kusno mempersembahkan sebuah pameran tunggal berjudul Fever Dream yang memantik rasa penasaran akan sejarah negara pasca-kolonial.",
 		"image": [
@@ -186,7 +186,7 @@
 		"startDate": "2024-06-25",
 		"endDate": "2024-08-25",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "SURVIVE!Garage",
 		"description": "KEEP THE FIRE ON adalah pameran seni tahunan yang bekerja sama dengan seniman era 90 hingga 2000-an awal untuk menampilkan karya-karya terbaiknya."
 	},
@@ -219,7 +219,7 @@
 				"price": 150000
 			}
 		],
-		"category": "Hiburan",
+		"category": "CP",
 		"location": "Ramayana Ballet Prambanan",
 		"description": "Ramayana adalah sendratari yang menceritakan tentang kisah seorang pangeran bernama Rama, yang harus melawan raja raksasa Rahwana untuk menyelamatkan istrinya, Shinta."
 	},
@@ -233,7 +233,7 @@
 				"price": 129000
 			}
 		],
-		"category": "Hiburan",
+		"category": "MS",
 		"location": "Lapangan Panahan Kenari, Yogyakarta",
 		"description": "Cherrypop Festival merupakan sebuah konser tahunan yang akan menghadirkan berbagai musisi terbaik Indonesia seperti Maliq & D'Essentials, The Adams, FSTVLST, dan masih banyak lagi.",
 		"image": [
@@ -252,7 +252,7 @@
 				"price": 40000
 			}
 		],
-		"category": "Hiburan",
+		"category": "MS",
 		"location": "Concert Hall, Taman Budaya Yogyakarta",
 		"description": "Siswa-siswi SMA Negeri 7 Yogyakarta menggelar pertunjukkan teater berjudul Anne Boleyn: Enthroned Betrayal yang memiliki genre romansa."
 	},
@@ -270,7 +270,7 @@
 		"startDate": "2024-08-22",
 		"endDate": "2024-08-25",
 		"ticket": null,
-		"category": "Hiburan",
+		"category": "FN",
 		"location": "Jogja Expo Centre",
 		"description": "Jogja Fashion Week jadi sebuah ajang mode bergengsi yang menggandeng berbagai desainer lokal terbaik untuk menampilkan rancangan busana ciri khasnya."
 	},
@@ -279,7 +279,7 @@
 		"startDate": "2024-08-24",
 		"endDate": "2024-08-24",
 		"ticket": null,
-		"category": "Hiburan",
+		"category": "MS",
 		"location": "Museum Benteng Vredeburg",
 		"description": "Merayakan kemerdekaan Indonesia ke-79, Keraton Yogyakarta membuat konser Royal Orchestra yang akan digelar pukul 19.00 dan mulai open gate di pukul 18.00."
 	},
@@ -288,7 +288,7 @@
 		"startDate": "2024-08-20",
 		"endDate": "2024-08-26",
 		"ticket": null,
-		"category": "Hiburan",
+		"category": "MS",
 		"location": "Plaza Ambarrukmo",
 		"description": "Para pencinta otomotif saatnya merapat ke Plaza Ambarrukmo untuk menyaksikan berbagai produk terbaru dari brand otomotif terbaik di Indonesia."
 	},
@@ -302,7 +302,7 @@
 				"price": 175000
 			}
 		],
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Stadion Mandala Krida",
 		"description": "KAI Bandara Yogyakarta membuat event lari yang digelar malam hari di Stadion Mandala Krida. Tersedia dua pilihan rute yakni 5K dan 10K dan bisa diikuti oleh masyarakat umum. Nantinya, setiap peserta akan mendapatkan glow wristband, jersey, dan juga medali untuk finisher."
 	},
@@ -316,7 +316,7 @@
 				"price": 200000
 			}
 		],
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Plaza Ambarrukmo",
 		"description": "Kabar gembira untuk para orang tua karena 2024 Plaza Ambarrukmo kembali menggelar Ambarrukmo Runbike di Roof Space yang bisa diikuti anak-anak berusia 2-8 tahun. Ada berbagai aktivasi seru yang bisa dinikmati sepanjang acara berlangsung mulai dari bermain, lomba, hingga kuliner."
 	},
@@ -330,7 +330,7 @@
 				"price": 15000
 			}
 		],
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Bangsal Srimanganti Museum Kedhaton",
 		"description": "Pentas Wisata Srimanganti adalah event yang digelar oleh Dinas Kebudayaan DIY yang akan menampilkan berbagai pertunjukan seni tradisional dan modern."	
 	},
@@ -339,7 +339,7 @@
 		"startDate": "2024-08-11",
 		"endDate": "2024-08-25",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Alun-alun Ambarrukmo",
 		"description": "Pasar Wiguna merupakan eco cultural market yang digelar dua kali dalam sebulan di Alun-alun Ambarrukmo. Di sini, pengunjung bisa menjajal berbagai jenama lokal mulai dari kuliner, mode, hingga kerajinan tangan. Selain itu, terdapat beberapa aktivasi lainnya seperti lokakarya, talkshow, dan masih banyak lagi."
 	},
@@ -353,7 +353,7 @@
 				"price": 950000
 			}
 		],
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Kompleks Candi Prambanan",
 		"description": "Tour de Prambanan adalah lomba sepeda yang digelar oleh Pemerintah Sleman dengan titik start dan finish di Kompleks Candi Prambanan. Rute yang akan ditempuh peserta Tour de Prambanan adalah 115 kilometer yang akan mengelilingi area Jogja bagian selatan."
 	},
@@ -362,16 +362,16 @@
 		"startDate": "2023-04-01",
 		"endDate": "2023-04-30",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Jl. Pasar Kembang, Malioboro",
-		"description": "Festival budaya dan promo wisata, menampilkan berbagai atraksi seperti fashion, kuliner, dan olahraga di Malioboro."
+		"description": "Festival budaya dan promo wisata, menampilkan berbagai atraksi seperti fashion, kuliner, dan OL di Malioboro."
 	},
 	{
 		"name": "Loka Collective Performance",
 		"startDate": "2023-06-22",
 		"endDate": "2023-06-22",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Taman Budaya Gunungkidul",
 		"description": "Pertunjukan seni kontemporer dari seniman Yogyakarta dan daerah lainnya di Jawa."
 	},
@@ -380,7 +380,7 @@
 		"startDate": "2023-04-01",
 		"endDate": "2023-04-30",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": null,
 		"description": "Konser orkestra yang menghadirkan musisi nasional dan lokal dengan konsep tematik dan asik."
 	},
@@ -389,7 +389,7 @@
 		"startDate": "2023-06-01",
 		"endDate": "2023-06-30",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": null,
 		"description": "Festival tahunan masyarakat Yogyakarta sebagai bentuk rasa syukur Jumenengan Tingalan Dalem (naik tahta) Kesultanan Yogyakarta."
 	},
@@ -398,7 +398,7 @@
 		"startDate": "2023-04-01",
 		"endDate": "2023-04-30",
 		"ticket": null,
-		"category": "Fashion",
+		"category": "FN",
 		"location": null,
 		"description": "Carnival fashion yang menampilkan jenama lokal Yogyakarta dengan dukungan untuk seni dan budaya."
 	},
@@ -412,7 +412,7 @@
 				"price": 350000
 			}
 		],
-		"category": "Musik",
+		"category": "MS",
 		"location": "Candi Prambanan, Jl. Raya Solo - Yogyakarta No.16, Kranggan, Bokoharjo, Kec. Prambanan, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55571",
 		"description": "Festival musik jazz tahunan yang menampilkan musisi lokal dan internasional di kawasan Candi Prambanan."
 	},
@@ -421,7 +421,7 @@
 		"startDate": "2023-07-22",
 		"endDate": "2023-07-22",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Yogyakarta",
 		"description": "Event sepeda yang memperkenalkan citra Yogyakarta sebagai kota wisata dan budaya melalui kegiatan bersepeda."
 	},
@@ -430,7 +430,7 @@
 		"startDate": "2023-11-25",
 		"endDate": "2023-12-02",
 		"ticket": null,
-		"category": "Film",
+		"category": "FM",
 		"location": null,
 		"description": "Jogja-NETPAC Asian Film Festival (JAFF) adalah festival film prestisius yang menampilkan film lokal dan internasional berkualitas."
 	},
@@ -439,7 +439,7 @@
 		"startDate": "2023-12-01",
 		"endDate": "2023-12-01",
 		"ticket": null,
-		"category": "Festival",
+		"category": "FS",
 		"location": "Plaza Ngasem",
 		"description": "Wonderful Yogyakarta 2023 adalah event yang menampilkan Lomba Esport Mobile Legends, Pameran Ekraf, Pameran Foto Destinasi Wisata DIY, BBoy Battle Dance, dan penampilan musik dari musisi lokal ternama seperti Olski, Paksiband, dan Aftershine."
 	},
@@ -448,7 +448,7 @@
 		"startDate": "2023-12-01",
 		"endDate": "2023-12-01",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Stadion Kridosono Yogyakarta",
 		"description": "Dadakan Dangdut Vol.2 menghadirkan penampilan dari NDX AKA dan Guyon Waton untuk para penggemar musik dangdut yang ingin menikmati joget bareng."
 	},
@@ -471,7 +471,7 @@
 				"price": 100000
 			}
 		],
-		"category": "Musik",
+		"category": "MS",
 		"location": "Obelix Hills, Dusun Klumprit, Blok 1 & 2, Kec. Prambanan, Kabupaten Sleman, Daerah Istimewa Yogyakarta",
 		"description": "Konser musik bertajuk Obelix Hills Music Fest #3 ini menghadirkan NDX AKA sebagai guest star."
 	},
@@ -502,7 +502,7 @@
 				"price": 600000
 			}
 		],
-		"category": "Festival",
+		"category": "FS",
 		"location": "Laguna Pantai Depok, Parangtritis, Kretek, Bantul",
 		"description": "Festival 1001 Lampion akan digelar mulai pukul 17.00 WIB hingga 22.30 WIB, dihadiri lebih dari 8.000 peserta setiap tahunnya."
 	},
@@ -511,7 +511,7 @@
 		"startDate": "2024-09-08",
 		"endDate": "2024-09-08",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Mandala Krida",
 		"description": "Jurasik Fest 2024 menghadirkan artis nasional yang menarik serta festival kuliner dan kegiatan interaktif lainnya."
 	},
@@ -520,7 +520,7 @@
 		"startDate": "2024-09-14",
 		"endDate": "2024-09-14",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Gumuk Pasir",
 		"description": "Simfoni Gumuk Pasir menampilkan repertoar musik orkestra dari SMM Orchestra dengan bintang tamu Bilal Indrajaya dan Fleur."
 	},
@@ -529,7 +529,7 @@
 		"startDate": "2024-09-14",
 		"endDate": "2024-09-14",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Jogja National Museum (JNM) Pakuncen, Jogja",
 		"description": "Hiphop Soringin Fest adalah sebuah selebrasi Hiphop di Yogyakarta yang menampilkan rap, graffiti, bboy, breakdance, dan DJ dari berbagai elemen Hip Hop."
 	},
@@ -538,7 +538,7 @@
 		"startDate": "2024-09-21",
 		"endDate": "2024-09-21",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Concert Hall Taman Budaya Yogyakarta",
 		"description": "Konser Opera Puccini adalah persembahan Yogyakarta Royal Orchestra & Choir dalam rangka 75 Tahun Hubungan Bilateral Italia - Indonesia."
 	},
@@ -556,7 +556,7 @@
 				"price": 25000
 			}
 		],
-		"category": "SENI",
+		"category": "SN",
 		"location": "Gedung Sarangbaya Kompleks Kedhaton, Keraton Jogja",
 		"description": "Pameran upacara Keraton Yogyakarta untuk mengenalkan adat Jawa dan makna di baliknya."
 	},
@@ -574,7 +574,7 @@
 				"price": 750000
 			}
 		],
-		"category": "Musik",
+		"category": "MS",
 		"location": "Kompleks Candi Prambanan",
 		"description": "Prambanan Jazz 2024 menghadirkan artis nasional dan internasional seperti Ar Rahman, Queen at The Opera, Tulus, dan banyak lagi."
 	},
@@ -583,7 +583,7 @@
 		"startDate": "2024-07-20",
 		"endDate": "2024-07-20",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Hutan Pinus Mangunan, Bantul",
 		"description": "Pertunjukan musik keroncong dengan suasana alami dan pengisi acara seperti Ardhito Pramono dan Putri Manjo."
 	},
@@ -592,7 +592,7 @@
 		"startDate": "2024-07-27",
 		"endDate": "2024-07-27",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Plaza Ambarrukmo, Yogyakarta",
 		"description": "Lomba sepeda dengan dua kategori rute reguler 125 km dan rute menanjak 145 km, melewati kawasan Candi Prambanan."
 	},
@@ -601,7 +601,7 @@
 		"startDate": "2024-07-27",
 		"endDate": "2024-07-28",
 		"ticket": null,
-		"category": "Festival",
+		"category": "FS",
 		"location": "Pantai Parangkusumo, Kretek, Bantul",
 		"description": "Festival layang-layang internasional yang diikuti oleh lebih dari 50 klub nasional dan 22 klub internasional."
 	},
@@ -610,7 +610,7 @@
 		"startDate": "2024-06-28",
 		"endDate": "2024-09-01",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": null,
 		"description": "Pameran seni rupa yang menampilkan karya dari 49 artis, serta kategori ARTJOG Kids dan Young Artist Award."
 	},
@@ -619,7 +619,7 @@
 		"startDate": "2024-08-25",
 		"endDate": "2024-08-25",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Candi Prambanan",
 		"description": "Event lari 5K yang diikuti oleh ribuan peserta dengan pemandangan Candi Prambanan, mengusung tema Let's Fun & Run."
 	},
@@ -628,7 +628,7 @@
 		"startDate": "2024-09-08",
 		"endDate": "2024-09-08",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Candi Banyunibo, Candi Ijo, dan sekitarnya",
 		"description": "Lomba lari yang melintasi situs-situs candi di Sleman, dengan tiga kategori 5K, 15K, dan 30K."
 	},
@@ -642,7 +642,7 @@
 				"price": 50000 
 			}
 		],
-		"category": "Musik",
+		"category": "MS",
 		"location": "Watu Goyang, Dlingo, Yogyakarta",
 		"description": "Pertunjukan musik dengan line up Utopia, Niskala, The Kick, dan lainnya di salah satu destinasi wisata Yogyakarta."
 	},
@@ -651,7 +651,7 @@
 		"startDate": "2022-02-01",
 		"endDate": "2022-02-07",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Kampung Ketandan, Jalan Malioboro, Yogyakarta",
 		"description": "Peringatan Tahun Baru Imlek di Kampung Ketandan, Jalan Malioboro dengan karnaval liong, naga barongsai, dan bazar kuliner."
 	},
@@ -660,7 +660,7 @@
 		"startDate": "2022-02-15",
 		"endDate": "2022-02-16",
 		"ticket": null,
-		"category": "Pariwisata",
+		"category": "PW",
 		"location": "Jogja",
 		"description": "Event pariwisata dihadiri oleh pengelola hotel, restoran, dan objek wisata."
 	},
@@ -669,7 +669,7 @@
 		"startDate": "2022-05-02",
 		"endDate": "2022-05-03",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Kraton Yogyakarta",
 		"description": "Upacara besar yang diselenggarakan oleh Kraton Jogja untuk merayakan Hari Raya Idul Fitri setelah ibadah puasa."
 	},
@@ -678,7 +678,7 @@
 		"startDate": "2022-07-07",
 		"endDate": "2022-08-07",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Jogja Nasional Museum dan Taman Budaya Yogyakarta",
 		"description": "Festival peragaan seni kontemporer di Jogja Nasional Museum (JNM) dan Taman Budaya Yogyakarta (TBY) selama satu bulan."
 	},
@@ -687,7 +687,7 @@
 		"startDate": "2022-07-10",
 		"endDate": "2022-07-17",
 		"ticket": null,
-		"category": "Kuliner",
+		"category": "KL",
 		"location": "Taman Budaya Yogyakarta",
 		"description": "Festival kuliner unik yang menyajikan jajanan khas Yogyakarta yang langka dan tradisional."
 	},
@@ -696,7 +696,7 @@
 		"startDate": "2022-08-02",
 		"endDate": "2022-08-02",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Kraton Ngayogyakarta Hadiningrat",
 		"description": "Kegiatan memandikan pusaka milik Keraton Ngayogyakarta Hadiningrat pada tanggal 2 Agustus 2022."
 	},
@@ -705,7 +705,7 @@
 		"startDate": "2022-09-05",
 		"endDate": "2022-09-10",
 		"ticket": null,
-		"category": "Ekonomi Kreatif",
+		"category": "SN",
 		"location": "Mall di Yogyakarta",
 		"description": "Pameran produk UMKM, festival kuliner, fashion show, dan live music dalam suasana pasar rakyat."
 	},
@@ -714,7 +714,7 @@
 		"startDate": "2022-10-07",
 		"endDate": "2022-10-07",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Tugu Jogja",
 		"description": "Pertunjukan wayang modern oleh 14 kecamatan di Kota Jogja, dengan kolaborasi koreografi, kostum, vehicle, dan musik."
 	},
@@ -723,7 +723,7 @@
 		"startDate": "2022-10-08",
 		"endDate": "2022-10-08",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Alun-alun Utara Kraton Jogja",
 		"description": "Upacara tradisional peringatan Maulid Nabi Muhammad SAW dengan parade gunungan hasil bumi."
 	},
@@ -732,7 +732,7 @@
 		"startDate": "2022-10-15",
 		"endDate": "2022-11-15",
 		"ticket": null,
-		"category": "SENI",
+		"category": "SN",
 		"location": "Yogyakarta",
 		"description": "Pameran seni rupa tahunan yang mengundang seniman nasional dan internasional."
 	},
@@ -741,7 +741,7 @@
 		"startDate": "2022-10-20",
 		"endDate": "2022-10-21",
 		"ticket": null,
-		"category": "Otomotif",
+		"category": "SN",
 		"location": "Yogyakarta",
 		"description": "Pameran modifikasi otomotif di Asia Tenggara, mengolaborasikan modifikasi dengan kekayaan budaya."
 	},
@@ -750,7 +750,7 @@
 		"startDate": "2022-11-05",
 		"endDate": "2022-11-05",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Desa-desa di Yogyakarta",
 		"description": "Festival musik jazz yang dikombinasikan dengan seni tradisional dan tradisi daerah."
 	},
@@ -759,7 +759,7 @@
 		"startDate": "2022-02-25",
 		"endDate": "2022-02-26",
 		"ticket": null,
-		"category": "Olahraga",
+		"category": "OL",
 		"location": "Lapangan Panahan, Jalan Kenari, Jogja",
 		"description": "Event panahan kuno Mataram yang menjadi ikon khusus di Yogyakarta."
 	},
@@ -768,7 +768,7 @@
 		"startDate": "2022-03-10",
 		"endDate": "2022-03-11",
 		"ticket": null,
-		"category": "Kuliner",
+		"category": "KL",
 		"location": "Kalurahan Gunung Ketur, Jogja",
 		"description": "Pasar tradisional dengan mata uang kethip dan sajian kuliner tradisional."
 	},
@@ -777,7 +777,7 @@
 		"startDate": "2022-04-02",
 		"endDate": "2022-04-02",
 		"ticket": null,
-		"category": "Budaya",
+		"category": "SN",
 		"location": "Warungboto, Jogja",
 		"description": "Tradisi padusan untuk menyambut bulan Ramadhan dengan arak-arakan tradisional."
 	},
@@ -786,7 +786,7 @@
 		"startDate": "2022-05-01",
 		"endDate": "2022-05-30",
 		"ticket": null,
-		"category": "Kuliner",
+		"category": "KL",
 		"location": "Kampung Kauman, Jalan Malioboro, Jogja",
 		"description": "Pasar kaget yang buka menjelang buka puasa dengan jajanan khas Yogyakarta."
 	},
@@ -795,7 +795,7 @@
 		"startDate": "2022-07-10",
 		"endDate": "2022-07-12",
 		"ticket": null,
-		"category": "Musik",
+		"category": "MS",
 		"location": "Pelataran Candi Prambanan",
 		"description": "Perhelatan musik tahunan dengan musisi nasional dan internasional."
 	},
@@ -809,7 +809,7 @@
 				"price": 50000
 			}
 		],
-		"category": "Akademik",
+		"category": "AK",
 		"location": "Universitas Gadjah Mada, Yogyakarta",
 		"description": "Acara akademik yang diadakan oleh Korps Mahasiswa HI UGM ini akan mengangkat isu-isu penting terkait aspek sosial-politik Indonesia sebagai tema utama. YYSF, sebagai acara akademik, akan menghadirkan pembicara-pembicara yang kredibel dan relevan untuk bersama-sama mendiskusikan serta membahas urgensi topik di masing-masing panel."
 	},
@@ -823,7 +823,7 @@
 				"price": 95000
 			}
 		],
-		"category": "Hiburan, Kompetisi",
+		"category": "AK",
 		"location": "Lapangan Pancasila, UGM",
 		"description": "Acara pertama yang menyampaikan Edukasi Kesehatan Gigi melalui Musik diselenggarakan oleh Fakultas Kedokteran Gigi UGM."
 	},
@@ -837,7 +837,7 @@
 				"price": 2950000
 			}
 		],
-		"category": "Akademik, Kompetisi",
+		"category": "AK",
 		"location": "Sheraton Mustika Yogyakarta",
 		"description": "Jogja International Model United Nations (JOINMUN) adalah rencana tahunan yang termasuk dalam kerangka kerja UGM MUN Community. Sebagai sebuah komunitas berbasis keilmuan di Universitas Gadjah Mada yang mendalami mengenai instrumen pelaksanaan sidang internasional."
 	},
@@ -846,7 +846,7 @@
 		"startDate": "2024-09-05",
 		"endDate": "2024-09-08",
 		"ticket": null,
-		"category": "Festival, Hiburan",
+		"category": "SN",
 		"location": "The Roof Space, Plaza Ambarrukmo",
 		"description": "Land of Leisures merupakan event tahunan yang diselenggarakan oleh Plaza Ambarrukmo sebagai perayaan terbesar industri lokal kreatif di Yogyakarta dan dapat dikunjungi mulai pukul 10.00 hingga 22.00 setiap harinya."
 	},
@@ -855,7 +855,7 @@
 		"startDate": "2024-07-19",
 		"endDate": "2024-07-21",
 		"ticket": null,
-		"category": "Festival, Hiburan",
+		"category": "SN",
 		"location": "Main Atrium Plaza Ambarrukmo & Alun-Alun Royal Ambarrukmo",
 		"description": "EXPOSURE lahir dari ide ambisius mahasiswa Manajemen yang ingin menciptakan pasar tematik kurasi khas Yogyakarta. Terinspirasi oleh pasar tematik di kota besar lain di Indonesia, EXPOSURE awalnya dibuat untuk membantu pengusaha lokal menjangkau pasar yang lebih luas di Yogyakarta."
 	},
@@ -878,7 +878,7 @@
 		"startDate": "2024-10-05",
 		"endDate": null,
 		"ticket": null,
-		"category": "Volunteer",
+		"category": "VL",
 		"location": "Yayasan Rumah Singgah Bumi Damai",
 		"description": "Sebagai wujud kepedulian dan tanggung jawab sosial, kami melaksanakan program kerja yang berfokus pada kegiatan bakti sosial, bernama Humman For Humanity (HFH)."
 	},
@@ -892,7 +892,7 @@
 				"price": 750000
 			}
 		],
-		"category": "Akademik",
+		"category": "AK",
 		"location": "D 105, Geografi UGM",
 		"description": "OLGENAS International Geolympiad is an annual event organized by the Faculty Of Geography Universitas Gadjah Mada (UGM). OLGENAS 2024 is competing in geography, this competition is present to provide opportunities for middle school and high school students to increase their competitiveness, compete with each other healthily and more critically, and be able to raise a student affective, cognitive, and psychomotor abilities, remembering that this third parameter is used as a standard for the success of learning."
 	},
@@ -906,7 +906,7 @@
 				"price": 500000
 			}
 		],
-		"category": "Akademik",
+		"category": "AK",
 		"location": "FISIPOL, UGM",
 		"description": "IREC adalah kompetisi bahasa Inggris tahunan yang diselenggarakan oleh KOMAHI sejak tahun 2013 lalu."
 	},
@@ -915,7 +915,7 @@
 		"startDate": "2024-09-01",
 		"endDate": null,
 		"ticket": null,
-		"category": "Volunteer",
+		"category": "VL",
 		"location": "Museum Dirgantara, Yogyakarta",
 		"description": "Menjadi Relawan menemani teman-teman PA Jampi Ati berkunjung ke Museum Dirgantara."
 	}

@@ -1,14 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    {% comment %} {% include "ds/fileinput.html" with name="test" input_id="hello" %}
-    {% include "ds/accordion.html" with title="Accordion 1" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit" class="space-y-4" %}
-
-    {% include "ds/inputwithquery.html" with placeholder="HELLO" query="TEST" id="test" %}
-    {% include "ds/button.html" with button_type="primary" text="Open Modal" id="openModalButton" specify="open-modal-1" class="w-fit" %}
-
-    {% include "testmodal.html" with modal_id="open-modal-1" modal_title="Test Modal" modal_label="modal-label"%}
-    {{search}} {% endcomment %}
     <style>
         @keyframes fadeIn {
             from {
@@ -22,58 +14,130 @@
         .fade-in {
             animation: fadeIn 1s ease-in-out;
         }
+
+        .section-title {
+            font-size: 3rem;
+            background: linear-gradient(to right, #4f46e5, #22d3ee);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .cta-button {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #4f46e5;
+            transform: scale(1.05);
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .card h2, .card p {
+            z-index: 1;
+        }
+
+        .card img {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover img {
+            transform: scale(1.1);
+        }
+
+        .accordion-item {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
     </style>
-    <section class="w-full flex flex-col justify-center items-center h-[100vh] gap-3 px-4 md:px-0 fade-in">
-        <h1 class="text-2xl md:text-4xl font-bold text-center">Welcome to</h1>
-        <img src={% static "assets/eventyog-icon-text.png" %} alt="" class="w-[300px] md:w-[500px]">
-        <p class="w-full md:w-[700px] text-center leading-7">
+
+    <!-- Hero Section -->
+    <section class="w-full flex flex-col justify-center items-center h-[100vh] gap-5 px-4 md:px-0 fade-in">
+        <h1 class="section-title font-bold text-center">Welcome to</h1>
+        <img src={% static "assets/eventyog-icon-text.png" %} alt="EventYog Logo" class="w-[300px] md:w-[500px]">
+        <p class="text-center leading-7 w-full md:w-[700px] text-lg text-gray-600">
             <b>EventYog</b> is your go-to platform for discovering and joining exciting events in Yogyakarta! From concerts to cultural festivals, find all the details in one place. Plus, shop exclusive event merchandise and create lasting memories with ease!
         </p>
         {% include "ds/button.html" with text="Learn More" class="w-fit h-fit" icon="fa fa-arrow-down" id="learnMoreButton" %}
     </section>
-    <section id="whatWeOffer" class="w-full flex flex-col justify-center items-center gap-2 px-4 md:px-10 fade-in mb-20">
-        <h3 class="font-bold text-lg md:text-xl text-gray-500">Features</h3>
-        <h1 class="text-2xl md:text-4xl font-bold text-center">Why Choose Us?</h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full">
-            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
-                <div class="absolute w-full h-full top-0 bg-black/100">
-                    <img src="{% static 'assets/landing/event.jpg' %}" alt="Events" class="w-full h-full object-cover opacity-40">
+
+    <!-- Features Section -->
+    <section id="whatWeOffer" class="w-full flex flex-col justify-center items-center gap-4 px-4 md:px-10 fade-in mt-20">
+        <h3 class="font-bold text-lg text-gray-500">Features</h3>
+        <h1 class="section-title font-bold text-center">Why Choose Us?</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 w-full">
+                <!-- Feature Card 1 -->
+                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
+                    <img src="{% static 'assets/landing/event.jpg' %}" alt="Events" class="w-full h-[300px] object-cover rounded-lg">
+                    <div class="mt-4 z-10">
+                        <h2 class="text-2xl font-bold text-center">Exciting Events</h2>
+                        <p class="text-center text-gray-600">Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.</p>
+                    </div>
                 </div>
-                <div class="relative z-10 text-white">
-                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Exciting <br/> Events</h2>
-                    <p class="text-center">Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.</p>
+
+                <!-- Feature Card 2 -->
+                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
+                    <img src="{% static 'assets/landing/merch.jpg' %}" alt="Merchandise" class="w-full h-[300px] object-cover rounded-lg">
+                    <div class="mt-4 z-10">
+                        <h2 class="text-2xl font-bold text-center">Exclusive Merchandise</h2>
+                        <p class="text-center text-gray-600">Shop exclusive event merchandise and create lasting memories with unique items.</p>
+                    </div>
+                </div>
+
+                <!-- Feature Card 3 -->
+                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
+                    <img src="{% static 'assets/landing/community.jpg' %}" alt="Community" class="w-full h-[300px] object-cover rounded-lg">
+                    <div class="mt-4 z-10">
+                        <h2 class="text-2xl font-bold text-center">Community Engagement</h2>
+                        <p class="text-center text-gray-600">Join a vibrant community of event enthusiasts and make new friends with similar interests.</p>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
-                <div class="absolute w-full h-full top-0 bg-black/100">
-                    <img src="{% static 'assets/landing/merch.jpg' %}" alt="Merchandise" class="w-full h-full object-cover opacity-40">
-                </div>
-                <div class="relative z-10 text-white">
-                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Exclusive Merchandise</h2>
-                    <p class="text-center">Shop exclusive event merchandise and create lasting memories with unique items.</p>
-                </div>
-            </div>
-            <div class="flex flex-col items-center p-4 border rounded-xl shadow-md min-h-[400px] md:pt-20 transition-transform duration-300 hover:scale-105 bg-white relative overflow-hidden flex items-center justify-center md:justify-start">
-                <div class="absolute w-full h-full top-0 bg-black/100">
-                    <img src="{% static 'assets/landing/community.jpg' %}" alt="Community" class="w-full h-full object-cover opacity-40">
-                </div>
-                <div class="relative z-10 text-white">
-                    <h2 class="text-4xl md:text-2xl xl:text-4xl font-semibold mb-2 text-center">Community Engagement</h2>
-                    <p class="text-center">Join a vibrant community of event enthusiasts and make new friends with similar interests.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="w-full flex flex-col justify-center items-center gap-2 px-4 md:px-10 fade-in mb-20">
-        <h1 class="text-2xl md:text-4xl font-bold text-center">Wanna ask some questions?</h1>
-        {% for qna in faq_qna  %}
-            {% include "ds/accordion.html" with title=qna.question content=qna.answer class="w-full" id=qna.id %}
-        {% endfor %}
     </section>
 
+    <!-- FAQ Section -->
+    <section class="w-full flex flex-col justify-center items-center gap-4 px-4 md:px-10 fade-in mb-20 mt-16">
+        <h1 class="section-title font-bold text-center">Wanna ask some questions?</h1>
+        <div class="w-full md:w-[700px]">
+            {% for qna in faq_qna %}
+                <div class="accordion-item">
+                    {% include "ds/accordion.html" with title=qna.question content=qna.answer id=qna.id %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Smooth Scroll Script -->
     <script>
-        document.getElementById('learnMoreButton').addEventListener('click', function() {
-            const offset = 120; // Adjust this value to set the offset
+        document.getElementById('learnMoreButton').addEventListener('click', function () {
+            const offset = 100; // Adjust the offset for smooth scroll
             const element = document.getElementById('whatWeOffer');
             const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - offset;
@@ -83,9 +147,5 @@
                 behavior: 'smooth'
             });
         });
-
-        function sayHello() {
-            alert('HELLO WORLD');
-        }
     </script>
 {% endblock content %}
