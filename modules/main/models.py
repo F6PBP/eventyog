@@ -33,7 +33,7 @@ class UserProfile(models.Model):
 class MerchCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     merchandise = models.ForeignKey('Merchandise', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -43,12 +43,12 @@ class MerchCart(models.Model):
 class EventCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey('TicketPrice', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def totalPrice(self):
-        return self.event.price * self.quantity
+        return self.ticket.price * self.quantity
 
 # Class for Event Category
 class EventCategory(models.TextChoices):

@@ -89,7 +89,7 @@ class Command(BaseCommand):
             for row in data:
                 user = User.objects.filter(username=row['username'])
                 if len(user) == 0:
-                    print(f'Creating user {row['username']}')
+                    print(f'Creating user {row["username"]}')
                     user = User.objects.create_user(
                         username=row['username'],
                         password=row['password'],   
