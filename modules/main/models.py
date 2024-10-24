@@ -58,6 +58,12 @@ class EventCategory(models.TextChoices):
     COSPLAY='CP', 'Cosplay',
     LINGKUNGAN='LG', 'Lingkungan',
     VOLUNTEER='VL', 'Volunteer',
+    AKADEMIS='AK', 'Akademis',
+    KULINER='KL', 'Kuliner',
+    PARIWISATA='PW', 'Pariwisata',
+    FESTIVAL='FS', 'Festival',
+    FILM='FM', 'Film',
+    FASHION='FN', 'Fashion',
     LAINNYA='LN', 'Lainnya'
 
 class TicketPrice(models.Model):
@@ -99,6 +105,7 @@ class Event(models.Model):
     image_urls = models.JSONField(null=True, blank=True)
     
 class Merchandise(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     image_url = models.URLField()
     name = models.CharField(max_length=200)
     description = models.TextField()
