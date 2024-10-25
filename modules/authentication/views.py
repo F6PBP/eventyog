@@ -8,13 +8,14 @@ from django.contrib import messages
 from modules.main.models import UserProfile
 from django.contrib.auth.decorators import login_required
 from eventyog.decorators import check_user_profile
+from eventyog.types import AuthRequest
 
 import datetime
 
 from .forms import UserProfileForm
 
 # Create your views here.
-def login_user(request):
+def login_user(request: AuthRequest):
     if (request.user.is_authenticated):return redirect('main:main')
     
     if request.method == 'POST':
