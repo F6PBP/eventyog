@@ -11,11 +11,15 @@
 
         <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500 flex items-center">
-                <i class="fas fa-thumbs-up"></i> {{ reply.totalLike }}
+                <a href="{% url 'yogforum:like_reply' reply.id %}" class="text-blue-500 hover:underline">
+                    <i class="fas fa-thumbs-up"></i> {{ reply.totalLike }}
+                </a>
             </span>
             <span class="text-sm text-gray-500 flex items-center">
-                <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }}
-            </span>
+                <a href="{% url 'yogforum:dislike_reply' reply.id %}" class="text-red-500 hover:underline">
+                    <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }}
+                </a>
+            </span>        
             {% if reply.user == request.user.userprofile %}
                 <form method="POST" action="{% url 'yogforum:delete_reply' reply_id=reply.id %}" class="inline">
                     {% csrf_token %}

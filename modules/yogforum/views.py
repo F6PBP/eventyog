@@ -83,63 +83,48 @@ def viewforum(request, post_id):
 @login_required
 def add_reply(request, post_id):
     try:
-        # Try to get the forum post
         forum_post = Forum.objects.get(id=post_id)
         forum_reply = None
     except Forum.DoesNotExist:
-        # If the forum post doesn't exist, it might be a reply
         forum_reply = get_object_or_404(ForumReply, id=post_id)
-        forum_post = forum_reply.forum  # Get the original forum post from the reply
+        forum_post = forum_reply.forum
 
-    # Get 'reply_to' ID (optional), which could be a reply or a post
     reply_to_id = request.POST.get('reply_to', None)
 
     if request.method == 'POST':
         content = request.POST.get('content')
+        if not content:
+            return JsonResponse({"error": "Content cannot be empty."}, status=400)
 
         if reply_to_id:
-            # The reply is in response to another reply
             reply_to = get_object_or_404(ForumReply, id=reply_to_id)
-
-            # Calculate the depth manually
-            depth = 0
-            current_reply = reply_to
-            while current_reply.reply_to is not None:
-                depth += 1
-                current_reply = current_reply.reply_to
-
-            if depth >= 2:  # 0-based depth, so depth 2 is the 3rd level
-                return JsonResponse({"error": "Cannot reply more than 3 levels deep."}, status=400)
-
-            # Create a reply to another reply
-            ForumReply.objects.create(
+            new_reply = ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
                 content=content,
                 reply_to=reply_to
             )
         else:
-            if forum_reply:
-                # Calculate depth for forum reply
-                depth = 0
-                current_reply = forum_reply
-                while current_reply.reply_to is not None:
-                    depth += 1
-                    current_reply = current_reply.reply_to
-
-                if depth >= 2:
-                    return JsonResponse({"error": "Cannot reply more than 3 levels deep."}, status=400)
-
-            ForumReply.objects.create(
+            new_reply = ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
-                content=content,
-                reply_to=forum_reply  # This will be None if it's replying to the post
+                content=content
             )
 
-        return JsonResponse({"success": True, "message": "Reply added successfully!"})
+        # Pastikan reply_id dikirim dalam respons
+        return JsonResponse({
+            "success": True,
+            "message": "Reply added successfully!",
+            "username": new_reply.user.user.username,
+            "content": new_reply.content,
+            "reply_id": new_reply.id,  # Kirim reply_id di sini
+            "csrf_token": request.META['CSRF_COOKIE'],  # Kirim CSRF token untuk delete button
+            "is_owner": request.user.userprofile == new_reply.user,
+            "reply_to": new_reply.reply_to.user.user.username if new_reply.reply_to else None
+        })
 
     return JsonResponse({"error": "Invalid request."}, status=400)
+
 
 def view_reply_as_post(request, reply_id):
     # Get the reply by id
