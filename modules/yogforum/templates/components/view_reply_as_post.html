@@ -52,6 +52,49 @@
     <!-- Include modal for adding reply to this reply -->
     {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %}
 
+    <script>
+        document.getElementById('replyPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();  // Prevent form from submitting the default way
+
+            var formData = new FormData(this);  // Collect the form data
+            var url = this.action;  // Get the form's action (the URL)
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'  // Indicate it's an AJAX request
+                }
+            })
+            .then(response => response.json())  // Parse the JSON response
+            .then(data => {
+                if (data.error) {
+                    // Show the error message in a popup
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.error,
+                    });
+                } else {
+                    // Show success message and reload the page
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                    }).then(() => {
+                        location.reload();  // Reload the page to show the new reply
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+    <!-- Include SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Replies to this Reply -->
     <h3 class="font-bold text-lg mb-4">Replies to this Reply</h3>
     <div class="space-y-6">
@@ -68,4 +111,5 @@
         </a>
     </div>
 </main>
+
 {% endblock content %}

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from modules.main.models import Forum, ForumReply
 from django.http import JsonResponse
 from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
@@ -99,6 +100,18 @@ def add_reply(request, post_id):
         if reply_to_id:
             # The reply is in response to another reply
             reply_to = get_object_or_404(ForumReply, id=reply_to_id)
+
+            # Calculate the depth manually
+            depth = 0
+            current_reply = reply_to
+            while current_reply.reply_to is not None:
+                depth += 1
+                current_reply = current_reply.reply_to
+
+            if depth >= 2:  # 0-based depth, so depth 2 is the 3rd level
+                return JsonResponse({"error": "Cannot reply more than 3 levels deep."}, status=400)
+
+            # Create a reply to another reply
             ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
@@ -106,7 +119,17 @@ def add_reply(request, post_id):
                 reply_to=reply_to
             )
         else:
-            # The reply is to the original forum post or the reply acting as a post
+            if forum_reply:
+                # Calculate depth for forum reply
+                depth = 0
+                current_reply = forum_reply
+                while current_reply.reply_to is not None:
+                    depth += 1
+                    current_reply = current_reply.reply_to
+
+                if depth >= 2:
+                    return JsonResponse({"error": "Cannot reply more than 3 levels deep."}, status=400)
+
             ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
@@ -114,13 +137,9 @@ def add_reply(request, post_id):
                 reply_to=forum_reply  # This will be None if it's replying to the post
             )
 
-        # Redirect to the view forum page or reply as post page depending on the context
-        if forum_reply:
-            return redirect('yogforum:view_reply_as_post', reply_id=forum_reply.id)
-        else:
-            return redirect('yogforum:viewforum', post_id=forum_post.id)
+        return JsonResponse({"success": True, "message": "Reply added successfully!"})
 
-    return redirect('yogforum:viewforum', post_id=forum_post.id)
+    return JsonResponse({"error": "Invalid request."}, status=400)
 
 def view_reply_as_post(request, reply_id):
     # Get the reply by id
