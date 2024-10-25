@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpRequest, HttpResponse
 from .forms import MerchandiseForm
-from modules.main.models import Merchandise
+from modules.main.models import Merchandise, Event
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from eventyog.decorators import check_user_profile
@@ -9,7 +9,7 @@ from eventyog.decorators import check_user_profile
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
     merchandise = Merchandise.objects.all()
-    # print(merchandise)
+    print(merchandise)
     context = {
         'show_navbar': True,
         'is_admin': request.is_admin,
@@ -24,7 +24,7 @@ def create_merchandise(request):
         merchandise = form.save(commit=False)
         merchandise.user = request.user
         merchandise.save()
-        return redirect('main:main')
+        return redirect('merchandise:main')
 
     context = {
         'form': form,
@@ -38,12 +38,15 @@ def edit_merchandise(request, id):
 
     if form.is_valid() and request.method == "POST":
         form.save()
-        return HttpResponseRedirect(reverse('main:main'))
+        return HttpResponseRedirect(reverse('merchandise:main'))
 
-    context = {'form': form}
+    context = {
+        'form': form,
+        'show_navbar': True
+    }
     return render(request, "edit_merchandise.html", context)
 
 def delete_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     merchandise.delete()
-    return HttpResponseRedirect(reverse('main:main'))
+    return HttpResponseRedirect(reverse('merchandise:main'))
