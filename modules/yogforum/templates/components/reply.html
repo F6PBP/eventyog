@@ -44,6 +44,3 @@
         {% endfor %}
     </div>
 {% endif %}
-
-<!-- Reply Modal for each reply -->
-{% include "components/add_reply.html" with modal_id="reply-modal-{{ reply.id }}" modal_title="Reply to {{ reply.user.user.username }}" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
