@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from modules.yogforum.forms import ForumForm
+from modules.yogforum.forms import AddForm
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -32,14 +32,27 @@ def main(request):
     }
     return render(request, 'yogforum.html', context)
 
-@login_required
 def add_post(request):
     if request.method == 'POST':
-        form = ForumForm(request.POST)
+        form = AddForm(request.POST)
         if form.is_valid():
-            new_post = form.save(commit=False)
-            new_post.user = request.user.userprofile  # Asosiasikan post dengan user yang sedang login
-            new_post.save()
-            messages.success(request, 'Your post has been successfully added!')
-            return redirect('yogforum:main')
+            post = form.save(commit=False)
+            post.user = request.user.userprofile  # assuming user has a related profile
+            post.save()
+            return redirect('yogforum:main')  # redirect to forum main page after adding post
+    else:
+        form = AddForm()
+    
+    return render(request, 'components/new_post_modal.html', {'form': form})
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
+    post.delete()
     return redirect('yogforum:main')
+
+@login_required
+def delete_reply(request, reply_id):
+    reply = get_object_or_404(ForumReply, id=reply_id, user=request.user.userprofile)
+    reply.delete()
+    return redirect('yogforum:viewforum', post_id=reply.forum.id)

@@ -1,20 +1,28 @@
-<div class="p-4 border border-gray-200 shadow-sm mb-4 rounded-lg">  <!-- Tambahkan class rounded-lg -->
+<div class="p-4 border border-gray-200 shadow-sm mb-4 rounded-lg">
     <div class="flex justify-between items-center mb-2">
         <div>
             <p class="font-semibold text-gray-700">
                 Replied by {{ reply.user.user.username }}
             </p>
             {% if reply.reply_to %}
-                <p class="text-gray-500">To {{ reply.reply_to.user.user.username }}</p> <!-- Target reply -->
+                <p class="text-gray-500">To {{ reply.reply_to.user.user.username }}</p>
             {% endif %}
         </div>
+
         <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-500 flex items-center">
-                <i class="fas fa-thumbs-up"></i> {{ reply.totalLike }} <!-- Like reply -->
+                <i class="fas fa-thumbs-up"></i> {{ reply.totalLike }}
             </span>
             <span class="text-sm text-gray-500 flex items-center">
-                <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }} <!-- Dislike reply -->
+                <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }}
             </span>
+            <!-- Only show the delete button for the reply owner -->
+            {% if reply.user == request.user.userprofile %}
+                <form method="POST" action="{% url 'yogforum:delete_reply' reply_id=reply.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
+                </form>
+            {% endif %}
         </div>
     </div>
     <p class="text-gray-600 mb-2">{{ reply.content }}</p>

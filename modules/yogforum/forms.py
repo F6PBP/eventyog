@@ -1,7 +1,7 @@
 from django import forms
 from modules.main.models import Forum
 
-class ForumForm(forms.ModelForm):
+class AddForm(forms.ModelForm):
     class Meta:
         model = Forum
         fields = ['title', 'content']  # Field yang akan diisi oleh user

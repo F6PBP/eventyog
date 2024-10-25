@@ -16,6 +16,14 @@
                     <span class="text-sm text-gray-500 flex items-center">
                         <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }} <!-- Jumlah dislike -->
                     </span>
+
+                    <!-- Show delete button only if the current user is the owner of the post -->
+                    {% if request.user == forum_post.user.user %}
+                        <form method="POST" action="{% url 'yogforum:delete_post' forum_post.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 hover:text-red-700">Delete Post</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
             <p class="text-gray-700 mb-4">{{ forum_post.content }}</p>
