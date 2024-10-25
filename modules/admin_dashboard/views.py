@@ -88,6 +88,15 @@ def edit_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     user_profile = get_object_or_404(UserProfile, user=user)
     
+    context = {
+        'user': user,
+        'user_profile': user_profile,
+        'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
+        'show_navbar': True,
+        'show_footer': True,
+        'is_admin': True,
+    }
+
     if request.method == 'POST':
         # Update user profile
         user_profile.name = request.POST.get('name')
@@ -103,9 +112,13 @@ def edit_user(request, user_id):
         user.save()
         
         messages.success(request, 'User profile updated successfully')
-        return redirect('see_user', user_id=user_id)
         
-    return redirect('see_user', user_id=user_id)
+        # Render the same page with updated data and success message
+        return render(request, 'user.html', context)
+    
+    # For GET request, render the edit page with current context
+    return render(request, 'user.html', context)
+
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
@@ -117,6 +130,6 @@ def delete_user(request, user_id):
         user = get_object_or_404(User, pk=user_id)
         user.delete()
         messages.success(request, 'User account deleted successfully')
-        return redirect('show_main')
+        return redirect('admin_dashboard:main')  # Change this line to use the correct namespaced URL
         
-    return redirect('see_user', user_id=user_id)
+    return redirect('admin_dashboard:see_user', user_id=user_id)  # Also use the namespaced URL here
