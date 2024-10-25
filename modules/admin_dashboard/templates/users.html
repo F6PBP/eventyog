@@ -20,12 +20,13 @@
                         // Create a new user card
                         const userLink = document.createElement('a');
                         const url = window.location.href;
-                        userLink.href = `${url}user/${user.pk}`;
+                        userLink.href = `${url}user/${user.pk+1}`;
                         userLink.classList.add('user-item', 'flex', 'flex-col', 'items-center', 'max-w-[200px]', 'bg-gray-100', 'p-10', 'gap-2', 'rounded-xl', 'hover:scale-105', 'duration-300', 'cursor-pointer');
                         
                         const img = document.createElement('img');
+
                         img.src = `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}`;
-                        img.alt = user.name;
+                        img.alt = user.fields.name;
                         img.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover');
                         
                         const name = document.createElement('p');

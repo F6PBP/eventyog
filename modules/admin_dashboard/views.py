@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from modules.main.models import UserProfile
 from django.http import HttpResponse
 from django.core import serializers
+from django.contrib import messages
 
 
 # Create your views here.
@@ -35,6 +36,7 @@ def search_users(request):
     
     return HttpResponse(data, content_type='application/json')
 
+'''
 def see_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     
@@ -46,5 +48,74 @@ def see_user(request, user_id):
         'show_navbar': True,
         'show_footer': True,
     }
-    
+
     return render(request, 'user.html', context)
+'''
+
+@login_required(login_url='auth:login')
+@check_user_profile(is_redirect=True)
+def see_user(request, user_id):
+    if request.user_profile.role != 'AD':
+        return redirect('main:home')
+    
+    print(f"Requested user_id: {user_id}")
+    user = get_object_or_404(User, pk=user_id)
+    print(f"Found user: {user.username}, ID: {user.id}")
+    user_profile = get_object_or_404(UserProfile, user=user)
+    print(f"Found profile: {user_profile.name}, User ID: {user_profile.user.id}")
+        
+    user = get_object_or_404(User, pk=user_id)
+    user_profile = get_object_or_404(UserProfile, user=user)
+    
+    context = {
+        'user': user,
+        'user_profile': user_profile,
+        'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
+        'show_navbar': True,
+        'show_footer': True,
+        'is_admin': True,
+    }
+
+    return render(request, 'user.html', context)
+
+@login_required(login_url='auth:login')
+@check_user_profile(is_redirect=True)
+def edit_user(request, user_id):
+    if request.user_profile.role != 'AD':
+        return redirect('main:home')
+        
+    user = get_object_or_404(User, pk=user_id)
+    user_profile = get_object_or_404(UserProfile, user=user)
+    
+    if request.method == 'POST':
+        # Update user profile
+        user_profile.name = request.POST.get('name')
+        user_profile.bio = request.POST.get('bio')
+        
+        if 'profile_picture' in request.FILES:
+            user_profile.profile_picture = request.FILES['profile_picture']
+            
+        user_profile.save()
+        
+        # Update user email
+        user.email = request.POST.get('email')
+        user.save()
+        
+        messages.success(request, 'User profile updated successfully')
+        return redirect('see_user', user_id=user_id)
+        
+    return redirect('see_user', user_id=user_id)
+
+@login_required(login_url='auth:login')
+@check_user_profile(is_redirect=True)
+def delete_user(request, user_id):
+    if request.user_profile.role != 'AD':
+        return redirect('main:home')
+        
+    if request.method == 'POST':
+        user = get_object_or_404(User, pk=user_id)
+        user.delete()
+        messages.success(request, 'User account deleted successfully')
+        return redirect('show_main')
+        
+    return redirect('see_user', user_id=user_id)
