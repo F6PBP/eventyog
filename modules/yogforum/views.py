@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from modules.yogforum.forms import AddForm
+from modules.yogforum.forms import AddForm, AddReplyForm
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -56,3 +56,46 @@ def delete_reply(request, reply_id):
     reply = get_object_or_404(ForumReply, id=reply_id, user=request.user.userprofile)
     reply.delete()
     return redirect('yogforum:viewforum', post_id=reply.forum.id)
+
+def view_forum(request, post_id):
+    forum_post = get_object_or_404(Forum, id=post_id)
+    replies = ForumReply.objects.filter(forum=forum_post)
+    
+    # Create a form instance for the reply
+    if request.method == "POST":
+        form = AddReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.forum = forum_post
+            reply.user = request.user
+            reply.save()
+            # Redirect after saving
+    else:
+        form = AddReplyForm()
+
+    context = {
+        'forum_post': forum_post,
+        'replies': replies,
+        'form': form
+    }
+    return render(request, 'viewforum.html', context)
+
+@login_required
+def add_reply(request, post_id):
+    forum_post = get_object_or_404(Forum, id=post_id)
+    
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        parent_reply_id = request.POST.get('reply_to')
+
+        # Creating a new reply
+        new_reply = ForumReply(user=request.user.userprofile, forum=forum_post, content=content)
+
+        if parent_reply_id:
+            parent_reply = ForumReply.objects.get(id=parent_reply_id)
+            new_reply.reply_to = parent_reply
+
+        new_reply.save()
+        return redirect('yogforum:viewforum', post_id=post_id)
+    
+    return redirect('yogforum:viewforum', post_id=post_id)

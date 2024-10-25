@@ -1,53 +1,59 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="w-full mb-20 px-4 sm:px-6 lg:px-8 mt-24">  <!-- Margin top ditambahkan -->
-        <!-- Post Utama -->
-        <div class="bg-gray-100 p-6 rounded-lg shadow-md mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h2 class="text-xl font-semibold">{{ forum_post.title }}</h2>
-                    <p class="text-sm text-gray-500">by {{ forum_post.user.user.username }}</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500 flex items-center">
-                        <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }} <!-- Jumlah like -->
-                    </span>
-                    <span class="text-sm text-gray-500 flex items-center">
-                        <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }} <!-- Jumlah dislike -->
-                    </span>
+<main class="w-full mb-20 px-4 sm:px-6 lg:px-8">
+    <!-- Forum Title Section -->
+    <div class="flex flex-col items-center gap-4 text-left mt-24">
+        <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#003FE2]">Community Forum</h1>
+    </div>
 
-                    <!-- Show delete button only if the current user is the owner of the post -->
-                    {% if request.user == forum_post.user.user %}
-                        <form method="POST" action="{% url 'yogforum:delete_post' forum_post.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="text-red-500 hover:text-red-700">Delete Post</button>
-                        </form>
-                    {% endif %}
-                </div>
+    <!-- Main Forum Post -->
+    <div class="bg-gray-100 p-6 rounded-lg shadow-md mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">{{ forum_post.title }}</h2>
+                <p class="text-sm text-gray-500">by {{ forum_post.user.user.username }}</p>
             </div>
-            <p class="text-gray-700 mb-4">{{ forum_post.content }}</p>
-            <div class="flex justify-between text-sm text-gray-500">
-                <p>{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
-                <a href="#" class="text-blue-500 hover:underline">Reply to this Post</a>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center">
+                    <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }}
+                </span>
+                <span class="text-sm text-gray-500 flex items-center">
+                    <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }}
+                </span>
+                {% if forum_post.user == request.user.userprofile %}
+                    <form method="POST" action="{% url 'yogforum:delete_post' post_id=forum_post.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
-
-        <!-- Replies Section -->
-        <h3 class="font-bold text-lg mb-4">Replies</h3>
-        <div class="space-y-6">
-            {% for reply in replies %}
-                <!-- Include template for replies with level 1 as starting point -->
-                {% include "components/reply.html" with reply=reply level=1 %}
-            {% endfor %}
+        <p class="text-gray-700 mb-4">{{ forum_post.content }}</p>
+        <div class="flex justify-between text-sm text-gray-500">
+            <p>{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
+            
+            <!-- Button to trigger Reply Modal for main post -->
+            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
         </div>
+    </div>
 
-    
-        <!-- Button Kembali -->
-        <div class="mt-10">
-            <a href="{% url 'yogforum:main' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Home
-            </a>
-        </div>
-    </main>
+    {% include "components/add_reply.html" with modal_id="open-modal-1" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %}
+
+    <!-- Replies Section -->
+    <h3 class="font-bold text-lg mb-4">Replies</h3>
+    <div class="space-y-6">
+        {% for reply in replies %}
+            <!-- Include template for replies with level 1 as starting point -->
+            {% include "components/reply.html" with reply=reply level=1 %}
+        {% endfor %}
+    </div>
+
+    <!-- Button Back to Main Forum -->
+    <div class="mt-10">
+        <a href="{% url 'yogforum:main' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Home
+        </a>
+    </div>
+</main>
 {% endblock content %}

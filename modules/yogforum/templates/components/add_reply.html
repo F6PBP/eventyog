@@ -1,0 +1,28 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <form method="POST" id="replyPostForm" action="{% url 'yogforum:add_reply' forum_post.id %}" class="space-y-4 p-6">
+        {% csrf_token %}
+
+        <!-- Updated to reply to the user instead of the title -->
+        <div class="mt-2">
+            <h2 class="text-lg font-semibold">Reply to {{ forum_post.user.user.username }}</h2> <!-- Reply to the post author -->
+        </div>
+
+        <div class="mt-6">
+            <label for="content" class="block text-sm font-medium text-gray-700">Your Reply</label>
+            <textarea name="content" id="content" rows="4" required 
+                class="mt-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
+            </textarea>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-4">
+            <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                onclick="closeModal('reply-modal')">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Reply to {{ forum_post.user.user.username }}
+            </button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block modal_footer %}{% endblock %}

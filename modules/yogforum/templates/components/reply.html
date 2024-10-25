@@ -16,7 +16,6 @@
             <span class="text-sm text-gray-500 flex items-center">
                 <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }}
             </span>
-            <!-- Only show the delete button for the reply owner -->
             {% if reply.user == request.user.userprofile %}
                 <form method="POST" action="{% url 'yogforum:delete_reply' reply_id=reply.id %}" class="inline">
                     {% csrf_token %}
@@ -25,10 +24,11 @@
             {% endif %}
         </div>
     </div>
+
     <p class="text-gray-600 mb-2">{{ reply.content }}</p>
     <div class="flex justify-between text-sm text-gray-500">
         <p>{{ reply.created_at|date:"H:i" }} • {{ reply.created_at|date:"d/m/Y" }}</p>
-        <a href="#" class="text-blue-500 hover:underline">Reply to this Post</a>
+        <a href="#" class="text-blue-500 hover:underline" onclick="openModal('reply-modal-{{ reply.id }}')">Reply to this Post</a>
     </div>
 </div>
 
@@ -40,3 +40,6 @@
         {% endfor %}
     </div>
 {% endif %}
+
+<!-- Reply Modal -->
+{% include "components/add_reply.html" with modal_id="reply-modal-{{ reply.id }}" %}
