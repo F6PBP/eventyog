@@ -69,6 +69,9 @@ def register(request):
 
 def onboarding(request):
     # Check if user has profile
+    if (request.user.is_authenticated == False):
+        return redirect('auth:login')
+    
     profile = UserProfile.objects.filter(user=request.user)
     if (len(profile) > 0):
         print('User has profile')
@@ -76,8 +79,6 @@ def onboarding(request):
         return redirect('main:main')
     elif (len(profile) == 0):
         print('User does not have profile')
-        
-    print("HELLOOOO")
         
     if request.method == 'POST':
         # Process the form data here
