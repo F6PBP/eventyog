@@ -99,3 +99,17 @@ def add_reply(request, post_id):
         return redirect('yogforum:viewforum', post_id=post_id)
     
     return redirect('yogforum:viewforum', post_id=post_id)
+
+def view_reply_as_post(request, reply_id):
+    # Get the reply by id
+    reply_as_post = get_object_or_404(ForumReply, id=reply_id)
+    
+    # Get replies to this "reply" (nested replies)
+    replies = ForumReply.objects.filter(reply_to=reply_as_post)
+    
+    context = {
+        'forum_post': reply_as_post,  # treat reply as post
+        'replies': replies,           # replies to the reply
+    }
+    
+    return render(request, 'viewforum.html', context)
