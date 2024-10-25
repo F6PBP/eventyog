@@ -28,7 +28,11 @@
     <p class="text-gray-600 mb-2">{{ reply.content }}</p>
     <div class="flex justify-between text-sm text-gray-500">
         <p>{{ reply.created_at|date:"H:i" }} • {{ reply.created_at|date:"d/m/Y" }}</p>
-        <a href="#" class="text-blue-500 hover:underline" onclick="openModal('reply-modal-{{ reply.id }}')">Reply to this Post</a>
+
+        <!-- Link to view this reply as a post -->
+        <a href="{% url 'yogforum:view_reply_as_post' reply.id %}" class="text-blue-500 hover:underline">
+            View Reply
+        </a>
     </div>
 </div>
 
@@ -40,6 +44,3 @@
         {% endfor %}
     </div>
 {% endif %}
-
-<!-- Reply Modal -->
-{% include "components/add_reply.html" with modal_id="reply-modal-{{ reply.id }}" %}
