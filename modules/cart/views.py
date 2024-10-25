@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
-from modules.main.models import MerchCart, EventCart
+from modules.main.models import MerchCart, EventCart, UserProfile, Event, Merchandise
 from eventyog.decorators import check_user_profile
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.db import transaction
+import json
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
@@ -11,6 +13,21 @@ def main(request: HttpRequest) -> HttpResponse:
     # Retrieve cart items for events and merchandise
     cart_events = EventCart.objects.filter(user=request.user)
     cart_merch = MerchCart.objects.filter(user=request.user)
+    user_profile = UserProfile.objects.get(user=request.user)
+
+# Get the events the user has registered for
+    buyedE = user_profile.registeredEvent.all()
+
+# Get the merchandise the user has bought
+    buyedM = user_profile.boughtMerch.all()
+
+# Print the bought events
+    for event in buyedE:
+        print(event.title)  # or any other field in the Event model
+
+# Print the bought merchandise
+    for merch in buyedM:
+        print(merch.name)  # or any other field in the Merchandise model
 
     # Calculate cumulative total price
     priceEvent = 0
@@ -22,6 +39,7 @@ def main(request: HttpRequest) -> HttpResponse:
         priceCart += i.totalPrice()
     
     total_price = priceEvent + priceCart
+
 
     context = {
         'user': request.user,
@@ -38,49 +56,43 @@ def main(request: HttpRequest) -> HttpResponse:
     return render(request, 'cart.html', context)
 
 @require_POST
-def update_cart(request, type, item_id, action):
+@transaction.atomic
+def checkout(request):
     user = request.user
+    user_profile = UserProfile.objects.get(user=user)
 
-    # Fetch the correct cart item based on type
-    if type == 'event':
-        try:
-            cart_item = EventCart.objects.get(id=item_id, user=user)
-        except EventCart.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Event item not found.'})
-    elif type == 'merch':
-        try:
-            cart_item = MerchCart.objects.get(id=item_id, user=user)
-        except MerchCart.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Merch item not found.'})
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid cart item type.'})
+    # Parse updated quantities from the request
+    data = json.loads(request.body)
+    updated_events = data.get('event', {})
+    updated_merch = data.get('merch', {})
 
-    # Update quantity based on action
-    if action == 'increase':
-        cart_item.quantity += 1
-    elif action == 'decrease' and cart_item.quantity > 0:
-        cart_item.quantity -= 1
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid action or minimum quantity reached.'})
-
-    # Save the updated cart item
-    cart_item.save()
-
-    # Calculate the total price for this cart item (quantity * price)
-    item_total_price = cart_item.totalPrice()  # Assuming you have a method totalPrice on the cart item models
-
-    # Recalculate the total price for all cart items for the user
+    # Retrieve all EventCart and MerchCart items for the user
     cart_events = EventCart.objects.filter(user=user)
     cart_merch = MerchCart.objects.filter(user=user)
 
-    # Summing up total price for all events and merchandise items
-    total_price = sum([event.totalPrice() for event in cart_events]) + \
-                  sum([merch.totalPrice() for merch in cart_merch])              
+    # Update EventCart quantities
+    for event_cart in cart_events:
+        event_id = str(event_cart.id)
+        if event_id in updated_events:
+            event_cart.quantity = updated_events[event_id]['quantity']
+            event_cart.save()
 
-    # Return the updated values in the response
-    return JsonResponse({
-        'success': True,
-        'new_quantity': cart_item.quantity,  # Updated quantity of the specific item
-        'item_total_price': item_total_price,  # Total price of this specific item
-        'total_price': total_price  # Total price of the entire cart
-    })
+    # Update MerchCart quantities
+    for merch_cart in cart_merch:
+        merch_id = str(merch_cart.id)
+        if merch_id in updated_merch:
+            merch_cart.quantity = updated_merch[merch_id]['quantity']
+            merch_cart.save()
+
+    # Check if the cart is empty after updates
+    cart_events = EventCart.objects.filter(user=user, quantity__gt=0)
+    cart_merch = MerchCart.objects.filter(user=user, quantity__gt=0)
+
+    if not cart_events.exists() and not cart_merch.exists():
+        return JsonResponse({'success': False, 'error': 'Your cart is empty.'})
+
+    # Save the updated user profile
+    user_profile.save()
+
+    # Return success response
+    return JsonResponse({'success': True})

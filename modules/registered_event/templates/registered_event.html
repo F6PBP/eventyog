@@ -1,6 +1,128 @@
 {% extends "base.html" %}
 {% block content %}
-    <main class="mt-32 px-10">
-        Hello
+    <main class="my-32 px-10">
+        <h1 class="font-bold text-3xl mb-2">Event History</h1>
+        <h3 class="text-gray-500 text-lg mb-6">Relive your favorite events and memories</h3>
+
+        <!-- Filter Form -->
+        <form id="filterForm" class="flex items-center mb-10 space-x-4">
+            <div>
+                <label for="start_time" class="block text-sm font-medium text-gray-700">Filter by Start Time:</label>
+                <input type="date" id="start_time" name="start_time" 
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+            <button type="submit" 
+                    class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Apply Filter
+            </button>
+        </form>
+
+        <!-- Event grid that will be populated via AJAX -->
+        <section id="eventGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- AJAX loaded content goes here -->
+        </section>
+
+        <!-- No events message (Hidden initially) -->
+        <div id="noEventsMessage" class="text-center text-gray-600 py-10 hidden">
+            <p class="text-lg">No events found. Try a different filter!</p>
+        </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('filterForm');
+            const eventGrid = document.getElementById('eventGrid');
+            const noEventsMessage = document.getElementById('noEventsMessage');
+            const startTimeInput = document.getElementById('start_time');
+            const defaultImageUrl = "https://gudeg.net/cni-content/uploads/modules/posts/20240701031539.jpg";
+
+            function fetchEvents() {
+                const formData = new FormData(form);
+                const startTime = formData.get('start_time') || '';
+
+                // Perform AJAX request
+                fetch(`/registered-event/fetch-registered-event?start_time=${startTime}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Fetched events:', data);
+                    // Clear the current events
+                    eventGrid.innerHTML = '';
+
+                    if (data.events.length > 0) {
+                        noEventsMessage.classList.add('hidden');
+
+                        // Loop through events and inject HTML
+                        data.events.forEach(event => {
+                            const eventImage = event.image_urls != 'default_image_url' && event.image_urls.length > 0 ? event.image_urls[0] : defaultImageUrl;
+                            const eventCard = `
+                                <div class="flex flex-col gap-4 p-6 border rounded-lg shadow-lg hover:shadow-xl transition-shadow bg-white h-full">
+                                    <div class="relative h-40 overflow-hidden rounded-lg">
+                                        <img src="${eventImage}" alt="Event Image" class="object-cover h-full w-full">
+                                    </div>
+                                    <div class="flex flex-col gap-3 flex-grow">
+                                        <h1 class="text-xl font-semibold text-gray-800">${event.title}</h1>
+                                        <p class="text-sm text-gray-500 line-clamp-3">${event.description}</p>
+                                        <div class="text-sm text-gray-600 flex items-center gap-2">
+                                            <i class="fa fa-calendar text-blue-500 w-4"></i>
+                                            <span>${event.start_time}</span>
+                                        </div>
+                                        <div class="text-sm text-gray-600 flex items-center gap-2">
+                                            <i class="fa fa-map-pin text-blue-500 w-4"></i>
+                                            <span>${event.location}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between mt-auto pt-4">
+                                        <a href="" class="text-indigo-600 hover:underline text-sm">View Details</a>
+                                        <div class="flex gap-2">
+                                            <a href="" class="text-yellow-500 hover:underline text-sm">Edit</a>
+                                            <a href="" class="text-red-500 hover:underline text-sm">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            eventGrid.insertAdjacentHTML('beforeend', eventCard);
+                        });
+                    } else {
+                        noEventsMessage.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                });
+            }
+
+            // Handle form submission for filtering
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                fetchEvents();
+            });
+
+            // Update URL query parameter when date changes
+            startTimeInput.addEventListener('change', function () {
+                const startTime = startTimeInput.value;
+                const url = new URL(window.location);
+                if (startTime) {
+                    url.searchParams.set('start_time', startTime);
+                } else {
+                    url.searchParams.delete('start_time');
+                }
+                window.history.pushState({}, '', url);
+            });
+
+            // Check URL for start_time parameter on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const startTime = urlParams.get('start_time');
+            if (startTime) {
+                startTimeInput.value = startTime;
+            }
+
+            // Auto-load events when the page is loaded
+            fetchEvents();
+        });
+    </script>
 {% endblock content %}

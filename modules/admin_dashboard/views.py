@@ -5,12 +5,13 @@ from django.contrib.auth.models import User
 from modules.main.models import UserProfile
 from django.http import HttpResponse
 from django.core import serializers
+from eventyog.types import AuthRequest
 
 
 # Create your views here.
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
-def show_main(request):
+def show_main(request: AuthRequest) -> HttpResponse:
     user_profiles = UserProfile.objects.all()
     
     context = {
@@ -27,7 +28,7 @@ def show_main(request):
     return render(request, 'users.html', context)
 
 @login_required(login_url='auth:login')
-def search_users(request):
+def search_users(request: AuthRequest) -> HttpResponse:
     search = request.GET.get('search', '')
     users = UserProfile.objects.filter(name__contains=search)
     

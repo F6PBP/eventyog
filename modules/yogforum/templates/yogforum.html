@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <main class="w-full mb-20 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center gap-4 text-left mt-24">
+            <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#003FE2]">Community Forum</h1>
+        </div>
+
+        <!-- Tombol untuk membuka modal -->
+        {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="fixed right-10 bottom-10 z-50 w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+
+        <!-- Modal untuk Add Post -->
+        {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]"%}
+
+        <!-- Grid untuk Forum Posts -->
+        <section class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in forum_posts %}
+                <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">{{ post.title }}</h2>
+                        <p class="text-sm text-gray-500">by {{ post.user.user.username }}</p>
+                    </div>
+                    <p class="text-gray-700 mb-4">{{ post.content|truncatewords:20 }}</p>
+                    <p class="text-gray-500 text-sm">
+                        <i class="fas fa-thumbs-up"></i> {{ post.totalLike }}  <!-- Jumlah like -->
+                        <i class="fas fa-thumbs-down ml-4"></i> {{ post.totalDislike }} <!-- Jumlah dislike -->
+                    </p>
+                    <a href="{% url 'yogforum:viewforum' post_id=post.id %}" class="text-blue-500 hover:underline">Read more</a>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+{% endblock content %}
