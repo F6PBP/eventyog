@@ -140,11 +140,13 @@ def view_reply_as_post(request, reply_id):
 
 @login_required
 def edit_post(request, post_id):
+    post_object = None
+    
+    # Try to get the Forum post first
     try:
-        # Try to get the forum post first
-        post_object = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
+        post_object = Forum.objects.get(id=post_id, user=request.user.userprofile)
     except Forum.DoesNotExist:
-        # If the forum post does not exist, try finding a reply instead
+        # If not found, try finding a reply instead
         post_object = get_object_or_404(ForumReply, id=post_id, user=request.user.userprofile)
 
     if request.method == 'POST':
