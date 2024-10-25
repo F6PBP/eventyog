@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from modules.yogforum.forms import AddForm, AddReplyForm
+from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -137,3 +137,29 @@ def view_reply_as_post(request, reply_id):
     }
     
     return render(request, 'components/view_reply_as_post.html', context)
+
+@login_required
+def edit_post(request, post_id):
+    try:
+        # Try to get the forum post first
+        post_object = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
+    except Forum.DoesNotExist:
+        # If the forum post does not exist, try finding a reply instead
+        post_object = get_object_or_404(ForumReply, id=post_id, user=request.user.userprofile)
+
+    if request.method == 'POST':
+        form = EditPostForm(request.POST, instance=post_object)
+        if form.is_valid():
+            form.save()
+            if isinstance(post_object, Forum):
+                return redirect('yogforum:viewforum', post_id=post_object.id)
+            else:
+                return redirect('yogforum:view_reply_as_post', reply_id=post_object.id)
+    else:
+        form = EditPostForm(instance=post_object)
+    
+    return render(request, 'components/edit_modal.html', {
+        'form': form,
+        'object': post_object,
+        'modal_id': f"edit-modal-{post_id}"
+    })

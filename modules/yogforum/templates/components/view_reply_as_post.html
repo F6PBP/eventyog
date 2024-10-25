@@ -32,6 +32,11 @@
                         {% csrf_token %}
                         <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
                     </form>
+
+                    <button class="text-blue-500 hover:text-blue-700 ml-4" onclick="openModal('edit-modal-{{ forum_post.id }}')">
+                        Edit Post
+                    </button>
+                    {% include "components/edit_modal.html" with modal_id="edit-modal-{{ forum_post.id }}" object=forum_post %}
                 {% endif %}
             </div>
         </div>
