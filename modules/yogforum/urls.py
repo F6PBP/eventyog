@@ -4,6 +4,7 @@ from modules.yogforum.views import *
 app_name = 'yogforum'
 
 urlpatterns = [
-    path('', main, name='main'),  # Menampilkan semua post
-    path('post/<int:post_id>/', viewforum, name='viewforum'),  # Menampilkan detail post berdasarkan ID
+    path('', main, name='main'),
+    path('post/<int:post_id>/', viewforum, name='viewforum'),
+    path('add/', add_post, name='add_post'),  # Route untuk menambahkan post
 ]

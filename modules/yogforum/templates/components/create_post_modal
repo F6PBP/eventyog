@@ -1,0 +1,24 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto">
+        <form method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row gap-5 relative">
+            {% csrf_token %}
+            
+            <!-- Input Caption / Konten Post -->
+            <div class="p-5 w-full">
+                <div class="mb-4 flex flex-col gap-2">
+                    <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                    <input type="text" id="title" name="title" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+                    <label for="caption" class="block text-sm font-medium text-gray-700">Caption</label>
+                    <textarea id="caption" name="caption" class="w-full h-[200px] p-2 border border-gray-300 rounded-lg" placeholder="Enter your post content" required></textarea>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end p-4 border-t">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Post</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
