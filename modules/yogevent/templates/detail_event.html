@@ -26,7 +26,7 @@
 
             <div class="rating-section mt-5">
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
-                <p id="averageRating">Average Rating: {{ total_rating.average_rating }}/5</p>
+                <p id="averageRating">{{ average_rating }}</p>
             </div>
 
             <div class="mt-5 flex justify-between">
@@ -35,4 +35,38 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const messageDisplay = document.getElementById("averageRating");
+
+        submitButton.addEventListener("click", function() {
+            fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    messageDisplay.textContent = data.error;
+                    messageDisplay.classList.add("text-red-500");
+                } else {
+                    messageDisplay.textContent = data.message;
+                    messageDisplay.classList.add("text-green-500");
+                    
+                    if (data.average_rating) {
+                        document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
+                    }
+                }
+            })
+            .catch(error => {
+                messageDisplay.textContent = "An error occurred. Please try again.";
+                messageDisplay.classList.add("text-red-500");
+            });
+        });
+    });
+
+</script>
 {% endblock %}

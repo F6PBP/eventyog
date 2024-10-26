@@ -15,4 +15,6 @@ urlpatterns = [
     path('create-event/', create_event_entry_ajax, name="create_event_entry_ajax"),
     path('event-rate/<uuid:event_id>/', create_rating_event, name='create_rating_event'),
     path('add-rating/<uuid:event_id>/', add_rating, name='add_rating'),
+    path('load-ratings/<uuid:event_id>/', load_event_ratings, name='load_event_ratings'),
+    path('get-rating-event/<uuid:uuid>/', get_rating_event, name='get_rating_event')
 ]

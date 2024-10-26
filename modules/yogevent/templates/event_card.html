@@ -68,7 +68,7 @@
             });
 
             rateButton.addEventListener('click', function() {
-                window.location.href = "{% url 'yogevent:add_rating' event.uuid %}";
+                window.location.href = "{% url 'yogevent:create_rating_event' event.uuid %}";
             });
         });
 </script>
