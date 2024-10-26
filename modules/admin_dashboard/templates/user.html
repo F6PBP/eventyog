@@ -5,11 +5,19 @@
     <main class="px-4 md:px-48 mt-32">
         <div class="flex flex-col gap-8">
             <div class="flex w-32 h-32 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm mx-auto md:mx-0">
-                <img
-                    src = 'http://res.cloudinary.com/mxgpapp/{{user_profile.profile_picture}}'
-                    alt = '{{user_profile.name}}'
-                    class="w-full h-full object-cover"
-                />
+                {% if user_profile.profile_picture %}
+                    <img
+                        src="http://res.cloudinary.com/mxgpapp/{{ user_profile.profile_picture }}"
+                        alt="{{ user_profile.name }}"
+                        class="w-full h-full object-cover"
+                    />
+                {% else %}
+                    <img
+                        src="https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png"
+                        alt="{{ user_profile.name }}"
+                        class="w-full h-full object-cover"
+                    />
+                {% endif %}
             </div>
             <div class="flex flex-col gap-2 text-left">
                 <div class="flex flex-col">
@@ -49,10 +57,13 @@
 
     <!-- Edit Modal -->
     <div id="editModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg shadow-lg p-5 w-1/2">
+        <!-- Add max-height and overflow handling to modal -->
+        <div class="bg-white rounded-lg shadow-lg p-5 w-1/2 max-h-[90vh] flex flex-col">
             <h2 class="text-lg font-semibold mb-4">Edit User Profile</h2>
-            <form action="{% url 'admin_dashboard:edit_user' user.id %}" method="POST" enctype="multipart/form-data" id="editProfileForm">
-                {% csrf_token %}
+            <!-- Add overflow handling to form -->
+            <div class="overflow-y-auto flex-1 pr-8">
+                <form action="{% url 'admin_dashboard:edit_user' user.id %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Name</label>

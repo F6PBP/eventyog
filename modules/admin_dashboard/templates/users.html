@@ -31,8 +31,13 @@
                         
                         const img = document.createElement('img');
 
-                        img.src = `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}`;
-                        img.alt = user.fields.name;
+                        if (user.fields.profile_picture) {
+                            img.src = `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}`;
+                        } else {
+                            img.src = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png';
+                            img.alt = user.fields.name;
+                        }
+
                         img.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover');
                         
                         const name = document.createElement('p');
