@@ -12,4 +12,6 @@ urlpatterns = [
     path('post/<int:post_id>/add_reply/', add_reply, name='add_reply'),
     path('reply/<int:reply_id>/', view_reply_as_post, name='view_reply_as_post'), 
     path('edit/<int:post_id>/', edit_post, name='edit_post'),
+    path('like_reply/<int:id>/', like_reply, name='like_reply'),
+    path('dislike_reply/<int:id>/', dislike_reply, name='dislike_reply'),
 ]

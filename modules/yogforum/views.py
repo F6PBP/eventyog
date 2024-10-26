@@ -7,20 +7,38 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 
-def viewforum(request, post_id):
-    # Cari post berdasarkan post_id
-    forum_post = get_object_or_404(Forum, id=post_id)
-    
-    # Ambil semua reply yang terkait dengan post ini
-    replies = ForumReply.objects.filter(forum=forum_post, reply_to=None).order_by('created_at')
+@login_required
+def like_reply(request, id):
+    reply = get_object_or_404(ForumReply, id=id)
+    reply.like += 1  # Update like count (adjust logic as per your model's structure)
+    reply.save()
+    return JsonResponse({'success': True, 'total_likes': reply.like})
 
-    context = {
-        'forum_post': forum_post,
-        'replies': replies,
-        'show_navbar': True,
-        'show_footer': True
-    }
-    return render(request, 'viewforum.html', context)
+@login_required
+def dislike_reply(request, id):
+    reply = get_object_or_404(ForumReply, id=id)
+    reply.dislike += 1  # Update dislike count (adjust logic as per your model's structure)
+    reply.save()
+    return JsonResponse({'success': True, 'total_dislikes': reply.dislike})
+
+@login_required
+def like_post(request, id):
+    reply = get_object_or_404(Forum, id=id)
+    reply.like += 1  # Update like count (adjust logic as per your model's structure)
+    reply.save()
+    return JsonResponse({'success': True, 'total_likes': reply.like})
+
+@login_required
+def dislike_post(request, id):
+    reply = get_object_or_404(Forum, id=id)
+    reply.dislike += 1  # Update dislike count (adjust logic as per your model's structure)
+    reply.save()
+    return JsonResponse({'success': True, 'total_dislikes': reply.dislike})
+
+def viewforum(request, post_id):
+    forum_post = get_object_or_404(Forum, id=post_id)
+    replies = ForumReply.objects.filter(forum=forum_post)
+    return render(request, 'yogforum/viewforum.html', {'forum_post': forum_post, 'replies': replies})
 
 def main(request):
     # Ambil semua post
