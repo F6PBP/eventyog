@@ -26,17 +26,7 @@
 
             <div class="rating-section mt-5">
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
-                <ul class="space-y-2">
-                    {% for rating in event.user_rating.all %}
-                        <li class="flex justify-between">
-                            <strong>{{ rating.user.username }}:</strong> 
-                            <span class="text-gray-700">{{ rating.rating }} - {{ rating.review }}</span> 
-                            <em class="text-gray-500">({{ rating.created_at }})</em>
-                        </li>
-                    {% empty %}
-                        <li class="text-gray-500">No ratings yet.</li>
-                    {% endfor %}
-                </ul>
+                <p id="averageRating">Average Rating: {{ total_rating.average_rating }}/5</p>
             </div>
 
             <div class="mt-5 flex justify-between">

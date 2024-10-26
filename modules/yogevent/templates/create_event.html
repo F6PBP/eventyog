@@ -8,18 +8,12 @@
                 <div class="mb-4 w-full">
                     <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
                     <input type="text" id="title" name="title" class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ form.title.value }}" required placeholder="Title">
-                    {% if form.title.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.title.errors }}</p>
-                    {% endif %}
                 </div>
                 
                 <!-- Description Input -->
                 <div class="mb-4 w-full">
                     <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
                     <textarea id="description" name="description" class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required placeholder="Description">{{ form.description.value }}</textarea>
-                    {% if form.description.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
-                    {% endif %}
                 </div>
                 
                 <!-- Event Category Dropdown -->
@@ -93,17 +87,25 @@
             
             fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
                 method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
                 body: formData,
             })
             .then(response => {
+                console.log("Response status: ", response.status)
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.text();
+                return response.json();
             })
             .then(data => {
-                if (data.includes('Event Created Successfully')) {
+                if (data.status) {
                     window.location.href = "{% url 'yogevent:main' %}";
+                } else {
+                    console.log(data.message)
+                    document.getElementById("responseContainer").style.display = "block";
+                    document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
                 }
             })
             .catch(error => {
