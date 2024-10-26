@@ -98,50 +98,37 @@ def see_user(request, user_id):
 def edit_user(request, user_id):
     if request.user_profile.role != 'AD':
         return redirect('main:home')
-        
+       
     user = get_object_or_404(User, pk=user_id)
     user_profile = get_object_or_404(UserProfile, user=user)
-
-    # Handle categories properly
-    categories = []
-    if user_profile.categories:
-        # Strip any whitespace and split only if there's content
-        categories = [cat.strip() for cat in user_profile.categories.split(',') if cat.strip()]
     
-    context = {
-        'user': user,
-        'user_profile': user_profile,
-        'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
-        'categories': categories,
-        'show_navbar': True,
-        'show_footer': True,
-        'is_admin': True,
-    }
-
     if request.method == 'POST':
+        # Debug prints
+        print("POST data received:", request.POST)
+        print("Categories from POST:", request.POST.get('categories'))
+        
         # Update user profile
         user_profile.name = request.POST.get('name')
         user_profile.bio = request.POST.get('bio')
         user_profile.email = request.POST.get('email')
         
+        # Handle categories with debug logging
+        categories = request.POST.get('categories', '')
+        print("Categories before save:", categories)
+        user_profile.categories = categories
+        
         if 'profile_picture' in request.FILES:
             user_profile.profile_picture = request.FILES['profile_picture']
-
-        user_profile.categories = request.POST.get('categories')
             
         user_profile.save()
+        print("Categories after save:", user_profile.categories)
         
         # Update username
         user.username = request.POST.get('username')
         user.save()
-
-        messages.success(request, 'User profile updated successfully')
         
-        # Render the same page with updated data and success message
-        return render(request, 'user.html', context)
-    
-    # For GET request, render the edit page with current context
-    return render(request, 'user.html', context)
+        messages.success(request, 'User profile updated successfully')
+        return redirect('admin_dashboard:see_user', user_id=user.id)
 
 
 @login_required(login_url='auth:login')
