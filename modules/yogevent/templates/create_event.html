@@ -93,7 +93,7 @@
         document.querySelector('#event-form').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form default submission
             let formData = new FormData(this); // Collect form data
-
+            
             fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
                 method: "POST",
                 body: formData,

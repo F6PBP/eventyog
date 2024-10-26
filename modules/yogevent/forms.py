@@ -1,5 +1,5 @@
 from django import forms
-from modules.main.models import Event, EventCategory
+from modules.main.models import Event, EventCategory, Rating
 from django.utils.html import strip_tags
 
 class EventForm(forms.ModelForm):
@@ -24,3 +24,12 @@ class EventForm(forms.ModelForm):
     def clean_location(self):
         location = self.cleaned_data["location"]
         return strip_tags(location)
+
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+            'review': forms.Textarea(attrs={'rows': 3}),
+        }

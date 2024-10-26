@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
-from modules.yogevent.forms import EventForm
+from modules.yogevent.forms import EventForm, RatingForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
+from django.shortcuts import redirect
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
@@ -135,3 +138,46 @@ def edit_event(request, uuid):
     }
 
     return render(request, "edit_event.html", context)
+
+def rate_event(request, event_id):
+    event = Event.objects.get(pk=event_id)
+    total_rating = event.user_rating.aggregate(Avg('rating'))
+    # average_rating = Rating.objects.filter(event=event).aggregate(Avg('rating'))['rating__avg']
+
+    total_rating_value = total_rating['rating__avg'] or 0
+    # print(f"Total Rating Value: {total_rating_value}")  # Debugging line
+
+    context = {
+        'user': request.user,
+        'show_navbar': True,
+        'show_footer': True,
+        'event': event,
+        'total_rating': total_rating_value,
+    }
+    
+    return render(request, 'detail_event.html', context)
+
+def add_rating(request, event_id):
+    if request.method == 'POST':
+        rating_value = request.POST.get('rating')
+        event = get_object_or_404(Event, pk=event_id)
+
+        # Debugging output
+        print(f"Received rating for event {event.title}: {rating_value}")
+
+        try:
+            rating_value = int(rating_value)  # Convert to integer
+            if rating_value < 1 or rating_value > 5:  # Assuming a 1-5 rating scale
+                print("Rating value out of bounds.")
+                return redirect('yogevent:rate_event', event_id=event_id)
+        except (ValueError, TypeError):
+            print("Invalid rating value.")
+            return redirect('yogevent:rate_event', event_id=event_id)
+
+        # Create the rating
+        rating = Rating.objects.create(user=request.user.userprofile, rated_event=event, rating=rating_value)
+
+        # Check if the rating was created
+        print(f"Rating created: {rating.rating} for event {event.title} by user {request.user.username}")
+
+        return redirect('yogevent:rate_event', event_id=event_id)

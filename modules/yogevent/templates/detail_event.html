@@ -1,1 +1,49 @@
-<p>HALO</p>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto mt-5">
+    {% if event.image_url %}
+        <img class="w-full h-48 object-cover" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
+    {% else %}
+        <img class="w-full h-48 object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFI7ygT65aVwQcrF_RPAqJQvfDXby3GVDyng&s" alt="{{ event.title }}">
+    {% endif %}
+    <h1 class="text-3xl font-bold mt-32">{{ event.title }}</h1>
+    <div class="event-details">
+        <p class="text-gray-700">Description: {{ event.description }}</p>
+        <p class="text-gray-700">Start Time: {{ event.start_time }}</p>
+        <p class="text-gray-700">End Time: {{ event.end_time }}</p>
+        <p class="text-gray-700">Location: {{ event.location }}</p>
+
+        {% if event.image_urls %}
+            <div class="event-images">
+                <h2 class="text-xl font-semibold">Event Images:</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    {% for image in event.image_urls %}
+                        <img src="{{ image }}" alt="{{ event.title }} Image" class="rounded shadow-lg">
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="rating-section mt-5">
+        <h2 class="text-xl font-semibold">Ratings:</h2>
+        <ul>
+            {% for rating in event.user_rating.all %}
+                <li>
+                    <strong>{{ rating.user.username }}:</strong> 
+                    <span>{{ rating.rating }} - {{ rating.review }}</span> 
+                    <em>({{ rating.created_at }})</em>
+                </li>
+            {% empty %}
+                <li>No ratings yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="mt-5">
+        <a href="{% url 'yogevent:edit_event' event.uuid %}" class="btn btn-primary">Edit Event</a>
+        <a href="{% url 'yogevent:delete_event' event.uuid %}" class="btn btn-danger">Delete Event</a>
+        <a href="{% url 'yogevent:main' %}" class="btn btn-secondary">Back to Events</a>
+    </div>
+</div>
+{% endblock %}

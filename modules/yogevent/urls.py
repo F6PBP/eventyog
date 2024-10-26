@@ -12,5 +12,7 @@ urlpatterns = [
     path('detail-event/<uuid:uuid>/', detail_event, name='detail_event'),
     path('edit-event/<uuid:uuid>/', edit_event, name='edit_event'),
     path('delete-event/<uuid:uuid>/', delete_event, name='delete_event'),
-    path('create-event', create_event_entry_ajax, name="create_event_entry_ajax"), 
+    path('create-event/', create_event_entry_ajax, name="create_event_entry_ajax"),
+    path('add-rating/<uuid:event_id>/', add_rating, name='add_rating'),
+    path('rate/<uuid:event_id>/', rate_event, name='rate_event'), 
 ]
