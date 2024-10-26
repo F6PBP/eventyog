@@ -5,15 +5,15 @@ from modules.main.models import Merchandise, Event
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from eventyog.decorators import check_user_profile
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.core import serializers
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
-    merchandise = Merchandise.objects.all()
-    print(merchandise)
     context = {
         'show_navbar': True,
         'is_admin': request.is_admin,
-        'merchandise': merchandise
     }
     return render(request, 'merchandise.html', context)
 
@@ -31,6 +31,24 @@ def create_merchandise(request):
         'show_navbar': True
     }
     return render(request, "create_merchandise.html", context)
+
+@csrf_exempt
+@require_POST
+def create_merchandise_ajax(request):
+    name = request.POST.get("name")
+    description = request.POST.get("description")
+    price = request.POST.get("price")
+    image_url = request.POST.get("image_url")
+
+    new_merchandise = Merchandise(
+        name = name, 
+        description = description,
+        price = price,
+        image_url = image_url,
+    )
+    new_merchandise.save()
+
+    return HttpResponse(b"CREATED", status=201)
 
 def edit_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
@@ -50,3 +68,7 @@ def delete_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     merchandise.delete()
     return HttpResponseRedirect(reverse('merchandise:main'))
+
+def showMerch_json(request):
+    data = Merchandise.objects.all()
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")

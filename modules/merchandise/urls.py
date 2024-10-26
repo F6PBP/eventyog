@@ -8,4 +8,6 @@ urlpatterns = [
     path('create/', create_merchandise, name='create_merchandise'),
     path('edit/<int:id>/', edit_merchandise, name='edit_merchandise'),
     path('delete/<int:id>/', delete_merchandise, name='delete_merchandise'),
+    path('add_merchandise_ajax/', create_merchandise_ajax, name='create_merchandise_ajax'),
+    path('show/', showMerch_json, name='showMerch_json'),
 ]

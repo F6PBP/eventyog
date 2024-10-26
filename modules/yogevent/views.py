@@ -105,6 +105,7 @@ def create_event_entry_ajax(request):
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
+    merchandise = Merchandise.objects.all()
 
     context = {
         'user': request.user,
@@ -114,6 +115,7 @@ def detail_event(request, uuid):
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
         'event': event,
+        'merchandise': merchandise,
     }
     return render(request, 'detail_event.html', context)
 

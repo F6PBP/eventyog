@@ -34,5 +34,9 @@
             </div>
         </div>
     </div>
+    <div class="w-full">
+        {% include 'merchandise.html' %}
+    </div>
+    {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed inset-0 flex items-center justify-center z-50 bg-white overflow-y-auto" %}
 </div>
 {% endblock %}

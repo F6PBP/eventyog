@@ -1,14 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="px-4 md:px-48 my-32">
-        <h2>Friend List</h2>
-        <ul>
+    <main class="px-10 md:20 lg:px-32 my-48">
+        <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl mb-4">Your Friends</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {% for friend in friends %}
-                <li>{{ friend.name }}</li>
+                <a href="{% url 'friends:main' friend.user_id %}" class="flex items-center">
+                    <div class="flex gap-4 items-center transition-transform transform hover:scale-105">
+                        <div class="flex w-16 h-16 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm">
+                            <img 
+                                src="{% if friend.profile_picture %}{{friend.profile_picture}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
+                                alt="profile" 
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div class="flex flex-col text-left">
+                            <h3 class="font-bold text-lg">{{friend.name}}</h3>
+                            <p class="text-sm text-gray-500">{{friend.email}}</p>
+                        </div>
+                    </div>
+                </a>
             {% empty %}
-                <li>You have no friends added.</li>
+                <p>You have no friends added. (lmao bro got no friends 💀)</p>
             {% endfor %}
-        </ul>
+        </div>
     </main>
 {% endblock content %}
