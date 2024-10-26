@@ -6,9 +6,9 @@
 {% endblock meta %}
 
 {% block content %}
-<main class="flex items-center justify-center w-screen h-screen px-5 border-[2px] border-black/5">
+<main class="flex items-center justify-center w-screen h-screen px-5 border-[2px] border-black/5  bg-gradient-to-br from-[#00FF57] to-[#487BFF]">
   <div
-    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center"
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center min-w-[400px]"
   >    
     <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
     <h1
@@ -23,7 +23,7 @@
             <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-black text-sm">
             {{ field.label }}
             </label>
-            <div class="relative">
+            <div class="relative w-full">
               {{ field }}
               {% if field.field.widget.input_type == "password" %}
                 <button type="button" onclick="togglePasswordVisibility('{{ field.id_for_label }}')" class="absolute inset-y-0 right-0 pr-5 flex items-center text-sm leading-5">

@@ -1,33 +1,79 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="w-full mb-20 px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col items-center gap-4 text-left mt-24">
-            <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#003FE2]">Community Forum</h1>
+    <main class="w-full mb-20 px-4 sm:px-10 lg:px-32 pt-10 max-h-[100vh] overflow-hidden">
+        <div class="flex flex-col gap-4 text-left mt-24">
+            <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl">Community Forum</h1>
         </div>
 
-        <!-- Tombol untuk membuka modal -->
-        {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="fixed right-10 bottom-10 z-50 w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+        <!-- Search Bar -->
+        <div class="flex my-4 gap-4">
+            {% include "ds/input.html" with class="w-full lg:w-1/3" placeholder="Search posts ..." %}
+            {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" variant="primary" %}
+        </div>
 
-        <!-- Modal untuk Add Post -->
-        {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]"%}
+        <!-- Button to open modal -->
 
-        <!-- Grid untuk Forum Posts -->
-        <section class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for post in forum_posts %}
-                <div class="bg-gray-100 p-6 rounded-lg shadow-md">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold">{{ post.title }}</h2>
-                        <p class="text-sm text-gray-500">by {{ post.user.user.username }}</p>
+        <!-- Modal for Add Post -->
+        {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[90%] max-w-[350px] lg:max-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
+
+        <!-- Grid for Forum Posts -->
+        <section class="flex flex-col lg:flex-row h-full gap-10">
+            <div class="flex flex-col gap-4 w-full max-h-[100vh] overflow-y-scroll">
+                {% for post in forum_posts %}
+                <a href="{% url 'yogforum:viewforum' post_id=post.id %}">
+                    <div class="px-4 sm:px-10 py-5 rounded-2xl shadow-sm bg-gray-100 hover:bg-gray-200 transition duration-300">
+                        <h2 class="text-xl font-bold font-Catamaran">{{ post.title }}</h2>
+                        <div class="flex gap-2 items-center">
+                            <img 
+                                src="{{ post.user.profile_picture }}" 
+                                alt="avatar" 
+                                class="w-8 h-8 rounded-full"
+                            />
+                            <div>
+                                <p class="text-sm font-medium">by {{ post.user.user.username }}</p>
+                                <p class="text-sm font-medium text-gray-500">{{ post.created_at|timesince }} ago</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4 text-sm">{{ post.content|truncatewords:20 }}</p>
+                        <p class="text-gray-500 text-sm flex gap-4">
+                            <span class="flex space-x-2 items-center">
+                                <i class="fa fa-thumbs-up"></i> 
+                                <span>
+                                    {{ post.totalLike }}  <!-- Number of likes -->
+                                </span>
+                            </span>
+                            <span class="flex space-x-2 items-center">
+                                <i class="fa fa-thumbs-down"></i> 
+                                <span>
+                                    {{ post.totalDislike }}
+                                </span>
+                            </span>
+                            <span class="flex space-x-2 items-center">
+                                <i class="fa fa-comment"></i> 
+                                <span>
+                                    {{ post.comment_count }}
+                                </span>
+                            </span>
+                        </p>
                     </div>
-                    <p class="text-gray-700 mb-4">{{ post.content|truncatewords:20 }}</p>
-                    <p class="text-gray-500 text-sm">
-                        <i class="fas fa-thumbs-up"></i> {{ post.totalLike }}  <!-- Jumlah like -->
-                        <i class="fas fa-thumbs-down ml-4"></i> {{ post.totalDislike }} <!-- Jumlah dislike -->
-                    </p>
-                    <a href="{% url 'yogforum:viewforum' post_id=post.id %}" class="text-blue-500 hover:underline">Read more</a>
-                </div>
-            {% endfor %}
+                </a>
+                {% endfor %}
+            </div>
+            <div class="w-full lg:w-[300px] flex flex-col">
+                <h3 class="font-bold mb-4">Top Creators</h3>
+                <ul class="space-y-4">
+                    {% for creator in top_creators %}
+                    <li class="flex items-center gap-4">
+                        <img src="{{ creator.profile_picture }}" alt="avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium">{{ creator.username }}</p>
+                            <p class="text-sm text-gray-500">{{ creator.total }} posts</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </section>
     </main>
 {% endblock content %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto mt-32">
+    <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row">
+        <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
+            {% if event.image_urls %}
+                <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
+            {% else %}
+                <img class="w-full max-w-lg object-cover rounded-lg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFI7ygT65aVwQcrF_RPAqJQvfDXby3GVDyng&s" alt="{{ event.title }}">
+            {% endif %}
+        </div>
+
+        <div class="md:w-1/2 flex flex-col justify-center pl-0 md:pl-6">
+            <h1 class="text-4xl font-bold text-center md:text-left mb-2">{{ event.title }}</h1>
+            <div class="event-details">
+                <p class="text-gray-700 mb-2">{{ event.description }}</p>
+                <div class="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                    <i class="fa fa-calendar text-blue-500 w-4"></i>
+                    <p><span class="font-semibold">{{ event.start_time }}</span> - <span class="font-semibold">{{ event.end_time }}</span></p>
+                </div>
+                <div class="text-sm text-gray-600 flex items-center gap-2">
+                    <i class="fa fa-map-pin text-blue-500 w-4"></i>
+                    <span class="font-semibold">{{ event.location }}</span>
+                </div>
+            </div>
+
+            <div class="rating-section mt-5">
+                <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
+                <p id="averageRating">Average Rating: {{ total_rating.average_rating }}/5</p>
+            </div>
+
+            <div class="mt-5 flex justify-between">
+                <a href="{% url 'yogevent:main' %}" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200">Back to Events</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
