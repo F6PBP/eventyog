@@ -100,14 +100,13 @@
                     <a href="{% url 'yogevent:main' %}" class="w-full">
                         {% include "ds/button.html" with text="See Events" %} 
                     </a>
-                    {% include "ds/button.html" with text="Learn More" variant="secondary" %}
+                    {% include "ds/button.html" with text="Learn More" variant="secondary" id="learn-more-button" %}
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10">
+    <section id="why-us-section" class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10">
         <div class="flex flex-col items-center gap-2 text-center">
             <h1 class="text-3xl md:text-5xl font-bold">Why Us</h1>
             <h3 class="">Lorem Ipsum Dolor Sit Amet Lorem Ipsum Dolor Sit AmetLorem Ipsum Dolor Sit Amet</h3>
@@ -211,7 +210,7 @@
             {% endfor %}
         </div>
         <a href="{% url 'yogevent:main' %}">
-            {% include "ds/button.html" with text="See More" variant="primary" class="w-fit " %}
+            {% include "ds/button.html" with text="See More" variant="primary" class="w-fit" %}
         </a>
     </section>
 
@@ -230,6 +229,18 @@
 
     <!-- Smooth Scroll Script -->
     <script>
+        document.getElementById('learn-more-button').addEventListener('click', function () {
+            const offset = 100; // Adjust the offset for smooth scroll
+            const element = document.getElementById('why-us-section');
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - offset - 100;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }); 
+
         // Scroll event to change navbar text color
         window.addEventListener('scroll', function() {
             const navbar1 = document.getElementById('navbar-1-container');
@@ -244,17 +255,6 @@
             }
         });
 
-        {% comment %} document.getElementById('learnMoreButton').addEventListener('click', function () {
-            const offset = 100; // Adjust the offset for smooth scroll
-            const element = document.getElementById('whatWeOffer');
-            const element.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - offset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }); {% endcomment %}
         const images = [
             "https://res.cloudinary.com/mxgpapp/image/upload/v1729906731/eventyog/assets/eqevwhpsunbakctnacoo.png",
             "https://res.cloudinary.com/mxgpapp/image/upload/v1729873975/eventyog/assets/bfnbuzrckx95zi8suogq.png",
