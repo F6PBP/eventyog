@@ -45,5 +45,8 @@
         <a href="{% url 'yogevent:delete_event' event.uuid %}" class="btn btn-danger">Delete Event</a>
         <a href="{% url 'yogevent:main' %}" class="btn btn-secondary">Back to Events</a>
     </div>
+    <div class="w-full">
+        {% include 'merchandise.html' %}
+    </div>
 </div>
 {% endblock %}

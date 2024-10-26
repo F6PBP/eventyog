@@ -57,7 +57,7 @@
             <!-- Admin Controls -->
             {% if is_admin %}
                 {% include "ds/button.html" with icon="fa fa-plus" text="Create Event" class="w-fit h-fit fixed right-10 bottom-10 z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-1" %}
-                {% include "create_event.html" with modal_id="open-modal-1" modal_title="+ Create Event" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
+                {% include "create_event.html" with modal_id="open-modal-1" modal_title="+ Create Event" modal_label="modal-label" modal_class="w-screen h-screen absolute left-0 top-0" %}
             {% endif %}
         </div>
     </body>
