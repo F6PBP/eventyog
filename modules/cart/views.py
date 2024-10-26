@@ -26,6 +26,10 @@ def main(request: HttpRequest) -> HttpResponse:
     priceEvent = 0
     priceCart = 0
     for i in cart_events:
+        if i.ticket.event.image_urls:
+            i.image_url = i.ticket.event.image_urls[0]
+        else:
+            i.image_url = None
         priceEvent += i.totalPrice()
     
     for i in cart_merch:

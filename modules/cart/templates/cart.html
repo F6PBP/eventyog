@@ -18,10 +18,21 @@
         <div class="max-h-[500px] overflow-y-auto">
             {% if cart_events %}
                 <h2 class="text-xl font-semibold mb-4">Event Tickets</h2>
+                <div class="grid grid-cols-5 px-10">
+                    <h3 class="col-span-3">Item</h3>
+                    <h3>Quantity</h3>
+                    <h3>Total Price</h3>
+                </div>
+                <hr class="my-5">
                 {% for event in cart_events %}
-                <div class="border border-gray-300 p-4 mb-5 rounded-lg flex justify-between items-center">
-                    <div class="flex justify-between items-center w-full">
-                        <div class="flex flex-col w-3/5">
+                <div class="p-10 mb-5 rounded-lg flex justify-between items-center hover:bg-gray-100 duration-300">
+                    <div class="flex justify-between items-center w-full grid grid-cols-5">
+                        <img 
+                            src="{{event.image_url}}" 
+                            alt=""
+                            class="max-w-[200px] max-h-[150px] rounded-xl"
+                        >
+                        <div class="flex flex-col col-span-2">
                             <h1 class="text-xl font-semibold mb-4">{{ event.ticket.event.title }}</h1>
                             <span class="font-bold mb-1">{{ event.ticket.name }}</span>
                             <span>Ticket Price: {{ event.ticket.price }}</span>
@@ -32,7 +43,7 @@
                             <button class="bg-green-600 text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('event', {{ event.id }}, 'increase')">+</button>
                         </div>
                         <div class="font-bold w-1/5">
-                            Total<span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
+                            Rp<span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
                         </div>
                     </div>
                 </div>
@@ -41,6 +52,7 @@
 
             <!-- Merchandise Items -->
             {% if cart_merch %}
+                <h2 class="text-xl font-semibold mb-4">Merch Tickets</h2>
                 <div class="grid grid-cols-5 px-10">
                     <h3 class="col-span-3">Item</h3>
                     <h3>Quantity</h3>
