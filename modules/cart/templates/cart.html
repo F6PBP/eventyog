@@ -111,6 +111,11 @@
             return;
         }
 
+        if (totalPrice == 0){
+            showNotification("Nothing Checkout", "error");
+            return;
+        }
+
         // Trigger AJAX request for checkout if balance is enough
         fetch("{% url 'cart:checkout' %}", {
             method: 'POST',
@@ -163,7 +168,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         initializeLocalCart();
-        updateTotalPrice();
+        initializeTotalPrice();
         const initialWalletBalance = parseFloat("{{ user_profile.wallet }}");
         document.getElementById("wallet-balance").innerText = formatPrice(initialWalletBalance);
     });
@@ -215,6 +220,30 @@
     }
 
     function updateTotalPrice() {
+        console.log('update total')
+        let totalPrice = 0;
+
+        function parsePrice(priceStr) {
+        // Remove thousand separators and convert commas to dots for decimal places
+        return parseFloat(priceStr.replace(/\./g, '').replace(',', '.'));
+    }
+        const walletBalance = parsePrice(document.getElementById('wallet-balance').innerText);
+        console.log(`${walletBalance}`)
+        let remaining = walletBalance;
+
+        for (const eventId in localCart.event) {
+            totalPrice += localCart.event[eventId].totalPrice;
+        }
+        for (const merchId in localCart.merch) {
+            totalPrice += localCart.merch[merchId].totalPrice;
+        }
+        remaining -= totalPrice;
+
+        document.getElementById("total-price").innerText = formatPrice(totalPrice);
+        document.getElementById("remaining-balance").innerText = formatPrice(remaining);
+    }
+
+    function initializeTotalPrice() {
         console.log('update total')
         let totalPrice = 0;
         const initialWalletBalance = parseFloat("{{ user_profile.wallet }}");
