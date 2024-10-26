@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+        <main class="px-4 md:px-48 my-32">
+        <div class="flex flex-col gap-8">
+            <!-- Profile Picture Section -->
+            <div class="flex w-32 h-32 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm mx-auto md:mx-0">
+                <img 
+                    src="{% if image_url %}{{image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
+                    alt="profile" 
+                    class="w-full h-full object-cover"
+                />
+            </div>
+            
+            <!-- User Information Section -->
+            <div class="flex flex-col gap-2 text-left">
+                <div class="flex flex-col">
+                    <h1 class="font-bold text-3xl">{{friend_profile.name}}</h1>
+                    <div class="flex gap-2 items-center">
+                        <h3 class="text-md">{{friend.username}}</h3>
+                        -
+                        <h3 class="text-md">{{friend_profile.email}}</h3>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">{{friend_profile.bio}}</p>
+            </div>
+
+            <!-- Event Categories Section -->
+            <div class="font-semibold flex flex-col gap-2">
+                <h3>Event Types</h3>
+                {% if categories %}
+                    <div class="flex flex-wrap gap-2 font-normal text-sm justify-start">
+                        {% for category in categories %}
+                            <span class="px-3 py-1 bg-blue-200 text-blue-800 rounded-full">{{category}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 font-semibold">No event categories selected yet.</p>
+                {% endif %}
+            </div>
+
+            {% if is_friend %}
+                {% include "ds/button.html" with text="Remove Friend" icon="fa fa-user-minus" class="w-fit" onclick="removeFriend();" variant="danger" %}
+            {% else %}
+                {% include "ds/button.html" with text="Add Friend" icon="fa fa-user-plus" class="w-fit" onclick="addFriend();" %}
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- JavaScript for Modal -->
+    <script>
+        function addFriend() {
+            const friendId = {{friend.id}};
+            const url = `add_friend_ajax/${friendId}`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{csrf_token}}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function removeFriend() {
+            const friendId = {{friend.id}};
+            const url = `remove_friend_ajax/${friendId}`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{csrf_token}}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+{% endblock content %}

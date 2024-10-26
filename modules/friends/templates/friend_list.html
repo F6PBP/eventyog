@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <main class="px-4 md:px-48 my-32">
+        <h2>Friend List</h2>
+        <ul>
+            {% for friend in friends %}
+                <li>{{ friend.name }}</li>
+            {% empty %}
+                <li>You have no friends added.</li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock content %}

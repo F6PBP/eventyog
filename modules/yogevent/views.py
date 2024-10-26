@@ -1,5 +1,8 @@
+from datetime import datetime
+import json
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect, reverse
-from modules.yogevent.forms import EventForm, RatingForm
+from modules.yogevent.forms import EventForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
@@ -14,6 +17,7 @@ from django.shortcuts import redirect
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
+    user_profile = UserProfile.objects.get(user=request.user)
     events = Event.objects.all()
     query = request.GET.get('q')
     category = request.GET.get('category')
@@ -26,17 +30,16 @@ def main(request: HttpRequest) -> HttpResponse:
 
     context = {
         'user': request.user,
-        'user_profile': request.user_profile,
-        'image_url': request.image_url,
+        'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
-        'is_admin': request.user_profile.role == 'AD',
+        'is_admin': user_profile.role == 'AD' if user_profile else False,
         'events': events,
     }
     return render(request, 'yogevent.html', context)
 
 def show_event_xml(request):    
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
     if user_profile:
         events = Event.objects.filter(userprofile=user_profile)
     else:
@@ -45,7 +48,7 @@ def show_event_xml(request):
     return HttpResponse(serializers.serialize("xml", events), content_type="application/json") 
 
 def show_event_json(request):
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
     if user_profile:
         events = Event.objects.filter(userprofile=user_profile)
     else:
@@ -58,7 +61,7 @@ def show_xml_event_by_id(request, id):
     return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
 
 def show_json_event_by_id(request, id):
-    data = Event.objects.filter(pk=id)  # Cari event berdasarkan primary key
+    data = Event.objects.filter(pk=id)
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 @check_user_profile(is_redirect=True)
@@ -74,11 +77,12 @@ def create_event_entry_ajax(request):
     image_url = strip_tags(request.POST.get('image_url'))
 
     end_time = end_time if end_time != "" else None
+
+    if title == "" or description == "" or location == "" or image_url == "":
+        return JsonResponse({'status': False, 'message': 'Invalid input'})
+
     if end_time and start_time >= end_time:
-        context = {
-            'message': 'Tidak Bisa Membuat Event karena Acara Berakhir sebelum Dimulai',
-        }
-        return render(request, "error.html", context)
+        return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
 
     try:
         print(f"Creating event with title: {title}")
@@ -92,25 +96,20 @@ def create_event_entry_ajax(request):
             image_urls=[image_url]
         )
         new_event.save()
-        
-        return JsonResponse({'status': 'success', 'redirect_url': reverse('yogevent:main')})
+        return JsonResponse({'status': True, 'message': 'Event created successfully.'})
     
     except Exception as e:
-        print(f"Error creating event: {e}")
-        context = {
-            'message': 'Error',
-        }
-        return render(request, "error.html", context)
+        return JsonResponse({'status': False, 'message': 'Error creating event.'})
 
 
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
 
     context = {
         'user': request.user,
         'user_profile': user_profile,
-        'image_url': request.image_url if hasattr(request, 'image_url') else None,
+        'image_url': user_profile.profile_picture,
         'show_navbar': True,
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
@@ -125,62 +124,89 @@ def delete_event(request, uuid):
 
 def edit_event(request, uuid):
 
-    event = get_object_or_404(Event, uuid=uuid)  # Use get_object_or_404 for safety
+    event = get_object_or_404(Event, uuid=uuid) 
+    user_profile = UserProfile.objects.get(user=request.user)
     form = EventForm(request.POST or None, instance=event)
 
-    if request.method == "POST" and form.is_valid():  # Check method first
+    if request.method == "POST" and form.is_valid():  
         form.save()
         return HttpResponseRedirect(reverse('yogevent:main'))
 
     context = {
         'user': request.user,
+        'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
         'event': event,
+        'is_admin': user_profile.role == 'AD' if user_profile else False,
         'form': form,
     }
 
     return render(request, "edit_event.html", context)
 
-def rate_event(request, event_id):
-    event = Event.objects.get(pk=event_id)
-    total_rating = event.user_rating.aggregate(Avg('rating'))
-    # average_rating = Rating.objects.filter(event=event).aggregate(Avg('rating'))['rating__avg']
-
-    total_rating_value = total_rating['rating__avg'] or 0
-    # print(f"Total Rating Value: {total_rating_value}")  # Debugging line
-
-    context = {
-        'user': request.user,
-        'show_navbar': True,
-        'show_footer': True,
-        'event': event,
-        'total_rating': total_rating_value,
-    }
-    
-    return render(request, 'detail_event.html', context)
-
 def add_rating(request, event_id):
+    event = get_object_or_404(Event, uuid=event_id)
+
     if request.method == 'POST':
         rating_value = request.POST.get('rating')
-        event = get_object_or_404(Event, pk=event_id)
+        review = request.POST.get('review', '')
+        user_profile = UserProfile.objects.get(user=request.user)
 
-        # Debugging output
-        print(f"Received rating for event {event.title}: {rating_value}")
-
+        # Validate rating value
         try:
-            rating_value = int(rating_value)  # Convert to integer
-            if rating_value < 1 or rating_value > 5:  # Assuming a 1-5 rating scale
-                print("Rating value out of bounds.")
-                return redirect('yogevent:rate_event', event_id=event_id)
+            rating_value = int(rating_value)
         except (ValueError, TypeError):
-            print("Invalid rating value.")
-            return redirect('yogevent:rate_event', event_id=event_id)
+            messages.error(request, 'Invalid rating value.')
+            return redirect('yogevent:create_rating_event', event_id=event.uuid)
 
-        # Create the rating
-        rating = Rating.objects.create(user=request.user.userprofile, rated_event=event, rating=rating_value)
+        # Create and save the new rating
+        new_rating = Rating(user=user_profile, rated_event=event, rating=rating_value, review=review)
+        new_rating.save()
+        messages.success(request, 'Rating added successfully!')
+        average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 1
 
-        # Check if the rating was created
-        print(f"Rating created: {rating.rating} for event {event.title} by user {request.user.username}")
+        print(event.title)
+        for rate in Rating.objects.filter(rated_event=event):
+            print(rate)
+        print(" ")
+        print(average_rating, len(Rating.objects.filter(rated_event=event)))
 
-        return redirect('yogevent:rate_event', event_id=event_id)
+        context = {
+            'user': request.user,
+            'user_profile': user_profile,
+            'show_navbar': True,
+            'show_footer': True,
+            'event': event,
+            'total_rating': average_rating,
+        }
+        print(context['total_rating'])
+
+        return render(request, 'detail_event.html', context)
+    return redirect('yogevent:create_rating_event', event_id=event.uuid)
+
+def event_list(request):
+    events = Event.objects.all()
+    data = []
+    for event in events:
+        rating_count = Rating.objects.filter(event=event).count()
+        avg_rating = 0
+        if rating_count > 0:
+            total_rating = 0
+            ratings = Rating.objects.filter(event=event)
+            for rating in ratings:
+                total_rating += rating.rating
+            avg_rating = total_rating / rating_count
+        data.append({
+            'id': event.id,
+            'name': event.name,
+            'location': event.location,
+            'date': event.date,
+            'rating_count': rating_count,
+            'avg_rating': avg_rating,
+        })
+    return JsonResponse({'events': data})
+
+
+def create_rating_event(request, event_id):
+    event = get_object_or_404(Event, uuid=event_id)
+    return render(request, 'create_rating_event.html', {'event': event})

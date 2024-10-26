@@ -1,3 +1,11 @@
+<style>
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+</style>
+
 <div class="relative max-w-sm min-h-[400px] rounded shadow-lg border border-gray-300 event-card mx-auto" id="event-card-{{ event.uuid }}">
     {% if event.image_url %}
         <img class="w-full h-48 object-cover" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
@@ -17,27 +25,14 @@
             <i class="fa fa-map-pin text-blue-500 w-4"></i>
             <span>{{ event.location }}</span>
         </div>
-        <button id="view-more-{{ event.uuid }}" class="read-more text-blue-500 hover:text-blue-700">View More</button>
-        <button id="add-rating-{{ event.uuid }}" class="read-more text-yellow-500 hover:text-yellow-700">
-            Add Rate
-        </button>
 
-        <!-- Form Rating -->
-        <form method="POST" action="{% url 'yogevent:add_rating' event.uuid %}" id="rating-form-{{ event.uuid }}" class="hidden">
-            {% csrf_token %}
-            <div class="flex items-center mt-4">
-                <label for="rating-{{ event.uuid }}" class="mr-2">Rate:</label>
-                <select name="rating" id="rating-{{ event.uuid }}" class="border rounded p-1">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-                <button type="submit" class="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full px-3 py-1">Submit Rating</button>
-            </div>
-        </form>
+        <button id="view-more-{{ event.uuid }}" class="read-more text-blue-500 hover:text-blue-700">View More</button>
+
+        <button id="add-rating-{{ event.uuid }}" class="read-more text-yellow-500 hover:text-yellow-700">
+            Add Rate            
+        </button>        
     </div>
+
     <div class="px-6 pt-4 pb-2">
         <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#{{ event.get_category_display }}</span>
     </div>
@@ -61,27 +56,17 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const card = document.getElementById('event-card-{{ event.uuid }}');
-        const viewMoreBtn = document.getElementById('view-more-{{ event.uuid }}');
+            const card = document.getElementById('event-card-{{ event.uuid }}');
+            const viewMoreBtn = document.getElementById('view-more-{{ event.uuid }}');
+            const rateButton = document.getElementById('add-rating-{{ event.uuid }}');
 
-        viewMoreBtn.addEventListener('click', function() {
-            window.location.href = "{% url 'yogevent:detail_event' event.uuid %}";
+            viewMoreBtn.addEventListener('click', function() {
+                window.location.href = "{% url 'yogevent:detail_event' event.uuid %}";
+            });
+
+            rateButton.addEventListener('click', function() {
+                window.location.href = "{% url 'yogevent:add_rating' event.uuid %}";
+            });
         });
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const rateButton = document.getElementById('add-rating-{{ event.uuid }}');
-        const ratingForm = document.getElementById('rating-form-{{ event.uuid }}');
-
-        rateButton.addEventListener('click', function() {
-            ratingForm.classList.toggle('hidden');
-        });
-
-        ratingForm.addEventListener('submit', function() {
-            ratingForm.classList.add('hidden');
-        });
-    });
-
-
 </script>
 
