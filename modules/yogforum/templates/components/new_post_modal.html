@@ -5,16 +5,16 @@
             {% csrf_token %}
             <div class="mt-4">
                 <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                <input type="text" name="title" id="title" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                {% include "ds/input.html" with name="title" id="title" placeholder="Write about something big" %}
             </div>
             
             <div class="mt-4">
                 <label for="content" class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea name="content" id="content" rows="4" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                {% include "ds/textarea.html" with name="content" id="content" placeholder="Content goes here" class="w-full min-h-[200px]" %}
             </div>
             
             <div class="mt-6 flex justify-end">
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Add to Forum</button>
+                {% include "ds/button.html" with text="Add to Forum" type="submit" class="w-fit" icon="fa fa-plus" %}
             </div>
         </form>
     </div>

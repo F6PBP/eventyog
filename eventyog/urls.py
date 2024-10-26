@@ -28,4 +28,5 @@ urlpatterns = [
     path("yogevent/", include('modules.yogevent.urls')),
     path("yogforum/", include('modules.yogforum.urls')),
     path("registered-event/", include('modules.registered_event.urls')),
+    path("friends/", include('modules.friends.urls')),
 ]

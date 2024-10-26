@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'modules.yogevent',
     'modules.admin_dashboard',
     'modules.yogforum',
+    'modules.friends',
     'modules.registered_event',
     'whitenoise.runserver_nostatic',
     'cloudinary',
