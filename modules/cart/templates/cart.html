@@ -189,9 +189,17 @@
     document.getElementById('checkoutButton').addEventListener('click', function(event) {
         event.preventDefault();
 
+        function parsePrice(priceStr) {
+        // Remove thousand separators and convert commas to dots for decimal places
+        return parseFloat(priceStr.replace(/\./g, '').replace(',', '.'));
+    }
+
         // Check if the wallet balance is enough for the total price
-        const walletBalance = parseFloat(document.getElementById('wallet-balance').innerText);
-        const totalPrice = parseFloat(document.getElementById('total-price').innerText);
+        const walletBalance = parsePrice(document.getElementById('wallet-balance').innerText);
+        const totalPrice = parsePrice(document.getElementById('total-price').innerText);
+
+        console.log(walletBalance);
+        console.log(totalPrice);
         if (walletBalance < totalPrice) {
             showNotification("Insufficient wallet balance.", "error");
             return;
@@ -213,7 +221,7 @@
 
                 // Update wallet balance and remaining balance in UI
                 document.getElementById('wallet-balance').innerText = formatPrice(data.new_wallet_balance);
-                document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance-totalPrice*1000);
+                document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance-totalPrice);
 
                 // Optionally clear the cart in the UI
                 // document.querySelector('.cart-container').innerHTML = "<p>Your cart is now empty.</p>";
