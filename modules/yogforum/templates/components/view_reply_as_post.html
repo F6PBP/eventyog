@@ -21,33 +21,119 @@
                 <p class="text-sm text-gray-500">{{ forum_post.content }}</p>
             </div>
             <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500 flex items-center">
-                    <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }}
-                </span>
-                <span class="text-sm text-gray-500 flex items-center">
-                    <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }}
-                </span>
+                <!-- Tombol Edit dan Delete -->
                 {% if forum_post.user == request.user.userprofile %}
-                    <form method="POST" action="{% url 'yogforum:delete_reply' reply_id=forum_post.id %}">
+                <div class="flex space-x-2">
+                    {% include "ds/button.html" with icon="fa fa-edit" text="Edit Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+                    {% include "components/edit_modal.html" with modal_id="open-modal-1" modal_title="Edit Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
+                    <form method="POST" action="{% url 'yogforum:delete_post' post_id=forum_post.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
+                        <button type="submit" class="bg-gray-200 text-gray-600 px-2 py-1 rounded hover:bg-gray-300">Delete</button>
                     </form>
-
-                    <button class="text-blue-500 hover:text-blue-700 ml-4" onclick="openModal('edit-modal-{{ forum_post.id }}')">
-                        Edit Post
-                    </button>
-                    {% include "components/edit_modal.html" with modal_id="edit-modal-{{ forum_post.id }}" object=forum_post %}
+                </div>
                 {% endif %}
             </div>
         </div>
         <p class="text-gray-700 mb-4">{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
-
-        <!-- Button to trigger Reply Modal for reply acting as post -->
-        {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Reply" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+            <!-- Likes and Dislikes Section -->
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center space-x-1">
+                    <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }}
+                </span>
+                <span class="text-sm text-gray-500 flex items-center space-x-1">
+                    <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }}
+                </span>
+            </div>
+        <div class="flex justify-end mt-4">
+            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" button_type="primary" %}
+        </div>    
     </div>
 
     <!-- Include modal for adding reply to this reply -->
-    {% include "components/add_reply.html" with modal_id="open-modal-1" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %}
+    {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %}
+
+    <script>
+        document.getElementById('replyPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();  // Prevent form from submitting the default way
+    
+            var formData = new FormData(this);  // Collect the form data
+            var url = this.action;  // Get the form's action (the URL)
+    
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())  // Parse the JSON response
+            .then(data => {
+                console.log(data);  // Log respons dari server untuk debugging
+    
+                if (data.error) {
+                    // Tampilkan error menggunakan SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.error,
+                    });
+                } else {
+                    // Hide the modal (make sure modal ID is correct)
+                    document.getElementById('open-modal-2').classList.remove('is-active');
+    
+                    // Menggunakan template dari reply.html untuk menambah reply baru ke DOM
+                    const replyElement = `
+                        <div class="p-4 border border-gray-200 shadow-sm mb-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <p class="font-semibold text-gray-700">Reply by ${data.username}</p>
+                                    ${data.reply_to ? `<p class="text-gray-500">To ${data.reply_to}</p>` : ''}
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-sm text-gray-500 flex items-center">
+                                        <i class="fas fa-thumbs-up"></i> 0
+                                    </span>
+                                    <span class="text-sm text-gray-500 flex items-center">
+                                        <i class="fas fa-thumbs-down"></i> 0
+                                    </span>
+                                    ${data.is_owner ? `
+                                        <form method="POST" action="/delete_reply/${data.reply_id}/" class="inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="${data.csrf_token}">
+                                            <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
+                                        </form>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-2">${data.content}</p>
+                            <div class="flex justify-between text-sm text-gray-500">
+                                <p>Just now</p>
+                                <a href="/view_reply_as_post/${data.reply_id}/" class="text-blue-500 hover:underline">View Reply</a>
+                            </div>
+                        </div>
+                    `;
+    
+                    // Append the new reply to the list of replies
+                    document.querySelector('.space-y-6').insertAdjacentHTML('beforeend', replyElement);
+    
+                    // Tampilkan pesan sukses menggunakan SweetAlert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Reply added successfully!',
+                    });
+    
+                    // Clear the form fields
+                    document.getElementById('replyPostForm').reset();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>    
+
+    <!-- Include SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Replies to this Reply -->
     <h3 class="font-bold text-lg mb-4">Replies to this Reply</h3>
@@ -65,4 +151,5 @@
         </a>
     </div>
 </main>
+
 {% endblock content %}
