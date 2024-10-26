@@ -32,6 +32,21 @@ def create_merchandise(request):
     }
     return render(request, "create_merchandise.html", context)
 
+@check_user_profile()
+def show_merchandise_by_id(request, id):
+    try:
+        merch = Merchandise.objects.get(id=id)
+    except Merchandise.DoesNotExist:
+        return redirect('main:main')
+    
+    context = {
+        'merch': merch,
+        'show_navbar': True,
+        'show_footer': True,
+        'is_admin': request.is_admin,
+    }
+    return render(request, "merchandise_detail.html", context)
+
 @csrf_exempt
 @require_POST
 def create_merchandise_ajax(request):
@@ -67,7 +82,7 @@ def edit_merchandise(request, id):
 def delete_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     merchandise.delete()
-    return HttpResponseRedirect(reverse('merchandise:main'))
+    return HttpResponseRedirect(reverse('main:main'))
 
 def showMerch_json(request):
     data = Merchandise.objects.all()

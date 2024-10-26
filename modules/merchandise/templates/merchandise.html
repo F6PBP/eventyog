@@ -21,15 +21,17 @@
             
             const isAdmin = {{ is_admin|yesno:"true,false" }};
 
+            
+
             merchandiseEntries.forEach((item) => {
                 let cardHTML = `
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative flex flex-col justify-between">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative flex flex-col justify-between cursor-pointer" onclick="window.location.href='/merchandise/show/${item.pk}'">
                         ${isAdmin ? `
                             <div class="absolute top-2 right-2 flex space-x-1 z-10">
-                                <a href="/edit-merchandise/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7">
+                                <a href="/edit-merchandise/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
                                     <i class="fa fa-pencil text-sm" aria-hidden="true"></i>
                                 </a>
-                                <a href="/delete-merchandise/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7">
+                                <a href="/delete-merchandise/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
                                     <i class="fa fa-trash text-sm" aria-hidden="true"></i>
                                 </a>
                             </div>
@@ -45,12 +47,12 @@
                                 
                                 <div class="flex justify-between items-center w-full mt-2">
                                     <div class="flex justify-center w-full gap-2">
-                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}')">-</button>
-                                        <input type="number" id="quantity-${item.pk}" value="1" min="1" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5">
-                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}')">+</button>
+                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}'); event.stopPropagation();">-</button>
+                                        <input type="number" id="quantity-${item.pk}" value="1" min="1" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()">
+                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}'); event.stopPropagation();">+</button>
                                     </div>
                                     <a href="">
-                                        <button class="text-xs px-6" style="font-size: 5px; padding: 1px; width: 10px; height: 6px;">Buy</button>
+                                        <button class="text-xs px-6" style="font-size: 5px; padding: 1px; width: 10px; height: 6px;" onclick="event.stopPropagation()">Buy</button>
                                     </a>
                                 </div>
                             </div>
