@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
 from modules.main.models import Forum, ForumReply
 from django.http import JsonResponse
-from django.http import HttpRequest, HttpResponse
-from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 from eventyog.decorators import check_user_profile
+from modules.main.models import UserProfile
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -28,11 +28,30 @@ def main(request):
     # Ambil semua post
     forum_posts = Forum.objects.all().order_by('-created_at')
     
+    for post in forum_posts:
+        if post.user.profile_picture:
+            post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
+        else:
+            post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
+    top_creators = Forum.objects.values('user').annotate(total=Count('user')).order_by('-total')[:10]
+    
+    print(top_creators)
+    
+    for creator in top_creators:
+        user = UserProfile.objects.get(id=creator['user'])
+        creator['username'] = user.user.username
+        if user.profile_picture:
+            creator['profile_picture'] = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user.profile_picture}.jpg'
+        else:
+            creator['profile_picture'] = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
     context = {
         'forum_posts': forum_posts,
         'show_navbar': True,
         'show_footer': True,
         'is_admin': request.is_admin,
+        'top_creators': top_creators
     }
     return render(request, 'yogforum.html', context)
 
