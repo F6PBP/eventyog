@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from django.shortcuts import redirect
+from modules.yogevent.forms import MerchandiseForm
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
@@ -186,3 +187,45 @@ def add_rating(request, event_id):
         print(f"Rating created: {rating.rating} for event {event.title} by user {request.user.username}")
 
         return redirect('yogevent:rate_event', event_id=event_id)
+    
+@csrf_exempt
+@require_POST
+def create_merchandise_ajax(request):
+    name = request.POST.get("name")
+    description = request.POST.get("description")
+    price = request.POST.get("price")
+    image_url = request.POST.get("image_url")
+
+    new_merchandise = Merchandise(
+        name = name, 
+        description = description,
+        price = price,
+        image_url = image_url,
+    )
+    new_merchandise.save()
+
+    return JsonResponse
+
+def edit_merchandise(request, id):
+    merchandise = Merchandise.objects.get(pk = id)
+    form = MerchandiseForm(request.POST or None, instance=merchandise)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse('yogevent:main'))
+
+    context = {
+        'form': form,
+        'show_navbar': True
+    }
+    return render(request, "edit_merchandise.html", context)
+
+def delete_merchandise(request, id):
+    merchandise = Merchandise.objects.get(pk = id)
+    merchandise.delete()
+    return HttpResponseRedirect(reverse('yogevent:main'))
+
+def showMerch_json(request):
+    data = Merchandise.objects.all()
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+

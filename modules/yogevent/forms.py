@@ -1,5 +1,5 @@
 from django import forms
-from modules.main.models import Event, EventCategory, Rating
+from modules.main.models import Event, EventCategory, Rating, Merchandise
 from django.utils.html import strip_tags
 
 class EventForm(forms.ModelForm):
@@ -32,4 +32,15 @@ class RatingForm(forms.ModelForm):
         widgets = {
             'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
             'review': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class MerchandiseForm(forms.ModelForm):
+    class Meta:
+        model = Merchandise
+        fields = ["image_url", "name", "description", "price"]
+        widgets = {
+            'image_url': forms.URLInput(),
+            'name': forms.TextInput(),
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'price': forms.NumberInput(attrs={'min': 0}),
         }

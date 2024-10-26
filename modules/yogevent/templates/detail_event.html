@@ -45,8 +45,101 @@
         <a href="{% url 'yogevent:delete_event' event.uuid %}" class="btn btn-danger">Delete Event</a>
         <a href="{% url 'yogevent:main' %}" class="btn btn-secondary">Back to Events</a>
     </div>
-    <div class="w-full">
-        {% include 'merchandise.html' %}
+    <div>
+        <div class="">
+            <div class="mx-auto">
+                <div class="mt-8">
+                    <h1 class="text-3xl font-bold">Merchandise Shop</h1>
+                </div>
+        
+                {% if is_admin %}
+                    {% include "ds/button.html" with icon="fa fa-plus" text="Create Merchandise" class="my-4 w-fit h-fit z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" %}
+                    {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed flex items-center justify-center z-50 bg-white overflow-y-auto" %}
+                {% endif %}
+        
+                <div id="merchandise_cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2"></div>
+            </div>
+        
+            <style>
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                .quantity-selector { display: flex; align-items: center; }
+                .quantity-selector input[type="number"] { width: 50px; text-align: center; font-size: 14px; padding: 5px; }
+                .quantity-selector button { width: 30px; height: 30px; font-size: 20px; cursor: pointer; padding: 1px; }
+            </style>
+        
+            <script>
+                async function fetchMerchandiseEntries() {
+                    const merchandiseCards = document.getElementById("merchandise_cards");
+                    merchandiseCards.innerHTML = ""; // Clear existing cards
+                    const merchandiseEntries = await getMerchandise();
+
+                    console.log(merchandiseEntries)
+                    
+                    const isAdmin = {{ is_admin|yesno:"true,false" }};
+        
+                    merchandiseEntries.forEach((item) => {
+                        let cardHTML = `
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
+                                ${isAdmin ? `
+                                    <div class="absolute top-2 right-2 flex space-x-1 z-10">
+                                        <a href="/yogevent/edit/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center" style="width: 28px; height: 28px;">
+                                            <i class="fa fa-pencil text-sm" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="/yogevent/delete/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center" style="width: 28px; height: 28px;">
+                                            <i class="fa fa-trash text-sm" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                ` : ""}
+                                <img src="${item.fields.image_url}" alt="${item.fields.name}" class="w-full h-44 object-cover">
+                                <div class="p-4 flex flex-col justify-between h-[13rem]">
+                                    <div>
+                                        <h5 class="text-lg font-bold overflow-x-auto whitespace-nowrap no-scrollbar" title="${item.fields.name}">${item.fields.name}</h5>
+                                        <p class="text-gray-700 mb-2 overflow-auto max-h-16 text-xs">${item.fields.description}</p>
+                                    </div>
+                                    <div class="flex flex-col items-start">
+                                        <p class="text-base font-semibold text-red-00 mb-1">Rp ${item.fields.price}</p>
+                                        <div class="flex justify-between items-center w-full">
+                                            <div class="quantity-selector">
+                                                <button type="button" onclick="decreaseValue('${item.pk}')">-</button>
+                                                <input type="number" id="quantity-${item.pk}" value="1" min="1">
+                                                <button type="button" onclick="increaseValue('${item.pk}')">+</button>
+                                            </div>
+                                            <a href="">
+                                                {% include "ds/button.html" with text="Buy" class="text-xs px-4" style="font-size: 5px !important;width: 10px !important; height: 4px !important;" %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        merchandiseCards.innerHTML += cardHTML;
+                    });
+                    loadingSpinner.classList.add("hidden");
+                }
+                
+                async function getMerchandise() {
+                    return fetch("{% url 'merchandise:showMerch_json' %}").then((res) => res.json());
+                }
+        
+                function decreaseValue(id) {
+                    let quantityInput = document.getElementById("quantity-" + id);
+                    let currentValue = parseInt(quantityInput.value);
+                    if (currentValue > 1) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                }
+        
+                function increaseValue(id) {
+                    let quantityInput = document.getElementById("quantity-" + id);
+                    let currentValue = parseInt(quantityInput.value);
+                    quantityInput.value = currentValue + 1;
+                }
+        
+                // Call function to load merchandise entries
+                fetchMerchandiseEntries();
+            </script>
+        </div>
     </div>
 </div>
 {% endblock %}
