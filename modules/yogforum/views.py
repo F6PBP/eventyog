@@ -6,6 +6,7 @@ from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
+from eventyog.decorators import check_user_profile
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -18,10 +19,11 @@ def viewforum(request, post_id):
         'forum_post': forum_post,
         'replies': replies,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
     }
     return render(request, 'viewforum.html', context)
 
+@check_user_profile()
 def main(request):
     # Ambil semua post
     forum_posts = Forum.objects.all().order_by('-created_at')
@@ -29,7 +31,8 @@ def main(request):
     context = {
         'forum_posts': forum_posts,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
+        'is_admin': request.is_admin,
     }
     return render(request, 'yogforum.html', context)
 
