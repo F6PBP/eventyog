@@ -51,6 +51,7 @@ def main(request: HttpRequest) -> HttpResponse:
         'cart_events': cart_events,        # Pass events cart items
         'cart_merch': cart_merch,          # Pass merchandise cart items
         'total_price': total_price,        # Pass cumulative total price
+        'remaining_balance': user_profile.wallet - total_price
     }
 
     return render(request, 'cart.html', context)
@@ -66,33 +67,33 @@ def checkout(request):
     updated_events = data.get('event', {})
     updated_merch = data.get('merch', {})
 
-    # Retrieve all EventCart and MerchCart items for the user
+    # Calculate total cart price
+    total_price = sum(item['quantity'] * item['pricePerItem'] for item in updated_events.values()) + \
+                  sum(item['quantity'] * item['pricePerItem'] for item in updated_merch.values())
+
+    # Check if the wallet has enough balance
+    if user_profile.wallet < total_price:
+        return JsonResponse({'success': False, 'error': 'Insufficient wallet balance.'})
+
+    # Update cart items
     cart_events = EventCart.objects.filter(user=user)
     cart_merch = MerchCart.objects.filter(user=user)
 
-    # Update EventCart quantities
     for event_cart in cart_events:
         event_id = str(event_cart.id)
         if event_id in updated_events:
             event_cart.quantity = updated_events[event_id]['quantity']
             event_cart.save()
 
-    # Update MerchCart quantities
     for merch_cart in cart_merch:
         merch_id = str(merch_cart.id)
         if merch_id in updated_merch:
             merch_cart.quantity = updated_merch[merch_id]['quantity']
             merch_cart.save()
 
-    # Check if the cart is empty after updates
-    cart_events = EventCart.objects.filter(user=user, quantity__gt=0)
-    cart_merch = MerchCart.objects.filter(user=user, quantity__gt=0)
-
-    if not cart_events.exists() and not cart_merch.exists():
-        return JsonResponse({'success': False, 'error': 'Your cart is empty.'})
-
-    # Save the updated user profile
+    # Deduct total price from wallet and save
+    user_profile.wallet -= total_price
     user_profile.save()
 
-    # Return success response
-    return JsonResponse({'success': True})
+    # Return success response with updated wallet balance
+    return JsonResponse({'success': True, 'new_wallet_balance': user_profile.wallet})

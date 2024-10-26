@@ -112,6 +112,10 @@
 <section class="cart-container fade-in">
     <h1 class="cart-header text-2xl md:text-4xl font-bold">My Cart</h1>
 
+    <div class="wallet-info text-right font-semibold text-lg">
+        Wallet Balance: <span id="wallet-balance">{{ user_profile.wallet }}</span>
+    </div>
+
     <!-- Event Items -->
     {% if not cart_events and not cart_merch %}
         <div class="empty-message">
@@ -169,6 +173,11 @@
             Total Price: <span id="total-price">{{ total_price }}</span>
         </div>
 
+        <!-- Remaining Wallet Balance -->
+        <div class="wallet-info text-right font-semibold text-lg">
+            Remaining Balance: <span id="remaining-balance">{{ remaining_balance }}</span>
+        </div>
+
         <!-- Checkout Button -->
         <div class="checkout-button">
             {% include "ds/button.html" with text="Checkout" class="w-fit h-fit" id="checkoutButton" %}
@@ -180,31 +189,35 @@
     document.getElementById('checkoutButton').addEventListener('click', function(event) {
         event.preventDefault();
 
-        // Trigger an AJAX request for checkout
+        // Check if the wallet balance is enough for the total price
+        const walletBalance = parseFloat(document.getElementById('wallet-balance').innerText);
+        const totalPrice = parseFloat(document.getElementById('total-price').innerText);
+        if (walletBalance < totalPrice) {
+            showNotification("Insufficient wallet balance.", "error");
+            return;
+        }
+
+        // Trigger AJAX request for checkout if balance is enough
         fetch("{% url 'cart:checkout' %}", {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(localCart)  // Send localCart data
+            body: JSON.stringify(localCart)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show a success notification
                 showNotification("Checkout successful!", "success");
 
-                // // Optionally clear the cart in the UI
-                // document.querySelector('.cart-container').innerHTML = "<p>Your cart is now empty.</p>";
+                // Update wallet balance and remaining balance in UI
+                document.getElementById('wallet-balance').innerText = formatPrice(data.new_wallet_balance);
+                document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance-totalPrice*1000);
 
-                // // Check if the total-price element exists before modifying
-                // const totalPriceElement = document.getElementById('total-price');
-                // if (totalPriceElement) {
-                //     totalPriceElement.innerText = formatPrice(0);
-                // }
+                // Optionally clear the cart in the UI
+                // document.querySelector('.cart-container').innerHTML = "<p>Your cart is now empty.</p>";
             } else {
-                // Show an error notification if the checkout fails
                 showNotification(data.error, "error");
             }
         })
@@ -236,6 +249,8 @@
     document.addEventListener("DOMContentLoaded", () => {
         initializeLocalCart();
         updateTotalPrice();
+        const initialWalletBalance = parseFloat("{{ user_profile.wallet }}");
+        document.getElementById("wallet-balance").innerText = formatPrice(initialWalletBalance);
     });
 
     function initializeLocalCart() {
@@ -287,6 +302,8 @@
     function updateTotalPrice() {
         console.log('update total')
         let totalPrice = 0;
+        const initialWalletBalance = parseFloat("{{ user_profile.wallet }}");
+        let remaining = initialWalletBalance;
 
         for (const eventId in localCart.event) {
             totalPrice += localCart.event[eventId].totalPrice;
@@ -294,10 +311,13 @@
         for (const merchId in localCart.merch) {
             totalPrice += localCart.merch[merchId].totalPrice;
         }
+        remaining -= totalPrice;
 
         document.getElementById("total-price").innerText = formatPrice(totalPrice);
+        document.getElementById("remaining-balance").innerText = formatPrice(remaining);
     }
 
+    // Function to update the remaining wallet balance
     function formatPrice(price) {
         return new Intl.NumberFormat("de-DE", {
             minimumFractionDigits: 2,
