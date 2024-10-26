@@ -104,13 +104,16 @@ def edit_user(request, user_id):
         
         if 'profile_picture' in request.FILES:
             user_profile.profile_picture = request.FILES['profile_picture']
+
+        categories = request.POST.get('categories')
+        user_profile.categories = categories
             
         user_profile.save()
         
         # Update user email
         user.email = request.POST.get('email')
         user.save()
-        
+
         messages.success(request, 'User profile updated successfully')
         
         # Render the same page with updated data and success message

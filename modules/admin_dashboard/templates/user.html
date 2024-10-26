@@ -6,8 +6,8 @@
         <div class="flex flex-col gap-8">
             <div class="flex w-32 h-32 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm mx-auto md:mx-0">
                 <img
-                    src='http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}'
-                    alt="profile"
+                    src = 'http://res.cloudinary.com/mxgpapp/{{user_profile.profile_picture}}'
+                    alt = '{{user_profile.name}}'
                     class="w-full h-full object-cover"
                 />
             </div>
@@ -21,6 +21,19 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-500">{{user_profile.bio}}</p>
+            </div>
+
+            <div class="font-semibold flex flex-col gap-2">
+                <h3>Event Types</h3>
+                {% if user_profile.categories %}
+                    <div class="flex flex-wrap gap-2 font-normal text-sm justify-start">
+                        {% for category in user_profile.categories %}
+                            <span class="px-3 py-1 bg-blue-200 text-blue-800 rounded-full">{{category}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No event categories selected yet.</p>
+                {% endif %}
             </div>
             
             {% if is_admin %}
@@ -58,6 +71,17 @@
                         <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
                         <input type="file" name="profile_picture" class="mt-1 block w-full">
                     </div>
+                    <div class="mb-4">
+                        <label for="categories" class="block text-sm font-medium text-gray-700">Preferable Event Categories</label>
+                        <div class="relative">
+                            <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown(event)">Select Categories</button>
+                            <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden">
+                                <ul class="max-h-24 overflow-y-auto py-1" id='category-dropdown'>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="selected-categories" class="mt-2 flex flex-wrap gap-2"></div>
+                    </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
                     <button type="button" onclick="hideEditModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
@@ -83,15 +107,127 @@
     </div>
 
     <script>
-        function showEditModal() {
-            document.getElementById('editModal').classList.remove('hidden');
+        // Define categories array
+        const categories = [
+            "Music",
+            "Sports",
+            "Arts and Culture",
+            "Food and Drink",
+            "Business and Networking",
+            "Tech and Innovation",
+            "Fashion",
+            "Health and Wellness",
+            "Education and Workshops",
+            "Festivals",
+            "Comedy and Entertainment",
+            "Family and Kids",
+            "Charity and Causes",
+            "Nightlife",
+            "Film and Media"
+        ];
+    
+        // Get necessary DOM elements
+        const dropdown = document.getElementById('dropdown');
+        const categoryDropdown = document.getElementById('category-dropdown');
+        const selectedCategoriesDiv = document.getElementById('selected-categories');
+    
+        // Toggle dropdown visibility
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
         }
-
-        function hideEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
+    
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdownButton = document.querySelector('button[onclick="toggleDropdown(event)"]');
+            if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    
+        // Update the display of selected categories
+        function updateSelectedCategories() {
+            selectedCategoriesDiv.innerHTML = '';
+            const checkboxes = categoryDropdown.querySelectorAll('input[type="checkbox"]:checked');
+            const form = document.querySelector('form');
+            
+            // Remove existing hidden inputs
+            form.querySelectorAll('input[name="categories"]').forEach(input => input.remove());
+            
+            checkboxes.forEach(checkbox => {
+                // Create chip
+                const chip = document.createElement('div');
+                chip.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full', 'text-sm', 'flex', 'items-center');
+                chip.textContent = checkbox.value;
+                
+                const removeButton = document.createElement('button');
+                removeButton.classList.add('ml-2', 'text-blue-500', 'hover:text-blue-700');
+                removeButton.innerHTML = '<i class="fas fa-times"></i>';
+                removeButton.addEventListener('click', () => {
+                    checkbox.checked = false;
+                    updateSelectedCategories();
+                });
+                
+                chip.appendChild(removeButton);
+                selectedCategoriesDiv.appendChild(chip);
+                
+                // Create hidden input for form submission
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'categories';  // Changed from categories[] to categories
+                hiddenInput.value = checkbox.value;
+                form.appendChild(hiddenInput);
+            });
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
+    
+        // Initialize dropdown with existing categories
+        function initializeDropdown() {
+            categoryDropdown.innerHTML = '';
+            
+            // Get current user categories from the page
+            const currentCategories = [];
+            {% if user_profile.categories %}
+                {% for category in user_profile.categories %}
+                    currentCategories.push("{{ category }}");
+                {% endfor %}
+            {% endif %}
+            
+            categories.forEach(category => {
+                const li = document.createElement('li');
+                li.classList.add('px-4', 'py-2', 'text-sm', 'text-gray-700', 'hover:bg-gray-100', 'cursor-pointer');
+                
+                const label = document.createElement('label');
+                label.classList.add('flex', 'items-center', 'cursor-pointer', 'w-full', 'h-full');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = category;
+                checkbox.classList.add('mr-2');
+                
+                // Check if this category is already selected
+                if (currentCategories.includes(category)) {
+                    checkbox.checked = true;
+                }
+                
+                checkbox.addEventListener('change', updateSelectedCategories);
+                
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(category));
+                li.appendChild(label);
+                categoryDropdown.appendChild(li);
+            });
+            
+            updateSelectedCategories();
+        }
+    
+        // Initialize everything when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDropdown();
+            
             // Toast messages handling
             {% if messages %}
                 {% for message in messages %}
@@ -107,31 +243,44 @@
             const modal = document.getElementById('confirmationModal');
             const cancelButton = document.getElementById('cancelButton');
             
-            // Show the modal when the delete button is clicked
-            deleteButton.addEventListener('click', function (event) {
-                event.preventDefault();
-                modal.classList.remove('hidden');
-            });
+            if (deleteButton) {
+                deleteButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    modal.classList.remove('hidden');
+                });
+            }
             
-            // Hide the modal when the cancel button is clicked
-            cancelButton.addEventListener('click', function () {
-                modal.classList.add('hidden');
-            });
-            
-            // Hide the modal when clicking outside of it
-            modal.addEventListener('click', function (event) {
-                if (event.target === modal) {
+            if (cancelButton) {
+                cancelButton.addEventListener('click', function () {
                     modal.classList.add('hidden');
-                }
-            });
-
-            // Also close edit modal when clicking outside
-            document.getElementById('editModal').addEventListener('click', function (event) {
-                if (event.target === this) {
-                    hideEditModal();
-                }
-            });
+                });
+            }
+            
+            if (modal) {
+                modal.addEventListener('click', function (event) {
+                    if (event.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+    
+            const editModal = document.getElementById('editModal');
+            if (editModal) {
+                editModal.addEventListener('click', function (event) {
+                    if (event.target === this) {
+                        hideEditModal();
+                    }
+                });
+            }
         });
+    
+        function showEditModal() {
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+    
+        function hideEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
     </script>
     
 {% endblock content %}
