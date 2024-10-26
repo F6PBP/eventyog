@@ -33,9 +33,11 @@ def fetch_registered_event(request: HttpRequest) -> JsonResponse:
     event_list = []
     for event in registered_events:
         event_list.append({
+            'uuid': event.uuid,
             'title': event.title,
             'description': event.description,
-            'start_time': event.start_time.strftime('%Y-%m-%d'),
+            'month': event.start_time.strftime('%b'),
+            'day': event.start_time.strftime('%d'),
             'location': event.location,
             'image_urls': event.image_urls or ['default_image_url'],
         })

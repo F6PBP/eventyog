@@ -9,25 +9,18 @@ import json
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
-    
     # Retrieve cart items for events and merchandise
     cart_events = EventCart.objects.filter(user=request.user)
     cart_merch = MerchCart.objects.filter(user=request.user)
     user_profile = UserProfile.objects.get(user=request.user)
 
-# Get the events the user has registered for
-    buyedE = user_profile.registeredEvent.all()
-
-# Get the merchandise the user has bought
+    # Get the merchandise the user has bought
     buyedM = user_profile.boughtMerch.all()
 
-# Print the bought events
-    for event in buyedE:
-        print(event.title)  # or any other field in the Event model
-
-# Print the bought merchandise
+    # Print the bought events
+    # Print the bought merchandise
     for merch in buyedM:
-        print(merch.name)  # or any other field in the Merchandise model
+        print(merch.image_url)  # or any other field in the Merchandise model
 
     # Calculate cumulative total price
     priceEvent = 0
@@ -36,10 +29,10 @@ def main(request: HttpRequest) -> HttpResponse:
         priceEvent += i.totalPrice()
     
     for i in cart_merch:
+        i.image_url = i.merchandise.image_url
         priceCart += i.totalPrice()
     
     total_price = priceEvent + priceCart
-
 
     context = {
         'user': request.user,

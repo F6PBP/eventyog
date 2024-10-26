@@ -1,185 +1,91 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<main class="mt-16 px-10 flex flex-col gap-4">
-</main>
+<section class="my-48 px-10 md:px-20 lg:px-32 ">
+    <h1 class="font-bold text-3xl mb-2">My Cart</h1>
 
-<style>
-    .fade-in {
-        animation: fadeIn 1s ease-in-out;
-    }
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    .cart-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    .cart-header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .cart-items {
-        border: 1px solid #e2e2e2;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .cart-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
-    .item-info {
-        display: flex;
-        flex-direction: column;
-        width: 60%;
-    }
-    .item-name {
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-    .item-price {
-        font-weight: bold;
-        width: 20%;
-    }
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .btn-quantity {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        font-size: 16px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .btn-quantity:hover {
-        background-color: #45a049;
-    }
-    .total-price {
-        text-align: right;
-        font-weight: bold;
-        font-size: 1.2rem;
-        margin-top: 10px;
-    }
-    .checkout-button {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        color: white;
-        font-weight: bold;
-        z-index: 1000;
-    }
-
-    .notification.success {
-        background-color: #4caf50;
-    }
-
-    .notification.error {
-        background-color: #f44336;
-    }
-    .highlight {
-        font-weight: bold;
-    }
-    .empty-message {
-    display: grid;
-    place-items: center;
-    text-align: center;
-}
-</style>
-
-<section class="cart-container fade-in">
-    <h1 class="cart-header text-2xl md:text-4xl font-bold">My Cart</h1>
-
-    <div class="wallet-info text-right font-semibold text-lg">
+    <div class="font-semibold text-lg my-10">
         Wallet Balance: <span id="wallet-balance">{{ user_profile.wallet }}</span>
     </div>
 
     <!-- Event Items -->
     {% if not cart_events and not cart_merch %}
-        <div class="empty-message">
+        <div class="grid place-items-center text-center">
             <img src={% static "assets/eventyog-icon-text.png" %} alt="" class="w-[400px] md:w-[500px]">
         </div><br>
-        Maaf Event dan Merchandise Belum Tersedia, Mohon pilih sebuah <span class="highlight">EventYog</span> terlebih dahulu
+        Maaf Event dan Merchandise Belum Tersedia, Mohon pilih sebuah <span class="font-bold">EventYog</span> terlebih dahulu
     {% else %}
-        {% if cart_events %}
-            <h2 class="text-xl font-semibold mb-4">Event Tickets</h2>
-            {% for event in cart_events %}
-            <div class="cart-items">
-                <div class="cart-item">
-                    <div class="item-info">
-                        <h1 class="text-xl font-semibold mb-4">{{ event.ticket.event.title }}</h1>
-                        <span class="item-name">{{ event.ticket.name }}</span>
-                        <span>Ticket Price: {{ event.ticket.price }}</span>
-                    </div>
-                    <div class="quantity-controls">
-                        <button class="btn-quantity" onclick="updateQuantity('event', {{ event.id }}, 'decrease')">-</button>
-                        <span id="quantity-event-{{ event.id }}">{{ event.quantity }}</span>
-                        <button class="btn-quantity" onclick="updateQuantity('event', {{ event.id }}, 'increase')">+</button>
-                    </div>
-                    <div class="item-price">
-                        Total: <span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        {% endif %}
-          <!-- Merchandise Items -->
-        {% if cart_merch %}
-            <h2 class="text-xl font-semibold mb-4">Merchandise</h2>
-            {% for merch in cart_merch %}
-            <div class="cart-items">
-                <div class="cart-item">
-                    <div class="item-info">
-                        <span class="item-name">{{ merch.merchandise.name }}</span>
-                        <span>Price: {{ merch.merchandise.price }}</span>
-                    </div>
-                    <div class="quantity-controls">
-                        <button class="btn-quantity" onclick="updateQuantity('merch', {{ merch.id }}, 'decrease')">-</button>
-                        <span id="quantity-merch-{{ merch.id }}">{{ merch.quantity }}</span>
-                        <button class="btn-quantity" onclick="updateQuantity('merch', {{ merch.id }}, 'increase')">+</button>
-                    </div>
-                    <div class="item-price">
-                        Total: <span id="price-merch-{{ merch.id }}">{{ merch.totalPrice }}</span>
+        <div class="max-h-[500px] overflow-y-auto">
+            {% if cart_events %}
+                <h2 class="text-xl font-semibold mb-4">Event Tickets</h2>
+                {% for event in cart_events %}
+                <div class="border border-gray-300 p-4 mb-5 rounded-lg flex justify-between items-center">
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex flex-col w-3/5">
+                            <h1 class="text-xl font-semibold mb-4">{{ event.ticket.event.title }}</h1>
+                            <span class="font-bold mb-1">{{ event.ticket.name }}</span>
+                            <span>Ticket Price: {{ event.ticket.price }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="bg-green-600 text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('event', {{ event.id }}, 'decrease')">-</button>
+                            <span id="quantity-event-{{ event.id }}">{{ event.quantity }}</span>
+                            <button class="bg-green-600 text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('event', {{ event.id }}, 'increase')">+</button>
+                        </div>
+                        <div class="font-bold w-1/5">
+                            Total<span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <!-- Merchandise Items -->
+            {% if cart_merch %}
+                <div class="grid grid-cols-5 px-10">
+                    <h3 class="col-span-3">Item</h3>
+                    <h3>Quantity</h3>
+                    <h3>Total Price</h3>
+                </div>
+                <hr class="my-5">
+                {% for merch in cart_merch %}
+                    <div class="p-10 mb-5 rounded-xl flex justify-between items-center hover:bg-gray-100 duration-300">
+                        <div class="grid grid-cols-5 w-full">
+                            <div class="flex items-center ">
+                                <img 
+                                    src="{{ merch.image_url }}" 
+                                    alt=""
+                                    class="max-w-[200px] max-h-[150px]"
+                                >
+                            </div>
+                            <div class="flex flex-col w-3/5 col-span-2">
+                                <span class="font-bold text-xl">{{ merch.merchandise.name }}</span>
+                                <span>Rp{{ merch.merchandise.price }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="bg-[#0047FE] text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('merch', {{ merch.id }}, 'decrease')">-</button>
+                                <span id="quantity-merch-{{ merch.id }}">{{ merch.quantity }}</span>
+                                <button class="bg-[#0047FE] text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('merch', {{ merch.id }}, 'increase')">+</button>
+                            </div>
+                            <div class="font-bold flex items-center">
+                                Rp<span id="price-merch-{{ merch.id }}">{{ merch.totalPrice }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
 
         <!-- Total Price -->
-        <div class="total-price">
+        <div class="text-right font-bold text-xl mt-2">
             Total Price: <span id="total-price">{{ total_price }}</span>
         </div>
 
-        <!-- Remaining Wallet Balance -->
-        <div class="wallet-info text-right font-semibold text-lg">
+        <div class="text-right font-semibold text-lg">
             Remaining Balance: <span id="remaining-balance">{{ remaining_balance }}</span>
         </div>
 
         <!-- Checkout Button -->
-        <div class="checkout-button">
+        <div class="flex justify-center mt-5">
             {% include "ds/button.html" with text="Checkout" class="w-fit h-fit" id="checkoutButton" %}
         </div>
     {% endif %}
@@ -239,7 +145,8 @@
     // Function to show a notification popup
     function showNotification(message, type) {
         const notification = document.createElement('div');
-        notification.classList.add('notification', type);
+        notification.classList.add('fixed', 'top-5', 'right-5', 'p-2', 'rounded', 'text-white', 'font-bold', 'z-50');
+        notification.classList.add(type === 'success' ? 'bg-green-600' : 'bg-red-600');
         notification.innerText = message;
 
         document.body.appendChild(notification);
