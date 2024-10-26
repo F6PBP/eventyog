@@ -35,23 +35,30 @@ def get_forum_by_ajax(request):
         forum_posts = Forum.objects.filter(title__icontains=search).order_by('-created_at')
         
         for post in forum_posts:
+            post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
             if post.user.profile_picture:
                 post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
-            else:
-                post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
         
     print(forum_posts)
     
     temp = []
     
     for post in forum_posts:
+        replies_count = ForumReply.objects.filter(forum=post, reply_to=None).order_by('created_at').count()
+        user = UserProfile.objects.get(id=post.user.id)
+
+        print(user.user.username)   
+        
         temp.append({
             'id': post.id,
             'title': post.title,
             'content': post.content,
-            'user': post.user.user.username,
+            'user': user.user.username,
             'created_at': timesince(post.created_at),
-            'profile_picture': post.user.profile_picture
+            'profile_picture': post.user.profile_picture,
+            'totalLike': post.totalLike(),    
+            'totalDislike': post.totalDislike(),
+            'comment_count': replies_count
         })
     
     return JsonResponse({

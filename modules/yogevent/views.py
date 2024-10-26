@@ -223,6 +223,8 @@ def create_event_entry_ajax(request):
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
+    ratings = Rating.objects.filter(rated_event=event)
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
     merchandise = Merchandise.objects.all()
     
     # See all ticket
@@ -248,6 +250,7 @@ def detail_event(request, uuid):
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
         'event': event,
+        'average_rating': round(average_rating, 1),
         'merchandise': merchandise,
         'tickets': tickets,
         'total_rating': total_rating,
@@ -309,69 +312,69 @@ def edit_event(request, uuid):
 
     return render(request, "edit_event.html", context)
 
+@check_user_profile(is_redirect=True)
+@require_POST
+@csrf_exempt
 def add_rating(request, event_id):
     event = get_object_or_404(Event, uuid=event_id)
+    rating_value = request.POST.get('rating')
+    review = request.POST.get('review', '')
+    user_profile = getattr(request.user, 'userprofile', None)
 
-    if request.method == 'POST':
-        rating_value = request.POST.get('rating')
-        review = request.POST.get('review', '')
-        user_profile = UserProfile.objects.get(user=request.user)
+    try:
+        rating_value = int(rating_value)
+    except ValueError:
+        return JsonResponse({"status" : False, 'error': 'Invalid rating input'}, status=400)
 
-        # Validate rating value
-        try:
-            rating_value = int(rating_value)
-        except (ValueError, TypeError):
-            messages.error(request, 'Invalid rating value.')
-            return redirect('yogevent:create_rating_event', event_id=event.uuid)
+    # Create and save the new rating
+    new_rating = Rating(
+        user=user_profile, 
+        rated_event=event, 
+        rating=rating_value, 
+        review=review
+    )
+    new_rating.save()
+    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg']
+    context = {
+        'average_rating': round(average_rating, 1),
+    }
+    return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
 
-        # Create and save the new rating
-        new_rating = Rating(user=user_profile, rated_event=event, rating=rating_value, review=review)
-        new_rating.save()
-        messages.success(request, 'Rating added successfully!')
-        average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 1
-
-        print(event.title)
-        for rate in Rating.objects.filter(rated_event=event):
-            print(rate)
-        print(" ")
-        print(average_rating, len(Rating.objects.filter(rated_event=event)))
-
-        context = {
-            'user': request.user,
-            'user_profile': user_profile,
-            'show_navbar': True,
-            'show_footer': True,
-            'event': event,
-            'total_rating': average_rating,
-        }
-        print(context['total_rating'])
-
-        return render(request, 'detail_event.html', context)
-    return redirect('yogevent:create_rating_event', event_id=event.uuid)
-
-def event_list(request):
-    events = Event.objects.all()
-    data = []
-    for event in events:
-        rating_count = Rating.objects.filter(event=event).count()
-        avg_rating = 0
-        if rating_count > 0:
-            total_rating = 0
-            ratings = Rating.objects.filter(event=event)
-            for rating in ratings:
-                total_rating += rating.rating
-            avg_rating = total_rating / rating_count
-        data.append({
-            'id': event.id,
-            'name': event.name,
-            'location': event.location,
-            'date': event.date,
-            'rating_count': rating_count,
-            'avg_rating': avg_rating,
-        })
-    return JsonResponse({'events': data})
-
-
-def create_rating_event(request, event_id):
+def create_rating_event(request, event_id): #Kemungkinan akan dihapus tapi keep dulu
     event = get_object_or_404(Event, uuid=event_id)
-    return render(request, 'create_rating_event.html', {'event': event})
+    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
+    user_profile = getattr(request.user, 'userprofile', None)
+
+    return render(request, 'create_rating_event.html', {
+        'user': request.user,
+        'user_profile': user_profile,
+        'show_navbar': True,
+        'show_footer': True,
+        'event': event,
+        'average_rating': round(average_rating, 1),
+    })
+
+def get_rating_event(request, event_uuid):
+    event = get_object_or_404(Event, uuid=event_uuid)
+    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    context = {
+        'user_name': user_profile.user.username, 
+        'average_rating': round(average_rating, 1),
+    }
+
+    return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
+
+def load_event_ratings(request, event_id):
+    event = get_object_or_404(Event, uuid=event_id)
+    
+    # Get all ratings for the event and calculate the average rating
+    ratings = Rating.objects.filter(rated_event=event).values("rating", "review")
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+
+    # Return the ratings data as JSON
+    return JsonResponse({
+        "average_rating": round(average_rating, 1),
+        "ratings": list(ratings),
+    })

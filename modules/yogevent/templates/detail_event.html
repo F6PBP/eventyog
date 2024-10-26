@@ -28,7 +28,7 @@
 
             <div class="rating-section mt-5">
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
-                <p id="averageRating">Average Rating: {{ total_rating }}/5.0</p>
+                <p id="averageRating">{{ average_rating }}</p>
             </div>
 
             {% if tickets %}
@@ -43,6 +43,40 @@
     {% include 'merchandise.html' %}
     {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed inset-0 flex items-center justify-center z-50 bg-white overflow-y-auto" %}
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const messageDisplay = document.getElementById("averageRating");
+
+        submitButton.addEventListener("click", function() {
+            fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    messageDisplay.textContent = data.error;
+                    messageDisplay.classList.add("text-red-500");
+                } else {
+                    messageDisplay.textContent = data.message;
+                    messageDisplay.classList.add("text-green-500");
+                    
+                    if (data.average_rating) {
+                        document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
+                    }
+                }
+            })
+            .catch(error => {
+                messageDisplay.textContent = "An error occurred. Please try again.";
+                messageDisplay.classList.add("text-red-500");
+            });
+        });
+    });
+
+</script>
 <script>
     function onBookFree() {
         showToast('Event booked successfully!', 'success');
