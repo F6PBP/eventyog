@@ -39,10 +39,7 @@
                         <option value="FM">Film</option>
                         <option value="FN">Fashion</option>
                         <option value="LN">Lainnya</option>
-                    </select>
-                    {% if form.category.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.category.errors }}</p>
-                    {% endif %}                                    
+                    </select>                                
                 </div>
 
                 <!-- Align Start Time, End Time, and Location in one row -->
@@ -91,8 +88,8 @@
 
     <script>
         document.querySelector('#event-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent form default submission
-            let formData = new FormData(this); // Collect form data
+            e.preventDefault();
+            let formData = new FormData(this);
             
             fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
                 method: "POST",
@@ -100,41 +97,20 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(err => { throw err; });
+                    throw new Error('Network response was not ok');
                 }
-                return response.json();
+                return response.text();
             })
             .then(data => {
-                console.log('Data received:', data); // Tambahkan ini
-                if (data.message) {
-                    alert(data.message);
+                if (data.includes('Event Created Successfully')) {
                     window.location.href = "{% url 'yogevent:main' %}";
-                } else if (data.errors) {
-                    alert("Error in form submission: " + data.errors);
                 }
             })
             .catch(error => {
-                alert("An unexpected error occurred: " + error);
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
             });
         });
-
-        function displayNotification(message, type) {
-            const notificationDiv = document.getElementById('notification');
-            notificationDiv.style.display = 'block';
-            notificationDiv.innerText = message;
-
-            if (type === 'success') {
-                notificationDiv.style.color = 'green';
-            } else if (type === 'error') {
-                notificationDiv.style.color = 'red';
-            } else {
-                notificationDiv.style.color = 'blue';
-            }
-
-            setTimeout(() => {
-                notificationDiv.style.display = 'none';
-            }, 5000);
-        }
 
         function closeEditModal(modalId) {
             const modal = document.getElementById(modalId);

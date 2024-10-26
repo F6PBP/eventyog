@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
-from modules.yogevent.forms import EventForm, RatingForm
+from modules.yogevent.forms import EventForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
+    user_profile = UserProfile.objects.get(user=request.user)
     events = Event.objects.all()
     query = request.GET.get('q')
     category = request.GET.get('category')
@@ -26,17 +27,16 @@ def main(request: HttpRequest) -> HttpResponse:
 
     context = {
         'user': request.user,
-        'user_profile': request.user_profile,
-        'image_url': request.image_url,
+        'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
-        'is_admin': request.user_profile.role == 'AD',
+        'is_admin': user_profile.role == 'AD' if user_profile else False,
         'events': events,
     }
     return render(request, 'yogevent.html', context)
 
 def show_event_xml(request):    
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
     if user_profile:
         events = Event.objects.filter(userprofile=user_profile)
     else:
@@ -45,7 +45,7 @@ def show_event_xml(request):
     return HttpResponse(serializers.serialize("xml", events), content_type="application/json") 
 
 def show_event_json(request):
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
     if user_profile:
         events = Event.objects.filter(userprofile=user_profile)
     else:
@@ -102,7 +102,7 @@ def create_event_entry_ajax(request):
 
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
 
     context = {
         'user': request.user,
@@ -122,18 +122,21 @@ def delete_event(request, uuid):
 
 def edit_event(request, uuid):
 
-    event = get_object_or_404(Event, uuid=uuid)  # Use get_object_or_404 for safety
+    event = get_object_or_404(Event, uuid=uuid) 
+    user_profile = UserProfile.objects.get(user=request.user)
     form = EventForm(request.POST or None, instance=event)
 
-    if request.method == "POST" and form.is_valid():  # Check method first
+    if request.method == "POST" and form.is_valid():  
         form.save()
         return HttpResponseRedirect(reverse('yogevent:main'))
 
     context = {
         'user': request.user,
+        'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
         'event': event,
+        'is_admin': user_profile.role == 'AD' if user_profile else False,
         'form': form,
     }
 
@@ -142,7 +145,7 @@ def edit_event(request, uuid):
 def rate_event(request, event_id):
     event = Event.objects.get(pk=event_id)
     total_rating = event.user_rating.aggregate(Avg('rating'))
-    # average_rating = Rating.objects.filter(event=event).aggregate(Avg('rating'))['rating__avg']
+    average_rating = Rating.objects.filter(event=event).aggregate(Avg('rating'))['rating__avg']
 
     total_rating_value = total_rating['rating__avg'] or 0
     # print(f"Total Rating Value: {total_rating_value}")  # Debugging line
