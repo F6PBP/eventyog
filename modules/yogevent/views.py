@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from django.shortcuts import redirect
+from django.core.paginator import Paginator
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
@@ -27,6 +28,38 @@ def main(request: HttpRequest) -> HttpResponse:
 
     if category:
         events = events.filter(category=category)
+        
+    for event in events:
+        # Set image urls 
+        if event.image_urls:
+            event.image_urls = event.image_urls[0]
+        else:
+            event.image_urls = 'https://via.placeholder.com/800x400'
+        
+        event.month = event.start_time.strftime('%B')
+        event.day = event.start_time.strftime('%d')
+        
+        rating_count = Rating.objects.filter(rated_event=event).count()
+        avg_rating = 0
+        if rating_count > 0:
+            total_rating = 0
+            ratings = Rating.objects.filter(rated_event=event)
+            for rating in ratings:
+                total_rating += rating.rating
+            avg_rating = total_rating / rating_count
+        event.total_rating = avg_rating
+        
+    categories = EventCategory.choices
+    temp = []
+    
+    for category in categories:
+        temp.append({
+            'code': category[0],
+            'name': category[1]
+        })
+        
+    categories = temp
+    
 
     context = {
         'user': request.user,
@@ -35,6 +68,7 @@ def main(request: HttpRequest) -> HttpResponse:
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
         'events': events,
+        'categories': categories,
     }
     return render(request, 'yogevent.html', context)
 
@@ -63,6 +97,91 @@ def show_xml_event_by_id(request, id):
 def show_json_event_by_id(request, id):
     data = Event.objects.filter(pk=id)
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+def get_events_by_queries(request):
+    query = request.GET.get('q')
+    category = request.GET.get('category')
+    start_time = request.GET.get('start_date')
+    end_time = request.GET.get('end_date')
+    page = int(request.GET.get('page', 1))
+    limit = int(request.GET.get('limit', 10))
+    
+    print(f"Query: {query}, Category: {category}, Start Time: {start_time}, End Time: {end_time}, Page: {page}, Limit: {limit}")
+    
+    events = Event.objects.all()
+    
+    if query:
+        events = events.filter(Q(title__icontains=query))
+        
+    if category:
+        events = events.filter(category=category)
+        
+    if start_time:
+        events = events.filter(start_time__gte=start_time)
+    
+    if end_time:
+        events = events.filter(end_time__lte=end_time)
+
+    for event in events:
+        # Set image urls 
+        if event.image_urls:
+            event.image_urls = event.image_urls[0]
+        else:
+            event.image_urls = 'https://via.placeholder.com/800x400'
+        
+        event.month = event.start_time.strftime('%B')
+        event.day = event.start_time.strftime('%d')
+        
+        rating_count = Rating.objects.filter(rated_event=event).count()
+        avg_rating = 0
+        if rating_count > 0:
+            total_rating = 0
+            ratings = Rating.objects.filter(rated_event=event)
+            for rating in ratings:
+                total_rating += rating.rating
+            avg_rating = total_rating / rating_count
+        event.total_rating = avg_rating
+        
+    categories = EventCategory.choices
+    temp = []
+    
+    paginator = Paginator(events, limit)
+    paginated_events = paginator.get_page(page)
+    
+    print(paginated_events.object_list)
+    
+    for category in categories:
+        temp.append({
+            'code': category[0],
+            'name': category[1]
+        })
+        
+    categories = temp
+    
+    events_list = []
+    for event in paginated_events.object_list:
+        events_list.append({
+            'uuid': event.uuid,
+            'title': event.title,
+            'description': event.description,
+            'category': event.category,
+            'start_time': event.start_time,
+            'end_time': event.end_time,
+            'location': event.location,
+            'image_urls': event.image_urls,
+            'month': event.month,
+            'day': event.day,
+            'total_rating': event.total_rating,
+        })
+
+    response = {
+        'events': events_list,
+        'total': paginator.count,
+        'page': paginated_events.number,
+        'num_pages': paginator.num_pages,
+    }
+    
+    return JsonResponse(response)
 
 @check_user_profile(is_redirect=True)
 @csrf_exempt
@@ -101,12 +220,26 @@ def create_event_entry_ajax(request):
     except Exception as e:
         return JsonResponse({'status': False, 'message': 'Error creating event.'})
 
-
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
     merchandise = Merchandise.objects.all()
+    
+    # See all ticket
+    tickets = TicketPrice.objects.filter(event=event)
 
+    if (len(tickets) == 0):
+        tickets = None
+        
+    ratings = Rating.objects.filter(rated_event=event)
+    
+    total_rating = 0
+    
+    if len(ratings) > 0:
+        for rating in ratings:
+            total_rating += rating.rating
+        total_rating = total_rating / len(ratings)
+    
     context = {
         'user': request.user,
         'user_profile': user_profile,
@@ -116,8 +249,38 @@ def detail_event(request, uuid):
         'is_admin': user_profile.role == 'AD' if user_profile else False,
         'event': event,
         'merchandise': merchandise,
+        'tickets': tickets,
+        'total_rating': total_rating,
     }
     return render(request, 'detail_event.html', context)
+
+@check_user_profile(is_redirect=True)
+@csrf_exempt
+@require_POST
+def book_event(request):
+    event_id = request.POST.get('event_uuid')
+    ticket_name = request.POST.get('ticket_name')
+    
+    event = get_object_or_404(Event, uuid=event_id)
+    tickets = TicketPrice.objects.filter(event=event)
+    user_profile = request.userprofile
+    
+    # See all ticket
+    tickets = TicketPrice.objects.filter(event=event)
+
+    if (len(tickets) == 0):
+        tickets = None
+    
+    # If tickets is None then event is free
+    if tickets is None:
+        user_profile.registered_event.add(event)
+    else:
+        # If tickets is not None then event is not free
+        ticket = get_object_or_404(TicketPrice, name=ticket_name)
+        event_cart = EventCart(user=user_profile, event=event, ticket=ticket)
+        event_cart.save()
+
+    return JsonResponse({'status': True, 'message': 'Event booked successfully.'})            
 
 def delete_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)

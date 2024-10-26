@@ -5,6 +5,7 @@ app_name = 'yogevent'
 
 urlpatterns = [
     path('', main, name='main'),
+    path('get-event/', get_events_by_queries, name='get_event'),
     path('xml/', show_event_xml, name='show_xml'),
     path('json/', show_event_json, name='show_json'),
     path('xml/<str:id>/', show_xml_event_by_id, name='show_xml_by_id'),
@@ -15,4 +16,5 @@ urlpatterns = [
     path('create-event/', create_event_entry_ajax, name="create_event_entry_ajax"),
     path('event-rate/<uuid:event_id>/', create_rating_event, name='create_rating_event'),
     path('add-rating/<uuid:event_id>/', add_rating, name='add_rating'),
+    path('book-event/', book_event, name='book_event'),
 ]

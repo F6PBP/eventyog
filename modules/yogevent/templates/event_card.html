@@ -1,72 +1,21 @@
-<style>
-    .button-container {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-    }
-</style>
-
-<div class="relative max-w-sm min-h-[400px] rounded shadow-lg border border-gray-300 event-card mx-auto" id="event-card-{{ event.uuid }}">
-    {% if event.image_url %}
-        <img class="w-full h-48 object-cover" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
-    {% else %}
-        <img class="w-full h-48 object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFI7ygT65aVwQcrF_RPAqJQvfDXby3GVDyng&s" alt="{{ event.title }}">
-    {% endif %}
-    <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">{{ event.title }}</div>
-        <p class="text-gray-700 text-base" id="event-description-{{ event.uuid }}">
-            {{ event.description|truncatewords:10 }}
-        </p>
-        <div class="text-sm text-gray-600 flex items-center gap-2">
-            <i class="fa fa-calendar text-blue-500 w-4"></i>
-            <span>{{ event.start_time }}</span>
+<a href="{% url 'yogevent:detail_event' event.uuid %}">
+    <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden h-full">
+        <img 
+            src="{{event.image_urls}}" 
+            class="h-[200px] object-cover"
+            alt="">
+        <div class="flex gap-5 p-5 flex-grow">
+            <div class="flex flex-col items-center">
+                <h3 class="font-semibold text-[#3D37F1]">{{event.month}}</h3>
+                <h1 class="font-bold text-2xl">{{event.day}}</h1>
+            </div>
+            <div>
+                <h1 class="font-bold">{{event.title}}</h1>
+                <p class="text-sm font-regular line-clamp-3">
+                    {{event.description}}
+                </p>
+            </div>
         </div>
-        <div class="text-sm text-gray-600 flex items-center gap-2">
-            <i class="fa fa-map-pin text-blue-500 w-4"></i>
-            <span>{{ event.location }}</span>
-        </div>
-
-        <button id="view-more-{{ event.uuid }}" class="read-more text-blue-500 hover:text-blue-700">View More</button>
-
-        <button id="add-rating-{{ event.uuid }}" class="read-more text-yellow-500 hover:text-yellow-700">
-            Add Rate            
-        </button>        
     </div>
-
-    <div class="px-6 pt-4 pb-2">
-        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#{{ event.get_category_display }}</span>
-    </div>
-    
-    {% if is_admin %}
-    <!-- Button untuk Edit dan Delete -->
-    <div class="absolute top-0 -right-4 flex space-x-1">
-        <a href="{% url 'yogevent:edit_event' event.uuid %}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 transition duration-300 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-        </a>
-        <a href="{% url 'yogevent:delete_event' event.uuid %}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition duration-300 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-        </a>
-    </div>    
-    {% endif %}
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-            const card = document.getElementById('event-card-{{ event.uuid }}');
-            const viewMoreBtn = document.getElementById('view-more-{{ event.uuid }}');
-            const rateButton = document.getElementById('add-rating-{{ event.uuid }}');
-
-            viewMoreBtn.addEventListener('click', function() {
-                window.location.href = "{% url 'yogevent:detail_event' event.uuid %}";
-            });
-
-            rateButton.addEventListener('click', function() {
-                window.location.href = "{% url 'yogevent:add_rating' event.uuid %}";
-            });
-        });
-</script>
+</a>
 

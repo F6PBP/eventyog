@@ -7,6 +7,7 @@ from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 from eventyog.decorators import check_user_profile
 from modules.main.models import UserProfile
+from django.utils.timesince import timesince
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -23,6 +24,40 @@ def viewforum(request, post_id):
     }
     return render(request, 'viewforum.html', context)
 
+def get_forum_by_ajax(request):
+    search = request.GET.get('search')
+    
+    print(search)
+
+    forum_posts = Forum.objects.all().order_by('-created_at')
+    
+    if search:
+        forum_posts = Forum.objects.filter(title__icontains=search).order_by('-created_at')
+        
+        for post in forum_posts:
+            if post.user.profile_picture:
+                post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
+            else:
+                post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+        
+    print(forum_posts)
+    
+    temp = []
+    
+    for post in forum_posts:
+        temp.append({
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'user': post.user.user.username,
+            'created_at': timesince(post.created_at),
+            'profile_picture': post.user.profile_picture
+        })
+    
+    return JsonResponse({
+        'forum_posts': temp
+    })
+
 @check_user_profile()
 def main(request):
     # Ambil semua post
@@ -35,8 +70,6 @@ def main(request):
             post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
     
     top_creators = Forum.objects.values('user').annotate(total=Count('user')).order_by('-total')[:10]
-    
-    print(top_creators)
     
     for creator in top_creators:
         user = UserProfile.objects.get(id=creator['user'])

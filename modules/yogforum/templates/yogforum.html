@@ -8,18 +8,16 @@
 
         <!-- Search Bar -->
         <div class="flex my-4 gap-4">
-            {% include "ds/input.html" with class="w-full lg:w-1/3" placeholder="Search posts ..." %}
+            {% include "ds/input.html" with class="w-full lg:w-1/3" placeholder="Search posts ..." id="searchInput" %}
             {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" variant="primary" %}
         </div>
 
-        <!-- Button to open modal -->
-
         <!-- Modal for Add Post -->
-        {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[90%] max-w-[350px] lg:max-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
+        {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="max-w-[300px]" %}
 
         <!-- Grid for Forum Posts -->
         <section class="flex flex-col lg:flex-row h-full gap-10">
-            <div class="flex flex-col gap-4 w-full max-h-[100vh] overflow-y-scroll">
+            <div id="forumPosts" class="flex flex-col gap-4 w-full max-h-[100vh] overflow-y-scroll">
                 {% for post in forum_posts %}
                 <a href="{% url 'yogforum:viewforum' post_id=post.id %}">
                     <div class="px-4 sm:px-10 py-5 rounded-2xl shadow-sm bg-gray-100 hover:bg-gray-200 transition duration-300">
@@ -76,4 +74,48 @@
             </div>
         </section>
     </main>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value;
+            fetch(`/yogforum/get_forum_by_ajax?search=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const forumPosts = document.getElementById('forumPosts');
+                    forumPosts.innerHTML = '';
+                    data.forum_posts.forEach(post => {
+                        const postElement = document.createElement('a');
+                        postElement.href = `/yogforum/viewforum/${post.id}/`;
+                        postElement.innerHTML = `
+                            <div class="px-4 sm:px-10 py-5 rounded-2xl shadow-sm bg-gray-100 hover:bg-gray-200 transition duration-300">
+                                <h2 class="text-xl font-bold font-Catamaran">${post.title}</h2>
+                                <div class="flex gap-2 items-center">
+                                    <img src="${post.profile_picture}" alt="avatar" class="w-8 h-8 rounded-full" />
+                                    <div>
+                                        <p class="text-sm font-medium">by ${post.user.username}</p>
+                                        <p class="text-sm font-medium text-gray-500">${post.created_at} ago</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 mb-4 text-sm">${post.content}</p>
+                                <p class="text-gray-500 text-sm flex gap-4">
+                                    <span class="flex space-x-2 items-center">
+                                        <i class="fa fa-thumbs-up"></i> 
+                                        <span>${post.totalLike}</span>
+                                    </span>
+                                    <span class="flex space-x-2 items-center">
+                                        <i class="fa fa-thumbs-down"></i> 
+                                        <span>${post.totalDislike}</span>
+                                    </span>
+                                    <span class="flex space-x-2 items-center">
+                                        <i class="fa fa-comment"></i> 
+                                        <span>${post.comment_count}</span>
+                                    </span>
+                                </p>
+                            </div>
+                        `;
+                        forumPosts.appendChild(postElement);
+                    });
+                });
+        });
+    </script>
 {% endblock content %}

@@ -5,6 +5,7 @@ app_name = 'yogforum'
 
 urlpatterns = [
     path('', main, name='main'),
+    path('get_forum_by_ajax/', get_forum_by_ajax, name='get_forum_by_ajax'),
     path('post/<int:post_id>/', viewforum, name='viewforum'),
     path('add-post/', add_post, name='add_post'),
     path('post/<int:post_id>/delete/', delete_post, name='delete_post'),

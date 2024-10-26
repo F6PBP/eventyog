@@ -1,6 +1,6 @@
 <div id="{{ modal_id }}" class="fixed inset-0 flex items-center justify-center z-50 hidden bg-black bg-opacity-50 transition-opacity duration-300 max-h-[100vh] top-0">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg transform transition-transform duration-300 scale-95 flex flex-col {{modal_class}}">
-        <div class="flex justify-between items-center p-5 border-b">
+        <div class="flex justify-between items-center p-5">
             <h5 class="text-lg font-semibold">{{ modal_title }}</h5>
             <button type="button" class="text-gray-500 hover:text-gray-700 closeModalButton" aria-label="Close" data-modal-id="{{ modal_id }}">
                 <span aria-hidden="true">&times;</span>
@@ -9,7 +9,7 @@
         {% block modal_body %}
         <!-- Modal body content goes here -->
         {% endblock %}
-        <div class="flex justify-end p-4 border-t gap-2">
+        <div class="flex justify-end p-4 gap-2">
             {% block modal_footer %}
                 <button
                     class="flex items-center justify-center gap-2 w-full py-3 px-10 text-white text-xs md:text-sm font-semibold rounded-xl h-full hover:scale-105 duration-300 bg-gray-500 text-white closeModalButton"
