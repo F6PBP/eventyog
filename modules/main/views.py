@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from eventyog.decorators import check_user_profile
+from .models import Event
 
 # Create your views here.
 @check_user_profile(is_redirect=False)
@@ -28,14 +29,27 @@ def main(request):
         },
     ]
     
+    first_8_events = Event.objects.all()[:8]
+    
+    for event in first_8_events:
+        if event.image_urls:
+            event.image_urls = event.image_urls[0]
+        else:
+            event.image_urls = 'https://via.placeholder.com/800x400'
+            
+        event.month = event.start_time.strftime('%b').upper()
+        event.day = event.start_time.strftime('%d')
+    
+    
     context = {
         'user': request.user,
         'user_profile': request.user_profile,
         'image_url': request.image_url,
-        'show_navbar': True,
         'show_footer': True,
         'is_admin': request.is_admin,
         'faq_qna': faq_qna,
+        'isDark': True,
+        'first_8_events': first_8_events,
     }
     
     return render(request, 'landing.html', context)

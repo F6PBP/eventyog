@@ -7,7 +7,7 @@
         </div>
 
         <!-- Tombol untuk membuka modal -->
-        {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="fixed right-10 bottom-10 z-50 w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+        {% include "ds/button.html" with icon="fa fa-plus" text="Add Post" class="fixed right-10 bottom-10 z-50 w-fit h-fit" id="openModalButton" specify="open-modal-1" variant="primary" %}
 
         <!-- Modal untuk Add Post -->
         {% include "components/new_post_modal.html" with modal_id="open-modal-1" modal_title="+ Add Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]"%}

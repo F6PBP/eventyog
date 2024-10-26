@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from modules.yogevent.forms import EventForm, RatingForm
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
 from django.core import serializers
@@ -81,6 +81,7 @@ def create_event_entry_ajax(request):
         return render(request, "error.html", context)
 
     try:
+        print(f"Creating event with title: {title}")
         new_event = Event(
             title=title,
             description=description,
@@ -91,9 +92,11 @@ def create_event_entry_ajax(request):
             image_urls=[image_url]
         )
         new_event.save()
-        return redirect('yogevent:main')
+        
+        return JsonResponse({'status': 'success', 'redirect_url': reverse('yogevent:main')})
     
     except Exception as e:
+        print(f"Error creating event: {e}")
         context = {
             'message': 'Error',
         }

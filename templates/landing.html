@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+    <div class="container absolute" id="navbar-1-container">
+        {% include "ds/navbar.html" with nav_id="up" %}
+    </div>
+    <div class="container absolute hidden" id="navbar-2-container">
+        {% include "ds/navbar.html" with isDark=False nav_id="down" %}
+    </div>
     <style>
         @keyframes fadeIn {
             from {
@@ -79,73 +85,216 @@
     </style>
 
     <!-- Hero Section -->
-    <section class="w-full flex flex-col justify-center items-center h-[100vh] gap-5 px-4 md:px-0 fade-in">
-        <h1 class="section-title font-bold text-center">Welcome to</h1>
-        <img src={% static "assets/eventyog-icon-text.png" %} alt="EventYog Logo" class="w-[300px] md:w-[500px]">
-        <p class="text-center leading-7 w-full md:w-[700px] text-lg text-gray-600">
-            <b>EventYog</b> is your go-to platform for discovering and joining exciting events in Yogyakarta! From concerts to cultural festivals, find all the details in one place. Plus, shop exclusive event merchandise and create lasting memories with ease!
-        </p>
-        {% include "ds/button.html" with text="Learn More" class="w-fit h-fit" icon="fa fa-arrow-down" id="learnMoreButton" %}
+    <section class="w-full flex flex-col justify-center items-center h-[100vh] gap-5 px-10 md:20 lg:px-32 fade-in bg-cover bg-center relative" style="background-image: url('https://res.cloudinary.com/mxgpapp/image/upload/v1729873005/eventyog/assets/landing-hero-bg.jpg');">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#00FF57] to-[#487BFF] opacity-90 z-0"></div>
+        <div class="w-full h-full z-30 mt-32 flex flex-col md:flex-row gap-10 items-center">
+            <img 
+                id="hero-image" 
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729906731/eventyog/assets/eqevwhpsunbakctnacoo.png"
+                alt="EventYog Logo"
+                class="w-full object-contain max-h-[300px] md:max-h-[600px] max-w-[300px] lg:max-w-[400px] xl:max-w-[500px]"
+            />
+            <div class="w-full space-y-5 text-center md:text-left">
+                <h1 class="text-3xl md:text-6xl font-bold text-white">BEST EVENT AND MERCHING PLATFORM IN YOGYAKARTA</h1>
+                <div class="flex flex-col md:flex-row gap-2">
+                    <a href="{% url 'yogevent:main' %}" class="w-full">
+                        {% include "ds/button.html" with text="See Events" %} 
+                    </a>
+                    {% include "ds/button.html" with text="Learn More" variant="secondary" %}
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Features Section -->
-    <section id="whatWeOffer" class="w-full flex flex-col justify-center items-center gap-4 px-4 md:px-10 fade-in mt-20">
-        <h3 class="font-bold text-lg text-gray-500">Features</h3>
-        <h1 class="section-title font-bold text-center">Why Choose Us?</h1>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 w-full">
-                <!-- Feature Card 1 -->
-                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
-                    <img src="{% static 'assets/landing/event.jpg' %}" alt="Events" class="w-full h-[300px] object-cover rounded-lg">
-                    <div class="mt-4 z-10">
-                        <h2 class="text-2xl font-bold text-center">Exciting Events</h2>
-                        <p class="text-center text-gray-600">Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.</p>
-                    </div>
-                </div>
-
-                <!-- Feature Card 2 -->
-                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
-                    <img src="{% static 'assets/landing/merch.jpg' %}" alt="Merchandise" class="w-full h-[300px] object-cover rounded-lg">
-                    <div class="mt-4 z-10">
-                        <h2 class="text-2xl font-bold text-center">Exclusive Merchandise</h2>
-                        <p class="text-center text-gray-600">Shop exclusive event merchandise and create lasting memories with unique items.</p>
-                    </div>
-                </div>
-
-                <!-- Feature Card 3 -->
-                <div class="flex flex-col items-center p-10 border rounded-xl shadow-lg duration-300 bg-white">
-                    <img src="{% static 'assets/landing/community.jpg' %}" alt="Community" class="w-full h-[300px] object-cover rounded-lg">
-                    <div class="mt-4 z-10">
-                        <h2 class="text-2xl font-bold text-center">Community Engagement</h2>
-                        <p class="text-center text-gray-600">Join a vibrant community of event enthusiasts and make new friends with similar interests.</p>
-                    </div>
+    <section class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10">
+        <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold">Why Us</h1>
+            <h3 class="">Lorem Ipsum Dolor Sit Amet Lorem Ipsum Dolor Sit AmetLorem Ipsum Dolor Sit Amet</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="bg-gradient-to-br from-[#00FF57] to-[#0047FE]">
+                <div class="m-[2px] bg-white px-10 py-5 relative">
+                    <h3 class="absolute -top-5 font-bold text-2xl bg-white px-5">Exciting Events</h3>
+                    <p>
+                        Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.
+                    </p>
                 </div>
             </div>
+            <div class="bg-gradient-to-br from-[#00FF57] to-[#0047FE]">
+                <div class="m-[2px] bg-white px-10 py-5 relative">
+                    <h3 class="absolute -top-5 font-bold text-2xl bg-white px-5">Exclusive Merchandise</h3>
+                    <p>
+                        Shop exclusive event merchandise and create lasting memories with unique items.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-[#00FF57] to-[#0047FE]">
+                <div class="m-[2px] bg-white px-10 py-5 relative">
+                    <h3 class="absolute -top-5 font-bold text-2xl bg-white px-5">Exciting Events</h3>
+                    <p>
+                        Discover a wide range of events happening in Yogyakarta, from concerts to cultural festivals.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-[#00FF57] to-[#0047FE]">
+                <div class="m-[2px] bg-white px-10 py-5 relative">
+                    <h3 class="absolute -top-5 font-bold text-2xl bg-white px-5">Community Engangement</h3>
+                    <p>
+                        Join a vibrant community of event enthusiasts and make new friends with similar interests.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10">
+        <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold">Our Partners</h1>
+            <h3 class="">Lorem Ipsum Dolor Sit Amet Lorem Ipsum Dolor Sit AmetLorem Ipsum Dolor Sit Amet</h3>
+        </div>
+        <div class="flex flex-wrap justify-center">
+            <img 
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729907697/eventyog/assets/partners/xrkczsicrpdk7zwwhqyi.png" alt="CherryPop"
+                class="h-[60px] md:h-[90px] object-contain m-5"
+            >
+            <img 
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729907697/eventyog/assets/partners/vjuwak0yeq9w2nluxeea.png"
+                alt="Tokopedia"
+                class="h-[60px] md:h-[90px] object-contain m-5"
+            >
+            <img
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729907697/eventyog/assets/partners/gddxr9hdfa9csdjgy4yq.png"
+                alt="Wardah"
+                class="h-[60px] md:h-[90px] object-contain m-5"
+            >
+            <img 
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729907697/eventyog/assets/partners/knvd0dqp60bnnunbockv.png"
+                alt="Pemerintah Jogja"
+                class="h-[60px] md:h-[90px] object-contain m-5"
+            >
+            <img 
+                src="https://res.cloudinary.com/mxgpapp/image/upload/v1729907697/eventyog/assets/partners/srdjapgg2dkxhbskc9na.png"                
+                alt="Shoopee"
+                class="h-[60px] md:h-[90px] object-contain m-5"
+            >
+        </div>
+    </section>
+
+    <!-- Upcoming Events-->
+    <section class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10">
+        <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold">Upcoming Events</h1>
+            <h3 class="">Lorem Ipsum Dolor Sit Amet Lorem Ipsum Dolor Sit AmetLorem Ipsum Dolor Sit Amet</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {% for event in first_8_events %}
+                <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden">
+                    <img 
+                        src="{{event.image_urls}}" 
+                        class="h-[200px] object-cover"
+                        alt="">
+                    <div class="flex gap-5 p-5">
+                        <div class="flex flex-col items-center">
+                            <h3 class="font-semibold text-[#3D37F1]">{{event.month}}</h3>
+                            <h1 class="font-bold text-2xl">{{event.day}}</h1>
+                        </div>
+                        <div>
+                            <h1 class="font-bold">{{event.title}}</h1>
+                            <p class="text-sm font-regular line-clamp-3">
+                                {{event.description}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a href="{% url 'yogevent:main' %}">
+            {% include "ds/button.html" with text="See More" variant="primary" class="w-fit " %}
+        </a>
     </section>
 
     <!-- FAQ Section -->
-    <section class="w-full flex flex-col justify-center items-center gap-4 px-4 md:px-10 fade-in mb-20 mt-16">
-        <h1 class="section-title font-bold text-center">Wanna ask some questions?</h1>
-        <div class="w-full md:w-[700px]">
+    <section class="px-10 md:20 lg:px-32 flex flex-col items-center gap-10 mt-10 mb-32">
+        <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold">Wanna Ask Some Questions?</h1>
+            <h3 class="">Lorem Ipsum Dolor Sit Amet Lorem Ipsum Dolor Sit AmetLorem Ipsum Dolor Sit Amet</h3>
+        </div>
+        <div class="w-full md:w-[700px] space-y-5">
             {% for qna in faq_qna %}
-                <div class="accordion-item">
-                    {% include "ds/accordion.html" with title=qna.question content=qna.answer id=qna.id %}
-                </div>
+                {% include "ds/accordion.html" with title=qna.question content=qna.answer id=qna.id %}
             {% endfor %}
         </div>
     </section>
 
     <!-- Smooth Scroll Script -->
     <script>
-        document.getElementById('learnMoreButton').addEventListener('click', function () {
+        // Scroll event to change navbar text color
+        window.addEventListener('scroll', function() {
+            const navbar1 = document.getElementById('navbar-1-container');
+            const navbar2 = document.getElementById('navbar-2-container');
+
+            if (window.scrollY > window.innerHeight - 100) {
+                addClick()
+                navbar1.classList.add('hidden');
+                navbar2.classList.remove('hidden');
+            } else {
+                addClick()
+                navbar1.classList.remove('hidden');
+                navbar2.classList.add('hidden');
+            }
+        });
+
+        {% comment %} document.getElementById('learnMoreButton').addEventListener('click', function () {
             const offset = 100; // Adjust the offset for smooth scroll
             const element = document.getElementById('whatWeOffer');
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const element.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - offset;
 
             window.scrollTo({
                 top: offsetPosition,
                 behavior: 'smooth'
             });
-        });
+        }); {% endcomment %}
+        const images = [
+            "https://res.cloudinary.com/mxgpapp/image/upload/v1729906731/eventyog/assets/eqevwhpsunbakctnacoo.png",
+            "https://res.cloudinary.com/mxgpapp/image/upload/v1729873975/eventyog/assets/bfnbuzrckx95zi8suogq.png",
+            "https://res.cloudinary.com/mxgpapp/image/upload/v1729873975/eventyog/assets/jwte50yj5mzdhcqatkej.png"
+        ];
+
+        let currentIndex = 0;
+
+        function changeImage() {
+            const heroImage = document.getElementById('hero-image');
+            heroImage.classList.add('fade-out'); // Add fade-out class for smooth transition
+
+            setTimeout(() => {
+            currentIndex = (currentIndex + 1) % images.length; // Cycle through images
+            heroImage.src = images[currentIndex];
+            heroImage.classList.remove('fade-out'); // Remove fade-out class after image change
+            heroImage.classList.add('fade-in'); // Add fade-in class for smooth transition
+
+            setTimeout(() => {
+                heroImage.classList.remove('fade-in'); // Remove fade-in class after transition
+            }, 1000); // Duration of fade-in animation
+            }, 500); // Duration of fade-out animation
+        }
+
+        setInterval(changeImage, 5000); // Change image every 5 seconds
+
+        // CSS for smooth transitions
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            }
+            .fade-in {
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 {% endblock content %}

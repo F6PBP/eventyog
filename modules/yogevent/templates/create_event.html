@@ -1,7 +1,7 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
     <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto">
-        <form method="post" action="{% url 'yogevent:create_event_entry_ajax' %}" id="event-form">
+        <form id="event-form" onsubmit="event.preventDefault(); submitForm();">
             {% csrf_token %}
             <div class="p-5 w-full">
                 <!-- Title Input -->
@@ -90,18 +90,29 @@
     </div>
 
     <script>
-        document.querySelector('#event-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent form default submission
-            let formData = new FormData(this); // Collect form data
+        function submitForm() {
+            const form = document.getElementById('event-form');
+            const formData = new FormData(form);
             
+            console.log(form)
+            console.log(formData)
+
+
+            console.log("{% url 'yogevent:create_event_entry_ajax' %}")
+
             fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
                 method: "POST",
                 body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
             })
             .then(response => {
+                console.log('Response:', response); // Tambahkan ini
                 if (!response.ok) {
                     return response.json().then(err => { throw err; });
                 }
+
                 return response.json();
             })
             .then(data => {
@@ -116,7 +127,7 @@
             .catch(error => {
                 alert("An unexpected error occurred: " + error);
             });
-        });
+        }
 
         function displayNotification(message, type) {
             const notificationDiv = document.getElementById('notification');

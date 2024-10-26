@@ -24,7 +24,7 @@
                 <!-- Tombol Edit dan Delete -->
                 {% if forum_post.user == request.user.userprofile %}
                 <div class="flex space-x-2">
-                    {% include "ds/button.html" with icon="fa fa-edit" text="Edit Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" button_type="primary" %}
+                    {% include "ds/button.html" with icon="fa fa-edit" text="Edit Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" variant="primary" %}
                     {% include "components/edit_modal.html" with modal_id="open-modal-1" modal_title="Edit Post" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
                     <form method="POST" action="{% url 'yogforum:delete_post' post_id=forum_post.id %}">
                         {% csrf_token %}
@@ -45,7 +45,7 @@
                 </span>
             </div>
         <div class="flex justify-end mt-4">
-            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" button_type="primary" %}
+            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" variant="primary" %}
         </div>    
     </div>
 
