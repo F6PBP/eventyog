@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
 from modules.main.models import Forum, ForumReply
 from django.http import JsonResponse
-from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from modules.yogforum.forms import AddForm, AddReplyForm
+from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
+from eventyog.decorators import check_user_profile
+from modules.main.models import UserProfile
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -17,18 +19,39 @@ def viewforum(request, post_id):
         'forum_post': forum_post,
         'replies': replies,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
     }
     return render(request, 'viewforum.html', context)
 
+@check_user_profile()
 def main(request):
     # Ambil semua post
     forum_posts = Forum.objects.all().order_by('-created_at')
     
+    for post in forum_posts:
+        if post.user.profile_picture:
+            post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
+        else:
+            post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
+    top_creators = Forum.objects.values('user').annotate(total=Count('user')).order_by('-total')[:10]
+    
+    print(top_creators)
+    
+    for creator in top_creators:
+        user = UserProfile.objects.get(id=creator['user'])
+        creator['username'] = user.user.username
+        if user.profile_picture:
+            creator['profile_picture'] = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user.profile_picture}.jpg'
+        else:
+            creator['profile_picture'] = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
     context = {
         'forum_posts': forum_posts,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
+        'is_admin': request.is_admin,
+        'top_creators': top_creators
     }
     return render(request, 'yogforum.html', context)
 
@@ -82,45 +105,48 @@ def viewforum(request, post_id):
 @login_required
 def add_reply(request, post_id):
     try:
-        # Try to get the forum post
         forum_post = Forum.objects.get(id=post_id)
         forum_reply = None
     except Forum.DoesNotExist:
-        # If the forum post doesn't exist, it might be a reply
         forum_reply = get_object_or_404(ForumReply, id=post_id)
-        forum_post = forum_reply.forum  # Get the original forum post from the reply
+        forum_post = forum_reply.forum
 
-    # Get 'reply_to' ID (optional), which could be a reply or a post
     reply_to_id = request.POST.get('reply_to', None)
 
     if request.method == 'POST':
         content = request.POST.get('content')
+        if not content:
+            return JsonResponse({"error": "Content cannot be empty."}, status=400)
 
         if reply_to_id:
-            # The reply is in response to another reply
             reply_to = get_object_or_404(ForumReply, id=reply_to_id)
-            ForumReply.objects.create(
+            new_reply = ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
                 content=content,
                 reply_to=reply_to
             )
         else:
-            # The reply is to the original forum post or the reply acting as a post
-            ForumReply.objects.create(
+            new_reply = ForumReply.objects.create(
                 user=request.user.userprofile,
                 forum=forum_post,
-                content=content,
-                reply_to=forum_reply  # This will be None if it's replying to the post
+                content=content
             )
 
-        # Redirect to the view forum page or reply as post page depending on the context
-        if forum_reply:
-            return redirect('yogforum:view_reply_as_post', reply_id=forum_reply.id)
-        else:
-            return redirect('yogforum:viewforum', post_id=forum_post.id)
+        # Pastikan reply_id dikirim dalam respons
+        return JsonResponse({
+            "success": True,
+            "message": "Reply added successfully!",
+            "username": new_reply.user.user.username,
+            "content": new_reply.content,
+            "reply_id": new_reply.id,  # Kirim reply_id di sini
+            "csrf_token": request.META['CSRF_COOKIE'],  # Kirim CSRF token untuk delete button
+            "is_owner": request.user.userprofile == new_reply.user,
+            "reply_to": new_reply.reply_to.user.user.username if new_reply.reply_to else None
+        })
 
-    return redirect('yogforum:viewforum', post_id=forum_post.id)
+    return JsonResponse({"error": "Invalid request."}, status=400)
+
 
 def view_reply_as_post(request, reply_id):
     # Get the reply by id
@@ -137,3 +163,31 @@ def view_reply_as_post(request, reply_id):
     }
     
     return render(request, 'components/view_reply_as_post.html', context)
+
+@login_required
+def edit_post(request, post_id):
+    post_object = None
+    
+    # Try to get the Forum post first
+    try:
+        post_object = Forum.objects.get(id=post_id, user=request.user.userprofile)
+    except Forum.DoesNotExist:
+        # If not found, try finding a reply instead
+        post_object = get_object_or_404(ForumReply, id=post_id, user=request.user.userprofile)
+
+    if request.method == 'POST':
+        form = EditPostForm(request.POST, instance=post_object)
+        if form.is_valid():
+            form.save()
+            if isinstance(post_object, Forum):
+                return redirect('yogforum:viewforum', post_id=post_object.id)
+            else:
+                return redirect('yogforum:view_reply_as_post', reply_id=post_object.id)
+    else:
+        form = EditPostForm(instance=post_object)
+    
+    return render(request, 'components/edit_modal.html', {
+        'form': form,
+        'object': post_object,
+        'modal_id': f"edit-modal-{post_id}"
+    })

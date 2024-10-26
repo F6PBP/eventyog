@@ -1,1 +1,188 @@
-This is Cart
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<main class="mt-16 px-10 flex flex-col gap-4">
+</main>
+
+<style>
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .cart-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .cart-items {
+        border: 1px solid #e2e2e2;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .item-info {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+    }
+    .item-name {
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+    .item-price {
+        font-weight: bold;
+        width: 20%;
+    }
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-quantity {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-quantity:hover {
+        background-color: #45a049;
+    }
+    .total-price {
+        text-align: right;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-top: 10px;
+    }
+    .checkout-button {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+</style>
+
+<section class="cart-container fade-in">
+    <h1 class="cart-header text-2xl md:text-4xl font-bold">My Cart</h1>
+
+    <!-- Event Items -->
+    {% if cart_events %}
+        <h2 class="text-xl font-semibold mb-4">Event Tickets</h2>
+        {% for event in cart_events %}
+        <div class="cart-items">
+            <div class="cart-item">
+                <div class="item-info">
+                    <span class="item-name">{{ event.ticket.name }}</span>
+                    <span>Ticket Price: {{ event.ticket.price }}</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="btn-quantity" onclick="updateQuantity('event', {{ event.id }}, 'decrease')">-</button>
+                    <span id="quantity-event-{{ event.id }}">{{ event.quantity }}</span>
+                    <button class="btn-quantity" onclick="updateQuantity('event', {{ event.id }}, 'increase')">+</button>
+                </div>
+                <div class="item-price">
+                    Total: <span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Merchandise Items -->
+    {% if cart_merch %}
+        <h2 class="text-xl font-semibold mb-4">Merchandise</h2>
+        {% for merch in cart_merch %}
+        <div class="cart-items">
+            <div class="cart-item">
+                <div class="item-info">
+                    <span class="item-name">{{ merch.merchandise.name }}</span>
+                    <span>Price: {{ merch.merchandise.price }}</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="btn-quantity" onclick="updateQuantity('merch', {{ merch.id }}, 'decrease')">-</button>
+                    <span id="quantity-merch-{{ merch.id }}">{{ merch.quantity }}</span>
+                    <button class="btn-quantity" onclick="updateQuantity('merch', {{ merch.id }}, 'increase')">+</button>
+                </div>
+                <div class="item-price">
+                    Total: <span id="price-merch-{{ merch.id }}">{{ merch.totalPrice }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Total Price -->
+    <div class="total-price">
+        Total Price: <span id="total-price">{{ total_price }}</span>
+    </div>
+
+    <!-- Checkout Button -->
+    <div class="checkout-button">
+        {% include "ds/button.html" with text="Checkout" class="w-fit h-fit" id="checkoutButton" %}
+    </div>
+</section>
+
+<script>
+    function formatPrice(price) {
+        // Use Intl.NumberFormat to add dots for every three digits
+        return new Intl.NumberFormat('de-DE', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        }).format(price);
+    }
+
+    function updateQuantity(type, id, action) {
+    fetch(`/cart/update-cart/${type}/${id}/${action}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.log("Response not OK:", response.status, response.statusText);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update the quantity in the UI
+            document.getElementById(`quantity-${type}-${id}`).innerText = data.new_quantity;
+
+            // Update the total price for the item
+            document.getElementById(`price-${type}-${id}`).innerText = formatPrice(data.item_total_price);
+
+            // Update the overall total price with formatting
+            document.getElementById('total-price').innerText = formatPrice(data.total_price);
+        } else {
+            console.log("Error in response data:", data.error);
+            alert(data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
+{% endblock %}
