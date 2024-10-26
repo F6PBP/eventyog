@@ -58,26 +58,40 @@ def see_user(request, user_id):
 def see_user(request, user_id):
     if request.user_profile.role != 'AD':
         return redirect('main:home')
-    
+   
     print(f"Requested user_id: {user_id}")
     user = get_object_or_404(User, pk=user_id)
     print(f"Found user: {user.username}, ID: {user.id}")
     user_profile = get_object_or_404(UserProfile, user=user)
     print(f"Found profile: {user_profile.name}, User ID: {user_profile.user.id}")
-        
-    user = get_object_or_404(User, pk=user_id)
-    user_profile = get_object_or_404(UserProfile, user=user)
     
-    context = {
-        'user': user,
-        'user_profile': user_profile,
-        'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
-        'show_navbar': True,
-        'show_footer': True,
-        'is_admin': True,
-    }
-
-    return render(request, 'user.html', context)
+    # Debug print to see what's in categories
+    print(f"Raw categories: {user_profile.categories}")
+    
+    try:
+        # Handle categories properly
+        categories = []
+        if user_profile.categories:
+            # Strip any whitespace and split only if there's content
+            categories = [cat.strip() for cat in user_profile.categories.split(',') if cat.strip()]
+        
+        print(f"Processed categories: {categories}")  # Debug print
+        
+        context = {
+            'user': user,
+            'user_profile': user_profile,
+            'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
+            'categories': categories,
+            'show_navbar': True,
+            'show_footer': True,
+            'is_admin': True,
+        }
+        return render(request, 'user.html', context)
+   
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        print('User profile not found.')
+        return redirect('auth:onboarding')
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
@@ -87,11 +101,18 @@ def edit_user(request, user_id):
         
     user = get_object_or_404(User, pk=user_id)
     user_profile = get_object_or_404(UserProfile, user=user)
+
+    # Handle categories properly
+    categories = []
+    if user_profile.categories:
+        # Strip any whitespace and split only if there's content
+        categories = [cat.strip() for cat in user_profile.categories.split(',') if cat.strip()]
     
     context = {
         'user': user,
         'user_profile': user_profile,
         'image_url': user_profile.profile_picture.url if user_profile.profile_picture else None,
+        'categories': categories,
         'show_navbar': True,
         'show_footer': True,
         'is_admin': True,
@@ -101,17 +122,17 @@ def edit_user(request, user_id):
         # Update user profile
         user_profile.name = request.POST.get('name')
         user_profile.bio = request.POST.get('bio')
+        user_profile.email = request.POST.get('email')
         
         if 'profile_picture' in request.FILES:
             user_profile.profile_picture = request.FILES['profile_picture']
 
-        categories = request.POST.get('categories')
-        user_profile.categories = categories
+        user_profile.categories = request.POST.get('categories')
             
         user_profile.save()
         
-        # Update user email
-        user.email = request.POST.get('email')
+        # Update username
+        user.username = request.POST.get('username')
         user.save()
 
         messages.success(request, 'User profile updated successfully')

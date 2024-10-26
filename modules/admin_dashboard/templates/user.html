@@ -25,9 +25,9 @@
 
             <div class="font-semibold flex flex-col gap-2">
                 <h3>Event Types</h3>
-                {% if user_profile.categories %}
+                {% if categories %}
                     <div class="flex flex-wrap gap-2 font-normal text-sm justify-start">
-                        {% for category in user_profile.categories %}
+                        {% for category in categories %}
                             <span class="px-3 py-1 bg-blue-200 text-blue-800 rounded-full">{{category}}</span>
                         {% endfor %}
                     </div>
@@ -38,13 +38,12 @@
             
             {% if is_admin %}
             <div class="flex items-center gap-2">
-                <button onclick="showEditModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                    <i class="fas fa-user-edit"></i>
-                    Edit Profile
-                </button>
-                {% include "ds/button.html" with text="Delete Account" button_type="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" %}
+                {% include "ds/button.html" with text="Edit Profile" button_type="primary" icon="fas fa-user-edit" class="w-fit edit-profile-button" onclick="showEditModal()" %}
+                {% include "ds/button.html" with text="Delete Account" button_type="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" onclick="showDeleteModal()" %}
             </div>
             {% endif %}
+
+
         </div>
     </main>
 
@@ -58,6 +57,10 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Name</label>
                         <input type="text" name="name" value="{{user_profile.name}}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" name="username" value="{{user.username}}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email</label>
@@ -74,9 +77,9 @@
                     <div class="mb-4">
                         <label for="categories" class="block text-sm font-medium text-gray-700">Preferable Event Categories</label>
                         <div class="relative">
-                            <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown(event)">Select Categories</button>
-                            <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden">
-                                <ul class="max-h-24 overflow-y-auto py-1" id='category-dropdown'>
+                            <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown()">Select Categories</button>
+                            <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden transition-all duration-500 ease-in-out max-h-0 overflow-hidden">
+                                <ul class="max-h-16 overflow-auto" id='category-dropdown'>
                                 </ul>
                             </div>
                         </div>
@@ -107,7 +110,35 @@
     </div>
 
     <script>
-        // Define categories array
+        function toggleDropdown() {
+            var dropdown = document.getElementById('dropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                setTimeout(() => {
+                    dropdown.classList.remove('max-h-0');
+                    dropdown.classList.add('max-h-28');
+                }, 10);
+            } else {
+                dropdown.classList.remove('max-h-28');
+                dropdown.classList.add('max-h-0');
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                }, 500);
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('dropdown');
+            var button = dropdown.previousElementSibling;
+            if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('max-h-28');
+                dropdown.classList.add('max-h-0');
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                }, 500);
+            }
+        });
+
         const categories = [
             "Music",
             "Sports",
@@ -123,111 +154,80 @@
             "Family and Kids",
             "Charity and Causes",
             "Nightlife",
-            "Film and Media"
+            "Film and Media",
         ];
-    
-        // Get necessary DOM elements
-        const dropdown = document.getElementById('dropdown');
+        
         const categoryDropdown = document.getElementById('category-dropdown');
         const selectedCategoriesDiv = document.getElementById('selected-categories');
-    
-        // Toggle dropdown visibility
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            if (dropdown.classList.contains('hidden')) {
-                dropdown.classList.remove('hidden');
-            } else {
-                dropdown.classList.add('hidden');
-            }
-        }
-    
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdownButton = document.querySelector('button[onclick="toggleDropdown(event)"]');
-            if (!dropdownButton.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.add('hidden');
-            }
+
+        categories.forEach(category => {
+            const li = document.createElement('li');
+            li.classList.add('px-4', 'py-2', 'text-sm', 'text-gray-700', 'hover:bg-gray-100');
+            const label = document.createElement('label');
+            label.classList.add('flex', 'items-center', 'cursor-pointer');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = category;
+            checkbox.classList.add('mr-2');
+            checkbox.addEventListener('change', function() {
+                updateSelectedCategories();
+            });
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(category));
+            li.appendChild(label);
+            categoryDropdown.appendChild(li);
         });
-    
-        // Update the display of selected categories
+
         function updateSelectedCategories() {
             selectedCategoriesDiv.innerHTML = '';
-            const checkboxes = categoryDropdown.querySelectorAll('input[type="checkbox"]:checked');
-            const form = document.querySelector('form');
-            
-            // Remove existing hidden inputs
-            form.querySelectorAll('input[name="categories"]').forEach(input => input.remove());
-            
-            checkboxes.forEach(checkbox => {
-                // Create chip
+            const selectedCategories = [];
+            categoryDropdown.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedCategories.push(checkbox.value);
                 const chip = document.createElement('div');
                 chip.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full', 'text-sm', 'flex', 'items-center');
                 chip.textContent = checkbox.value;
-                
                 const removeButton = document.createElement('button');
                 removeButton.classList.add('ml-2', 'text-blue-500', 'hover:text-blue-700');
                 removeButton.innerHTML = '<i class="fas fa-times"></i>';
-                removeButton.addEventListener('click', () => {
+                removeButton.addEventListener('click', function() {
                     checkbox.checked = false;
                     updateSelectedCategories();
                 });
-                
                 chip.appendChild(removeButton);
                 selectedCategoriesDiv.appendChild(chip);
-                
-                // Create hidden input for form submission
-                const hiddenInput = document.createElement('input');
+            });
+
+            // Update hidden input with CSV string
+            const form = document.querySelector('form');
+            let hiddenInput = form.querySelector('input[name="categories"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
-                hiddenInput.name = 'categories';  // Changed from categories[] to categories
-                hiddenInput.value = checkbox.value;
+                hiddenInput.name = 'categories';
                 form.appendChild(hiddenInput);
-            });
+            }
+            hiddenInput.value = selectedCategories.join(',');
         }
-    
-        // Initialize dropdown with existing categories
-        function initializeDropdown() {
-            categoryDropdown.innerHTML = '';
-            
-            // Get current user categories from the page
-            const currentCategories = [];
-            {% if user_profile.categories %}
-                {% for category in user_profile.categories %}
-                    currentCategories.push("{{ category }}");
-                {% endfor %}
-            {% endif %}
-            
-            categories.forEach(category => {
-                const li = document.createElement('li');
-                li.classList.add('px-4', 'py-2', 'text-sm', 'text-gray-700', 'hover:bg-gray-100', 'cursor-pointer');
-                
-                const label = document.createElement('label');
-                label.classList.add('flex', 'items-center', 'cursor-pointer', 'w-full', 'h-full');
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = category;
-                checkbox.classList.add('mr-2');
-                
-                // Check if this category is already selected
-                if (currentCategories.includes(category)) {
-                    checkbox.checked = true;
-                }
-                
-                checkbox.addEventListener('change', updateSelectedCategories);
-                
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(category));
-                li.appendChild(label);
-                categoryDropdown.appendChild(li);
-            });
-            
-            updateSelectedCategories();
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const imagePreview = document.getElementById('image_preview');
+                imagePreview.src = reader.result;
+                imagePreview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(event.target.files[0]);
         }
-    
-        // Initialize everything when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDropdown();
-            
+
+        function showEditModal() {
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function hideEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
             // Toast messages handling
             {% if messages %}
                 {% for message in messages %}
@@ -243,44 +243,31 @@
             const modal = document.getElementById('confirmationModal');
             const cancelButton = document.getElementById('cancelButton');
             
-            if (deleteButton) {
-                deleteButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    modal.classList.remove('hidden');
-                });
-            }
+            // Show the modal when the delete button is clicked
+            deleteButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                modal.classList.remove('hidden');
+            });
             
-            if (cancelButton) {
-                cancelButton.addEventListener('click', function () {
+            // Hide the modal when the cancel button is clicked
+            cancelButton.addEventListener('click', function () {
+                modal.classList.add('hidden');
+            });
+            
+            // Hide the modal when clicking outside of it
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
                     modal.classList.add('hidden');
-                });
-            }
-            
-            if (modal) {
-                modal.addEventListener('click', function (event) {
-                    if (event.target === modal) {
-                        modal.classList.add('hidden');
-                    }
-                });
-            }
-    
-            const editModal = document.getElementById('editModal');
-            if (editModal) {
-                editModal.addEventListener('click', function (event) {
-                    if (event.target === this) {
-                        hideEditModal();
-                    }
-                });
-            }
+                }
+            });
+
+            // Also close edit modal when clicking outside
+            document.getElementById('editModal').addEventListener('click', function (event) {
+                if (event.target === this) {
+                    hideEditModal();
+                }
+            });
         });
-    
-        function showEditModal() {
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-    
-        function hideEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
     </script>
     
 {% endblock content %}
