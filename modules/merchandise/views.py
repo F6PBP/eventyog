@@ -8,6 +8,7 @@ from eventyog.decorators import check_user_profile
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.core import serializers
+from django.http import JsonResponse
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
@@ -63,7 +64,7 @@ def create_merchandise_ajax(request):
     )
     new_merchandise.save()
 
-    return HttpResponse(b"CREATED", status=201)
+    return JsonResponse({"status": "CREATED"}, status = 201)
 
 def edit_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
@@ -71,7 +72,7 @@ def edit_merchandise(request, id):
 
     if form.is_valid() and request.method == "POST":
         form.save()
-        return HttpResponseRedirect(reverse('merchandise:main'))
+        return HttpResponseRedirect(reverse('yogevent:main'))
 
     context = {
         'form': form,
@@ -82,7 +83,7 @@ def edit_merchandise(request, id):
 def delete_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     merchandise.delete()
-    return HttpResponseRedirect(reverse('main:main'))
+    return HttpResponseRedirect(reverse('yogevent:main'))
 
 def showMerch_json(request):
     data = Merchandise.objects.all()

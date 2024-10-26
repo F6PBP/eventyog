@@ -28,10 +28,10 @@
                     <div class="bg-white rounded-lg shadow-md overflow-hidden relative flex flex-col justify-between cursor-pointer" onclick="window.location.href='/merchandise/show/${item.pk}'">
                         ${isAdmin ? `
                             <div class="absolute top-2 right-2 flex space-x-1 z-10">
-                                <a href="/edit-merchandise/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
+                                <a href="/merchandise/edit/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
                                     <i class="fa fa-pencil text-sm" aria-hidden="true"></i>
                                 </a>
-                                <a href="/delete-merchandise/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
+                                <a href="/merchandise/delete/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
                                     <i class="fa fa-trash text-sm" aria-hidden="true"></i>
                                 </a>
                             </div>
