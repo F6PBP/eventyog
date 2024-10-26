@@ -31,12 +31,21 @@
                 <p id="averageRating">{{ average_rating }}</p>
             </div>
 
-            {% if tickets %}
-                {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
-                {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" %}
-            {% else %}
-                {% include "ds/button.html" with text="Book Event (Free)" class="w-fit mt-5" icon="fa fa-ticket" onclick="onBookFree();" %}
+            
+            {% if is_booked %}
+                <div class="flex gap-2">
+                    {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" %}
+                    {% include "ds/button.html" with text="Cancel Booking" class="w-fit mt-5 h-fit" icon="fa fa-x" variant="danger" onclick="onCancelBook();" %}
+                </div>
+            {% else %}            
+                {% if tickets %}
+                    {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
+                    {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" %}
+                {% else %}
+                    {% include "ds/button.html" with text="Book Event (Free)" class="w-fit mt-5" icon="fa fa-ticket" onclick="onBookFree();" %}
+                {% endif %}
             {% endif %}
+            
         </div>
     </div>
     <hr class="my-10">
@@ -79,18 +88,29 @@
 </script>
 <script>
     function onBookFree() {
-        showToast('Event booked successfully!', 'success');
-        fetch(`/yogevent/book-event/`, {
+        
+        const formData = new FormData();
+        formData.append('ticket_name', '');
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:book_event' %}", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: JSON.stringify({
-                ticket_name: null,
-                event_uuid: "{{ event.uuid }}"
-            })
+            body: formData
         })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Event booked successfully!', 'success');
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+
+    function onCancelBook() {
+        
     }
 </script>
 {% endblock %}

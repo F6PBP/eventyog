@@ -241,6 +241,10 @@ def detail_event(request, uuid):
         for rating in ratings:
             total_rating += rating.rating
         total_rating = total_rating / len(ratings)
+
+    registered_event = user_profile.registeredEvent.all()
+    
+    is_booked = event in registered_event
     
     context = {
         'user': request.user,
@@ -254,6 +258,7 @@ def detail_event(request, uuid):
         'merchandise': merchandise,
         'tickets': tickets,
         'total_rating': total_rating,
+        'is_booked': is_booked
     }
     return render(request, 'detail_event.html', context)
 
@@ -261,12 +266,13 @@ def detail_event(request, uuid):
 @csrf_exempt
 @require_POST
 def book_event(request):
+    print(request.POST)
     event_id = request.POST.get('event_uuid')
     ticket_name = request.POST.get('ticket_name')
     
     event = get_object_or_404(Event, uuid=event_id)
     tickets = TicketPrice.objects.filter(event=event)
-    user_profile = request.userprofile
+    user_profile = request.user_profile
     
     # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
@@ -276,7 +282,7 @@ def book_event(request):
     
     # If tickets is None then event is free
     if tickets is None:
-        user_profile.registered_event.add(event)
+        user_profile.registeredEvent.add(event)
     else:
         # If tickets is not None then event is not free
         ticket = get_object_or_404(TicketPrice, name=ticket_name)
@@ -284,6 +290,17 @@ def book_event(request):
         event_cart.save()
 
     return JsonResponse({'status': True, 'message': 'Event booked successfully.'})            
+
+
+@check_user_profile()
+@csrf_exempt
+@require_POST
+def cancel_book(request):
+    event_id = request.POST.get('event_uuid')
+    event = get_object_or_404(Event, uuid=event_id)
+    user_profile = request.user_profile
+    user_profile.registeredEvent.remove(event)
+    return JsonResponse({'status': True, 'message': 'Event cancelled successfully.'})
 
 def delete_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)

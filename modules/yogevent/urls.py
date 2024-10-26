@@ -18,5 +18,6 @@ urlpatterns = [
     path('add-rating/<uuid:event_id>/', add_rating, name='add_rating'),
     path('load-ratings/<uuid:event_id>/', load_event_ratings, name='load_event_ratings'),
     path('get-rating-event/<uuid:uuid>/', get_rating_event, name='get_rating_event'),
-    path('book-event/', book_event, name='book_event'),
+    path('book-event', book_event, name='book_event'),
+    path('cancel-book', book_event, name='cancel_book'),
 ]
