@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-    <main class="mt-32 px-10 flex flex-col gap-4">
+    <main class="mt-32 px-10 flex flex-col gap-4 pb-16">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Admin Dashboard</h1>
             <!-- Add User Button on the far right -->
-            <button id="addUserButton" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                Add User
-            </button>
+            {% include "ds/button.html" with text="Add User" button_type="primary" icon="fas fa-user-plus" class="w-fit add-user-button" onclick="updateModalState(true)" id="addUserButton"%}
         </div>
         {% include "ds/input.html" with id="queryInput" placeholder="Search User" %}
         
@@ -14,59 +12,96 @@
         </section>
     </main>
 
+    <!-- User Creation Modal -->
+    <div id="userCreationModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Create User</h2>
+            <form id="createUserForm">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm">Username:</label>
+                    <input type="text" id="username" name="username" class="border rounded w-full p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm">Name:</label>
+                    <input type="text" id="name" name="name" class="border rounded w-full p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm">Email:</label>
+                    <input type="email" id="email" name="email" class="border rounded w-full p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm">Password:</label>
+                    <input type="password" id="password" name="password" class="border rounded w-full p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="confirmPassword" class="block text-sm">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="border rounded w-full p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="bio" class="block text-sm">Bio:</label>
+                    <textarea id="bio" name="bio" class="border rounded w-full p-2"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="profilePicture" class="block text-sm">Profile Picture:</label>
+                    <input type="file" id="profilePicture" name="profile_picture" class="border rounded w-full p-2" accept="image/*">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded-full mr-2" onclick="updateModalState(false)">Cancel</button>
+                    <button type="submit" class="bg-[#003fe2] text-white px-4 py-2 rounded-full">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
     <script>
+        // Function to fetch users based on search query
         async function fetchUser(query) {
-                fetch(`search-users?search=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = '';  // Clear the existing user list
-                    console.log(data);
-                    data.forEach(user => {
-                        // Create a new user card
-                        const userLink = document.createElement('a');
-                        const url = window.location.href;
-                        userLink.href = `${url}user/${user.pk+1}`;
-                        userLink.classList.add('user-item', 'flex', 'flex-col', 'items-center', 'max-w-[200px]', 'bg-gray-100', 'p-10', 'gap-2', 'rounded-xl', 'hover:scale-105', 'duration-300', 'cursor-pointer');
-                        
-                        const img = document.createElement('img');
-
-                        if (user.fields.profile_picture) {
-                            img.src = `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}`;
-                        } else {
-                            img.src = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png';
-                            img.alt = user.fields.name;
-                        }
-
-                        img.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover');
-                        
-                        const name = document.createElement('p');
-                        name.textContent = user.fields.name;
-                        name.classList.add('text-center', 'text-sm', 'font-semibold', 'text-gray-800', 'mt-2');
-                        
-                        const username = document.createElement('p');
-                        username.textContent = user.fields.email;
-                        username.classList.add('w-full', 'text-center', 'text-sm', 'font-medium', 'text-gray-500', 'break-words');
-                        
-                        const buttonDiv = document.createElement('div');
-                        buttonDiv.classList.add('flex', 'gap-2');
-                        // Add button HTML here
-                        
-                        userLink.appendChild(img);
-                        userLink.appendChild(name);
-                        userLink.appendChild(username);
-                        userLink.appendChild(buttonDiv);
-                        
-                        userList.appendChild(userLink);
-                    });
-                })
-                .catch(error => console.error('Error fetching users:', error));
+            try {
+                const response = await fetch(`search-users?search=${query}`);
+                const data = await response.json();
+                
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';  // Clear the existing user list
+                
+                data.forEach(user => {
+                    // Create a new user card
+                    const userLink = document.createElement('a');
+                    const url = window.location.href;
+                    userLink.href = `${url}user/${user.pk + 1}`;
+                    userLink.classList.add('user-item', 'flex', 'flex-col', 'items-center', 'max-w-[200px]', 'bg-gray-100', 'p-10', 'gap-2', 'rounded-xl', 'hover:scale-105', 'duration-300', 'cursor-pointer');
+                    
+                    const img = document.createElement('img');
+                    img.src = user.fields.profile_picture ? 
+                        `http://res.cloudinary.com/mxgpapp/${user.fields.profile_picture}` : 
+                        'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png';
+                    img.alt = user.fields.name;
+                    img.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover');
+    
+                    const name = document.createElement('p');
+                    name.textContent = user.fields.name;
+                    name.classList.add('text-center', 'text-sm', 'font-semibold', 'text-gray-800', 'mt-2');
+                    
+                    const username = document.createElement('p');
+                    username.textContent = user.fields.email;
+                    username.classList.add('w-full', 'text-center', 'text-sm', 'font-medium', 'text-gray-500', 'break-words');
+                    
+                    userLink.appendChild(img);
+                    userLink.appendChild(name);
+                    userLink.appendChild(username);
+                    userList.appendChild(userLink);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
         }
+    
+        // Search users as user types in the query input
         document.getElementById('queryInput').oninput = function() {
             const query = this.value;
             fetchUser(query);   
         };
-
+    
         // Show toast messages if they exist
         document.addEventListener('DOMContentLoaded', function () {
             {% if messages %}
@@ -78,14 +113,67 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
-
         });
-
+    
+        // Show the user creation modal
         document.getElementById('addUserButton').addEventListener('click', function() {
-        // Logic to add a user, like opening a modal
-        alert('Add User button clicked!');
+            updateModalState(true);
         });
-
+    
+        // Close the modal
+        function updateModalState(isOpen) {
+            const modal = document.getElementById('userCreationModal');
+            modal.classList.toggle('hidden', !isOpen); // Show or hide the modal
+        }
+    
+        // Handle form submission for user creation
+        document.getElementById('createUserForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            const formData = new FormData(this);
+            
+            const username = formData.get('username');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+    
+            // Validate password
+            if (password.length < 8) {
+                showToast('Password must be at least 8 characters long', 'error');
+                return;
+            }
+            if (password.toLowerCase().includes(username.toLowerCase())) {
+                showToast('Password cannot be similar to the username', 'error');
+                return;
+            }
+            if (password != confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+    
+            try {
+                const response = await fetch('/admin/create-user/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                });
+    
+                if (response.ok) {
+                    showToast('User created successfully', 'success');
+                    updateModalState(false); // Hide the modal
+                    fetchUser(''); // Refresh the user list
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Error creating user', 'error');
+                }
+            } catch (error) {
+                showToast('Error creating user', 'error');
+                console.error('Error:', error);
+            }
+        });
+    
+        // Initial fetch to load users
         fetchUser('');
     </script>
+    
 {% endblock content %}

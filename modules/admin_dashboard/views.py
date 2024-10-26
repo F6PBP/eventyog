@@ -7,6 +7,8 @@ from django.http import HttpResponse
 from django.core import serializers
 from eventyog.types import AuthRequest
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from modules.authentication.forms import UserProfileForm
 
 
 # Create your views here.
@@ -144,3 +146,63 @@ def delete_user(request, user_id):
         return redirect('admin_dashboard:main')  # Change this line to use the correct namespaced URL
         
     return redirect('admin_dashboard:see_user', user_id=user_id)  # Also use the namespaced URL here
+
+@login_required(login_url='auth:login')
+def create_user(request):
+    if request.user_profile.role != 'AD':  # Check if the user is an admin
+        return redirect('main:home')
+
+    if request.method == 'POST':
+        # Create User form
+        user_form = UserCreationForm(request.POST)
+        # Create Profile form
+        profile_form = UserProfileForm(request.POST, request.FILES)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            try:
+                # Save User
+                user = user_form.save()
+                
+                # Save Profile
+                profile = profile_form.save(commit=False)
+                profile.user = user
+                
+                # Handle profile picture
+                if 'profile_picture' in request.FILES:
+                    profile.profile_picture = request.FILES['profile_picture']
+                    
+                profile.save()
+                
+                messages.success(request, 'User created successfully.')
+
+                # Redirect to onboarding if profile is not complete
+                user_profile = UserProfile.objects.filter(user=user).first()
+                if not user_profile:
+                    return redirect('auth:onboarding')  # Redirect to onboarding if no profile
+
+                return redirect('admin_dashboard:see_user', user_id=user.id)  # Redirect to user details page
+
+            except Exception as e:
+                messages.error(request, f'Error creating user: {str(e)}')
+                if user:
+                    user.delete()  # Clean up if profile creation failed
+        else:
+            # Form validation errors
+            for error in user_form.errors.values():
+                messages.error(request, error)
+            for error in profile_form.errors.values():
+                messages.error(request, error)
+
+    else:
+        user_form = UserCreationForm()
+        profile_form = UserProfileForm()
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'show_navbar': True,
+        'show_footer': True,
+    }
+
+    return render(request, 'admin/create_user.html', context)
+
