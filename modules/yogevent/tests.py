@@ -1,9 +1,7 @@
 from django.test import TestCase, Client
-from modules.main.models import User, UserProfile, UserRoles
-from django.urls import reverse
-from django.contrib.auth import login, logout, authenticate
+from modules.main.models import Event
 
-# Create your tests here.
+
 class mainTest(TestCase):
     def test_login_template(self):
         c = Client()

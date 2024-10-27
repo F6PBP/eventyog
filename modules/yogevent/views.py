@@ -1,5 +1,3 @@
-from datetime import datetime
-import json
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from modules.yogevent.forms import EventForm
@@ -11,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from django.shortcuts import redirect
 
