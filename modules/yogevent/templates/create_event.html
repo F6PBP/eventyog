@@ -65,48 +65,45 @@
     </div>
 
     <script>
-            document.querySelector('#event-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            let formData = new FormData(this);
-            
-            fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                },
-            })
-            .then(response => {
-                console.log("Response status: ", response.status)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                return response.json();
-            })
-            .then(data => {
-                if (data.status) {
-                    window.location.href = "{% url 'yogevent:main' %}";
-                } else {
-                    console.log(data.message)
-                    document.getElementById("responseContainer").style.display = "block";
-                    document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-            });
-        });
-
         function submitCreateEventForm() {
             form = document.getElementById('event-form');
 
             if (form.checkValidity()) {
-                form.submit();
+                let formData = new FormData(form);
+            
+                fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                })
+                .then(response => {
+                    console.log("Response: ", response)
+                    console.log("Response status: ", response.status)
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    if (data.status) {
+                        window.location.href = "{% url 'yogevent:main' %}";
+                    } else {
+                        console.log(data.message)
+                        document.getElementById("responseContainer").style.display = "block";
+                        document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred: ' + error.message);
+                });
             } else {
                 form.reportValidity();
                 throw new Error('Form is invalid');

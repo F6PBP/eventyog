@@ -90,7 +90,8 @@
         }
 
         async function getMerchandise() {
-            return fetch("{% url 'merchandise:showMerch_json' %}").then((res) => res.json());
+            console.log("{% url 'merchandise:showMerch_json' event.uuid %}")
+            return fetch("{% url 'merchandise:showMerch_json' event.uuid %}").then((res) => res.json());
         }
 
         function updateCart() {

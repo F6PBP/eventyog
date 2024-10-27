@@ -86,7 +86,11 @@ def delete_merchandise(request, id):
     return HttpResponseRedirect(reverse('yogevent:main'))
 
 @check_user_profile()
-def showMerch_json(request):
+def showMerch_json(request, event_id: str):
+    event = Event.objects.get(uuid=event_id)
+    
+    print(event)
+    
     data = Merchandise.objects.all()
     
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")

@@ -23,12 +23,18 @@ def main(request: HttpRequest) -> HttpResponse:
     query = request.GET.get('q')
     category = request.GET.get('category')
 
+    print(f"Query: {query}, Category: {category}")
+
     if query:
         events = events.filter(Q(title__icontains=query))
+    
+    print(len(events))
 
     if category:
         events = events.filter(category=category)
-        
+    
+    print(len(events))
+    
     for event in events:
         # Set image urls 
         if event.image_urls:
@@ -195,13 +201,7 @@ def create_event_entry_ajax(request):
     image_url = strip_tags(request.POST.get('image_url'))
 
     end_time = end_time if end_time != "" else None
-
-    if title == "" or description == "" or location == "" or image_url == "":
-        return JsonResponse({'status': False, 'message': 'Invalid input'})
-
-    if end_time and start_time >= end_time:
-        return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
-
+    
     try:
         print(f"Creating event with title: {title}")
         new_event = Event(
@@ -213,6 +213,7 @@ def create_event_entry_ajax(request):
             location=location,
             image_urls=[image_url]
         )
+        print(f"Event created: {new_event}")
         new_event.save()
         return JsonResponse({'status': True, 'message': 'Event created successfully.'})
     
