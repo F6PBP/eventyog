@@ -1,3 +1,5 @@
+from django.utils import timezone
+from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from modules.yogevent.forms import EventForm
@@ -75,13 +77,19 @@ def create_event_entry_ajax(request):
     location = strip_tags(request.POST.get('location'))
     image_url = strip_tags(request.POST.get('image_url'))
 
-    end_time = end_time if end_time != "" else None
+    end_time = end_time if end_time else None
 
-    if title == "" or description == "" or location == "" or category =="":
+    if not title or not category or not start_time:
         return JsonResponse({'status': False, 'message': 'Invalid input'})
 
     if end_time and start_time >= end_time:
         return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
+    
+    try:
+        start_time = timezone.make_aware(datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))
+        end_time = timezone.make_aware(datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')) if end_time else None
+    except ValueError:
+        return JsonResponse({'status': False, 'message': 'Invalid date format'})
 
     try:
         new_event = Event(
