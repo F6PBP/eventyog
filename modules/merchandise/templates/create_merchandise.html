@@ -89,10 +89,11 @@
             .catch(error => {
                 alert("An unexpected error occurred: " + error);
             });
-
+            
             modalId = 'open-modal-2';
             closeModal(modalId)
-
+            
+            location.reload();
             showToast('Merchandise created successfully!', 'success');
         }
 
