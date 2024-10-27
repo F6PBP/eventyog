@@ -30,7 +30,6 @@ def main(request: HttpRequest) -> HttpResponse:
         events = events.filter(category=category)
         
     for event in events:
-        # Set image urls 
         if event.image_urls:
             event.image_urls = event.image_urls[0]
         else:
@@ -59,13 +58,12 @@ def main(request: HttpRequest) -> HttpResponse:
         })
         
     categories = temp
-    
     context = {
         'user': request.user,
         'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
-        'is_admin': user_profile.role == 'AD' if user_profile else False,
+        'is_admin': user_profile.role == 'AD',
         'events': events,
         'categories': categories,
     }
@@ -106,8 +104,6 @@ def get_events_by_queries(request):
     page = int(request.GET.get('page', 1))
     limit = int(request.GET.get('limit', 10))
     
-    print(f"Query: {query}, Category: {category}, Start Time: {start_time}, End Time: {end_time}, Page: {page}, Limit: {limit}")
-    
     events = Event.objects.all()
     
     if query:
@@ -123,7 +119,6 @@ def get_events_by_queries(request):
         events = events.filter(end_time__lte=end_time)
 
     for event in events:
-        # Set image urls 
         if event.image_urls:
             event.image_urls = event.image_urls[0]
         else:
@@ -147,8 +142,6 @@ def get_events_by_queries(request):
     
     paginator = Paginator(events, limit)
     paginated_events = paginator.get_page(page)
-    
-    print(paginated_events.object_list)
     
     for category in categories:
         temp.append({
@@ -187,24 +180,24 @@ def get_events_by_queries(request):
 @csrf_exempt
 @require_POST
 def create_event_entry_ajax(request):
-    title = strip_tags(request.POST.get('title'))
-    description = strip_tags(request.POST.get('description'))
-    category = request.POST.get('category')
-    start_time = request.POST.get('start_time')
-    end_time = request.POST.get('end_time', '')
-    location = strip_tags(request.POST.get('location'))
-    image_url = strip_tags(request.POST.get('image_url'))
-
-    end_time = end_time if end_time else None
-
-    if not title or not category or not start_time:
-        return JsonResponse({'status': False, 'message': 'Invalid input'})
-
-    if end_time and start_time >= end_time:
-        return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
-
     try:
-        print(f"Creating event with title: {title}")
+        title = strip_tags(request.POST.get('title'))
+        description = strip_tags(request.POST.get('description'))
+        category = request.POST.get('category')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time', '')
+        location = strip_tags(request.POST.get('location'))
+        image_url = strip_tags(request.POST.get('image_url'))
+
+        start_time = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+        end_time = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S') if end_time else None
+
+        if not title or not category or not start_time:
+            return JsonResponse({'status': False, 'message': 'Invalid input'})
+        
+        if end_time and start_time >= end_time:
+            return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
+
         new_event = Event(
             title=title,
             description=description,
@@ -216,9 +209,9 @@ def create_event_entry_ajax(request):
         )
         new_event.save()
         return JsonResponse({'status': True, 'message': 'Event created successfully.'})
-    
+        
     except Exception as e:
-        return JsonResponse({'status': False, 'message': 'Error creating event.'})
+        return JsonResponse({'status': False, 'message': f'Error creating event: {str(e)}'})
 
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
@@ -448,33 +441,25 @@ def load_event_ratings(request, event_id):
         "ratings": list(ratings),
     })
 
-@csrf_exempt
-def ticket_price_list(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    ticket_prices = TicketPrice.objects.filter(event=event)
-
-    context = {
-        'event': event,
-        'ticket_prices': ticket_prices,
-    }
-    return render(request, 'ticket_price_list.html', context)
-
-def add_ticket_price(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+def select_ticket(request, event_id):
+    event = get_object_or_404(Event, uuid=event_id)
 
     if request.method == 'POST':
-        form = TicketPriceForm(request.POST)
-        if form.is_valid():
-            ticket_price = form.save(commit=False)
-            ticket_price.event = event
-            ticket_price.save()
-            return redirect('ticket_price_list', event_id=event.id)
-    else:
-        form = TicketPriceForm()
+        ticket_ids = request.POST.getlist('ticket_ids')
 
-    context = {
-        'event': event,
-        'form': form,
-    }
-    return render(request, 'add_ticket_price.html', context)
+        # Mendapatkan tiket yang dipilih
+        tickets = TicketPrice.objects.filter(id__in=ticket_ids)
+
+        if not tickets.exists():
+            return JsonResponse({'error': 'No tickets selected or found.'}, status=400)
+
+        # Misalnya, Anda ingin melakukan sesuatu dengan tiket yang dipilih
+        for ticket in tickets:
+            
+            ticket.is_selected = True 
+            ticket.save()
+
+        return JsonResponse({'success': 'Tickets selected successfully!'})
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
 

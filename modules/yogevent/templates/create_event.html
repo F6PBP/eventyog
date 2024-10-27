@@ -1,7 +1,7 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
     <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px]">
-        <form id="event-form">
+        <form id="event-form" method="POST">
             {% csrf_token %}
             <div class="p-5 w-full flex flex-col gap-4">
                 <!-- Title Input -->
@@ -65,9 +65,21 @@
     </div>
 
     <script>
-            document.querySelector('#event-form').addEventListener('submit', function(e) {
+        document.querySelector('#event-form').addEventListener('submit', function(e) {
+            console.log("HI");
             e.preventDefault();
             let formData = new FormData(this);
+
+            const startTime = new Date(formData.get('start_time'));
+            const endTime = new Date(formData.get('end_time'));
+            console.log('Start Time:', startTime);
+            console.log('End Time:', endTime);
+
+            if (startTime >= endTime) {
+                document.getElementById("responseContainer").style.display = "block";
+                document.getElementById("responseContainer").innerHTML = `<p style="color:red">End time must be after start time.</p>`;
+                return; 
+            }
             
             fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
                 method: "POST",
@@ -75,9 +87,6 @@
                     "X-CSRFToken": "{{ csrf_token }}",
                 },
                 body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                },
             })
             .then(response => {
                 if (!response.ok) {

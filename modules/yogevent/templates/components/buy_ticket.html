@@ -1,43 +1,116 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
-<div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px]">
-    <h1 class="text-2xl font-bold">{{ event.title }} - Ticket Prices</h1>
+<style>
+    /* CSS untuk membuat checkbox lebih menarik */
+    input[type="checkbox"].hidden + span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-    {% if is_admin %}
-    <!-- Add New Ticket Price Form -->
-    <h2 class="text-lg font-semibold mt-4">Add New Ticket Price</h2>
-    <form method="post" class="space-y-4" id="ticket-form">
-        {% csrf_token %}
+    /* Menampilkan checkbox ketika checkbox dipilih */
+    input[type="checkbox"]:checked + span {
+        background-color: #4CAF50; /* Ganti dengan warna pilihan Anda */
+        color: white; /* Warna teks yang terlihat di checkbox */
+    }
+
+    /* Mengganti warna border checkbox */
+    span {
+        border-color: #ccc;
+    }
+
+    /* Ketika checkbox dipilih */
+    input[type="checkbox"]:checked + span {
+        border-color: #4CAF50; /* Ganti dengan warna pilihan Anda */
+    }
+
+    .submit-button {
+        background-color: #4CAF50; /* Warna latar belakang hijau */
+        color: white; /* Warna teks putih */
+        padding: 10px 20px; /* Padding atas/bawah dan kiri/kanan */
+        border: none; /* Menghilangkan border default */
+        border-radius: 5px; /* Membuat sudut tombol menjadi melengkung */
+        cursor: pointer; /* Menampilkan kursor pointer saat hover */
+        font-size: 16px; /* Ukuran font */
+        transition: background-color 0.3s ease; /* Efek transisi saat hover */
+    }
+
+    .submit-button:hover {
+        background-color: #45a049; /* Warna latar belakang saat hover */
+    }
+
+</style>
+
+<div class="p-4"> <!-- Menambahkan padding di luar form -->
+    <h1>{{ event.title }} - Ticket Selection</h1>
+
+    <form method="POST" action="{% url 'yogevent:select_ticket' event.uuid %}" class="mt-4" id="ticket-form"> 
+       {% csrf_token %}
+       <h2>Select a Ticket</h2>
+            <ul id="ticket-options" class="list-disc pl-5" style="list-style-type: none; padding-left: 0;">
+                {% for ticket in event.ticketPrice.all %}
+                    <li class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="ticket_ids" value="{{ ticket.id }}" class="hidden" onchange="updateCheckbox(this)">
+                            <span class="flex items-center justify-center w-5 h-5 border-2 border-gray-300 rounded-lg mr-2 cursor-pointer transition-colors duration-200 ease-in-out">
+                                <span class="hidden">✓</span>
+                            </span>
+                            {{ ticket.name }} - 
+                            {% if ticket.isFree %}
+                                Free
+                            {% else %}
+                                Rp {{ ticket.price }}
+                            {% endif %}
+                        </label>
+                    </li>
+                {% empty %}
+                    <p>No tickets available for this event.</p>
+                {% endfor %}
+            </ul>
             
-        <!-- Field for Ticket Name -->
-            <div class="flex flex-col">
-                <label for="id_name" class="font-medium">Ticket Name</label>
-                <input type="text" name="name" id="id_name" class="border border-gray-300 rounded p-2" placeholder="Enter ticket name">
-            </div>
-            
-            <!-- Field for Ticket Price -->
-            <div class="flex flex-col">
-                <label for="id_price" class="font-medium">Ticket Price</label>
-                <input type="number" name="price" id="id_price" step="500" class="border border-gray-300 rounded p-2" placeholder="Enter ticket price">
-            </div>
-        </form>
-    {% else %}
-        <!-- Display Existing Ticket Prices -->
-        <h2 class="text-lg font-semibold">Existing Ticket Prices</h2>
-        <ul class="list-disc pl-5">
-            {% for ticket in ticket_prices %}
-                <li>
-                    {{ ticket.name }} - 
-                    {% if ticket.isFree %}
-                        Free
-                    {% else %}
-                        ${{ ticket.price }}
-                    {% endif %}
-                </li>
-            {% empty %}
-                <p>No ticket prices available.</p>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    </div>
+            <button type="button" onclick="submitForm()" class="submit-button">Submit Tickets</button>
+    </form>
+</div>
+
+<script>
+    function updateCheckbox(checkbox) {
+        const span = checkbox.nextElementSibling;
+
+        if (checkbox.checked) {
+            span.querySelector('span').classList.remove('hidden'); // Tampilkan tanda centang
+        } else {
+            span.querySelector('span').classList.add('hidden'); // Sembunyikan tanda centang
+        }
+    }
+
+    function submitForm() {
+        const form = document.getElementById('ticket-form'); // Ambil form berdasarkan ID
+        if (!form) {
+            console.error('Form not found!');
+            return; // Jika form tidak ditemukan, hentikan eksekusi
+        }
+        const formData = new FormData(form); // Buat objek FormData dari elemen form
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',  // Pastikan CSRF token ada
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
 {% endblock modal_body %}

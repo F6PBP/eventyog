@@ -147,7 +147,7 @@
         const formData = new FormData();
         formData.append('event_uuid', "{{ event.uuid }}");
 
-        fetch("{% url 'yogevent:ticket_price_list' event.uuid %}", {
+        fetch("{% url 'yogevent:select_ticket' event.uuid %}", {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}'
