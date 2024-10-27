@@ -10,19 +10,23 @@
         </div>
 
         <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-500 flex items-center">
-                    <i class="fas fa-thumbs-up"></i> {{ reply.totalLike }}
-            </span>
-            <span class="text-sm text-gray-500 flex items-center">
-                <i class="fas fa-thumbs-down"></i> {{ reply.totalDislike }}
-            </span>        
+            <button id="like-button-{{ reply.id }}" onclick="likeReply({{ reply.id }})" class="flex items-center space-x-1 text-blue-500 hover:text-blue-700">
+                <i class="fas fa-thumbs-up"></i> 
+                <span id="like-count-{{ reply.id }}">{{ reply.totalLike }}</span>
+            </button>
+            
+            <button id="dislike-button-{{ reply.id }}" onclick="dislikeReply({{ reply.id }})" class="flex items-center space-x-1 text-red-500 hover:text-red-700">
+                <i class="fas fa-thumbs-down"></i>
+                <span id="dislike-count-{{ reply.id }}">{{ reply.totalDislike }}</span>
+            </button>
+            
             {% if reply.user == request.user.userprofile %}
                 <form method="POST" action="{% url 'yogforum:delete_reply' reply_id=reply.id %}" class="inline">
                     {% csrf_token %}
                     <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Delete</button>
                 </form>
             {% endif %}
-        </div>
+        </div>                
     </div>
 
     <p class="text-gray-600 mb-2">{{ reply.content }}</p>
@@ -44,3 +48,4 @@
         {% endfor %}
     </div>
 {% endif %}
+
