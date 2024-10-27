@@ -1,4 +1,61 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
-    
+    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px] px-5">
+        <h1 class="text-2xl font-bold">{{ event.title }} - Ticket Prices</h1>
+
+        {% if is_admin %}
+        <select name="ticket" id="ticket" class="outline-none py-5">
+            <option value="0">Select Ticket</option>
+            {% for ticket in tickets %}
+                <option value="{{ ticket.id }}">{{ ticket.name }} - {{ticket.price}}</option>
+            {% endfor %}
+        </select>
+        {% else %}
+            <!-- Display Existing Ticket Prices -->
+            <h2 class="text-lg font-semibold">Existing Ticket Prices</h2>
+            <ul class="list-disc pl-5">
+                {% for ticket in ticket_prices %}
+                    <li>
+                        {{ ticket.name }} - 
+                        {% if ticket.isFree %}
+                            Free
+                        {% else %}
+                            ${{ ticket.price }}
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <p>No ticket prices available.</p>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        function buy_ticket() {
+            console.log('Buying ticket...');
+            var ticket = document.getElementById('ticket').value;
+
+            fetch('{% url "yogevent:buy_ticket" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'event': '{{ event.uuid }}',
+                    'ticket_id': ticket
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    alert('Ticket purchased successfully.');
+                    location.reload();
+                } else {
+                    location.reload();
+                }
+            });
+        }
+    </script>
 {% endblock modal_body %}

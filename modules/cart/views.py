@@ -60,7 +60,7 @@ def checkout(request):
     updated_merch = data.get('merch', {})
 
     # Calculate total cart price
-    total_price = sum(item['quantity'] * item['pricePerItem'] for item in updated_events.values()) + \
+    total_price = sum(1 * item['pricePerItem'] for item in updated_events.values()) + \
                   sum(item['quantity'] * item['pricePerItem'] for item in updated_merch.values())
 
     # Check if the wallet has enough balance
