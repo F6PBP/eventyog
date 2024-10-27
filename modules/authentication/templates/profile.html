@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="px-4 md:px-48 mt-32">
+    <main class="px-4 md:px-48 mt-48">
         <div class="flex flex-col gap-8">
             <!-- Profile Picture Section -->
             <div class="flex w-32 h-32 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm mx-auto md:mx-0">
@@ -23,6 +23,8 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-500">{{user_profile.bio}}</p>
+                <h3 class="font-bold mt-4">Wallet Balance</h3>
+                <p>Rp{{user_profile.wallet}}</p>
             </div>
 
             <!-- Event Categories Section -->
@@ -44,7 +46,7 @@
                 <a href="{% url 'auth:edit_profile' %}">
                     {% include "ds/button.html" with text="Edit Profile" icon="fas fa-user-edit" class="w-fit" %}
                 </a>
-                {% include "ds/button.html" with text="Delete Account" button_type="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" %}
+                {% include "ds/button.html" with text="Delete Account" variant="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" %}
             </div>
         </div>
     </main>

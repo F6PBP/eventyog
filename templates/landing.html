@@ -189,12 +189,13 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {% for event in first_8_events %}
-                <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden">
+            <a href="{% url 'yogevent:detail_event' event.uuid %}">
+                <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden h-full">
                     <img 
                         src="{{event.image_urls}}" 
                         class="h-[200px] object-cover"
                         alt="">
-                    <div class="flex gap-5 p-5">
+                    <div class="flex gap-5 p-5 flex-grow">
                         <div class="flex flex-col items-center">
                             <h3 class="font-semibold text-[#3D37F1]">{{event.month}}</h3>
                             <h1 class="font-bold text-2xl">{{event.day}}</h1>
@@ -207,6 +208,7 @@
                         </div>
                     </div>
                 </div>
+            </a>
             {% endfor %}
         </div>
         <a href="{% url 'yogevent:main' %}">

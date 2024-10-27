@@ -5,10 +5,15 @@ from eventyog.decorators import check_user_profile
 from modules.main.models import UserProfile, User
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from modules.main.models import UserProfile, User
 
 @check_user_profile()
 def show_list(request):
     friends = request.user_profile.friends.all()
+    for friend in friends:
+        user = friend.user
+        friend.user_id = user.id
+        
     context = {
         'friends': friends,
         'user': request.user,
