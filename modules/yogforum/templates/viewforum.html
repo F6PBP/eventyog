@@ -2,10 +2,19 @@
 {% load static %}
 {% block content %}
 <main class="w-full mb-20 px-10 md:20 lg:px-32 mt-32">
-    <div class="bg-gray-100 p-6 rounded-lg shadow-md mb-8 mt-4">
+    <div class="mt-10">
+        <a href="{% url 'yogforum:main' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Back
+        </a>
+    </div>
+    <div class="bg-gray-100 p-8 rounded-xl mb-8 mt-4">
         <div class="flex justify-between items-start">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+                {% if reply.user.profile_picture %}
+                    <img class="w-12 h-12 rounded-full" src="http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{{reply.user.profile_picture}}" alt="">
+                {% else %}
+                    <img class="w-12 h-12 rounded-full" src="https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png" alt="">
+                {% endif %}
                 <div>
                     <h2 class="text-lg font-bold">{{ forum_post.title }}</h2>
                     <p class="text-sm text-gray-500">by {{ forum_post.user.user.username }}</p>
@@ -46,10 +55,10 @@
         </div>
 
         <div class="flex justify-end mt-4">
-            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" variant="primary" %}
+            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-2" variant="primary" %}
         </div>
 
-        {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %} 
+        {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" onsubmit="submitReplyForm"%} 
 
         <script>
             document.getElementById('replyPostForm').addEventListener('submit', function(e) {
@@ -139,11 +148,7 @@
         {% endfor %}
     </div>
 
-    <div class="mt-10 text-center">
-        <a href="{% url 'yogforum:main' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i> Back to Home
-        </a>
-    </div>
+
 </main>
 
 <script>

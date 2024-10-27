@@ -7,20 +7,13 @@
         <div class="mt-2">
             <h2 class="text-lg font-semibold">Reply to {{ forum_post.user.user.username }}</h2> <!-- Reply to the post author -->
         </div>
-
-        <div class="mt-6">
-            <label for="content" class="block text-sm font-medium text-gray-700">Your Reply</label>
-            <textarea name="content" id="content" rows="4" required 
-                class="mt-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
-            </textarea>
-        </div>
-
-        <div class="mt-6 flex justify-end space-x-4">
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Reply to {{ forum_post.user.user.username }}
-            </button>
-        </div>
+        {% include "ds/textarea.html" with name="content" id="content" required="True" class="min-h-[200px] w-full" placeholder="Your reply goes here ..." %}
     </form>
+    <script>
+        function submitReplyForm() {
+            const form = document.getElementById('replyPostForm');
+            showToast('Replying to the post...', 'progress');
+            form.submit();
+        }
+    </script>
 {% endblock %}
-
-{% block modal_footer %}{% endblock %}

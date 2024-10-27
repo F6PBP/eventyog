@@ -133,19 +133,16 @@ def viewforum(request, post_id):
 def get_forum_by_ajax(request):
     search = request.GET.get('search')
     
-    print(search)
-
     forum_posts = Forum.objects.all().order_by('-created_at')
     
     if search:
         forum_posts = Forum.objects.filter(title__icontains=search).order_by('-created_at')
+    
         
-        for post in forum_posts:
-            post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
-            if post.user.profile_picture:
-                post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
-        
-    print(forum_posts)
+    for post in forum_posts:
+        post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+        if post.user.profile_picture:
+            post.user.profile_picture = f'{post.user.profile_picture}'
     
     temp = []
     
