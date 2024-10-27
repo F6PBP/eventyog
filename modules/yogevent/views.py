@@ -23,8 +23,6 @@ def main(request: HttpRequest) -> HttpResponse:
     query = request.GET.get('q')
     category = request.GET.get('category')
 
-    print(f"Query: {query}, Category: {category}")
-
     if query:
         events = events.filter(Q(title__icontains=query))
     
