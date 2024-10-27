@@ -175,7 +175,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  # Make sure to adjust the path as needed
 
 cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+    cloud_name=os.getenv('CLOUDINARY_NAME', 'mxgpapp'),
+    api_key=os.getenv('CLOUDINARY_API_KEY', '378869596434125'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', 'RqY1H1Yqi4JysBVrTUaasuIWFes')
 )
