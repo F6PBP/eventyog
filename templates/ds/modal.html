@@ -67,7 +67,11 @@
 
     function executeOnSubmit(onsubmit, modalId) {
         if (typeof window[onsubmit] === 'function') {
-            window[onsubmit]();
+            try {
+                window[onsubmit]();
+            } catch (error) {
+                return
+            }
         }
         closeModal(modalId);
     }

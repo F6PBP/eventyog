@@ -127,10 +127,10 @@ class Forum(models.Model):
         return self.title
     
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()
     
 class ForumReply(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -148,7 +148,7 @@ class ForumReply(models.Model):
 
         
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()

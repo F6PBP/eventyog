@@ -60,7 +60,6 @@ def main(request: HttpRequest) -> HttpResponse:
         
     categories = temp
     
-
     context = {
         'user': request.user,
         'user_profile': user_profile,
@@ -246,6 +245,16 @@ def detail_event(request, uuid):
     
     is_booked = event in registered_event
     
+    # Check if user has given the rating
+    rating = Rating.objects.filter(user=user_profile, rated_event=event)
+    
+    first_rating = None
+    if rating.exists():
+        is_rated = True
+        first_rating = rating.first()
+    else:
+        is_rated = False
+
     context = {
         'user': request.user,
         'user_profile': user_profile,
@@ -258,7 +267,9 @@ def detail_event(request, uuid):
         'merchandise': merchandise,
         'tickets': tickets,
         'total_rating': total_rating,
-        'is_booked': is_booked
+        'is_booked': is_booked,
+        'is_rated': is_rated,
+        'first_rating': first_rating,
     }
     return render(request, 'detail_event.html', context)
 

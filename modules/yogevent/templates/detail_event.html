@@ -28,13 +28,30 @@
 
             <div class="rating-section mt-5">
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
-                <p id="averageRating">{{ average_rating }}</p>
+                <p id="averageRating">{{ average_rating }} / 5.0</p>
             </div>
 
+            {% if is_rated and first_rating and is_booked %}
+                <div class="mt-4">
+                    <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
+                    <div class="">
+                        <b>
+                            {{first_rating.rating}}.0 / 5.0,
+                        </b>
+                        <span class="text-gray-500">
+                            {{first_rating.review}}
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
             
             {% if is_booked %}
                 <div class="flex gap-2">
-                    {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" %}
+                    {% if not is_rated %}
+                        {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" id="openModalButton" specify="give-rating-modal" %}
+                        {% include "components/give_rating_modal.html" with modal_id="give-rating-modal" modal_title="Give Rating" modal_label="modal-label" onsubmit="submitRating" %}
+                    {% endif %}
+
                     {% include "ds/button.html" with text="Cancel Booking" class="w-fit mt-5 h-fit" icon="fa fa-x" variant="danger" onclick="onCancelBook();" %}
                 </div>
             {% else %}            
@@ -102,9 +119,9 @@
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok.');
             showToast('Event booked successfully!', 'success');
-            return response.json();
+
+            location.reload();
         })
-        .then(data => console.log(data))
         .catch(error => console.error('There was a problem with the fetch operation:', error));
     }
 
