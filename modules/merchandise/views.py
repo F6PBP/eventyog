@@ -55,12 +55,16 @@ def create_merchandise_ajax(request):
     description = request.POST.get("description")
     price = request.POST.get("price")
     image_url = request.POST.get("image_url")
+    event_id = request.POST.get("event_id")
+
+    event = Event.objects.get(uuid=event_id)
 
     new_merchandise = Merchandise(
         name = name, 
         description = description,
         price = price,
         image_url = image_url,
+        related_event = event
     )
     new_merchandise.save()
 
@@ -87,6 +91,7 @@ def delete_merchandise(request, id):
 
 @check_user_profile()
 def showMerch_json(request, event_id: str):
-    data = Merchandise.objects.all().order_by('created_at')[::-1]
+    event = Event.objects.get(uuid=event_id)
+    data = Merchandise.objects.filter(related_event=event).order_by('created_at')[::-1]
     
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")

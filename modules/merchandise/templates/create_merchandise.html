@@ -64,6 +64,9 @@
         function submitCreateMerchForm() {
             const form = document.getElementById('merchandise-form');
             const formData = new FormData(form);
+            eventId = "{{event.uuid}}"
+            formData.append("event_id", eventId);
+
             fetch("{% url 'merchandise:create_merchandise_ajax' %}", {
                 method: "POST",
                 body: formData,

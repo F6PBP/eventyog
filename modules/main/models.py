@@ -99,8 +99,6 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    merch = models.ManyToManyField('Merchandise', blank=True)
-    
     user_rating = models.ManyToManyField(Rating, blank=True)
     image_urls = models.JSONField(null=True, blank=True)
     
@@ -109,6 +107,8 @@ class Merchandise(models.Model):
     image_url = models.URLField(max_length=500)
     name = models.CharField(max_length=200)
     description = models.TextField()
+    related_event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='merchandise')
+    quantity = models.IntegerField(default=10)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
