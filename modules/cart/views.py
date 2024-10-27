@@ -94,3 +94,14 @@ def checkout(request):
 
     # Return success response with updated wallet balance
     return JsonResponse({'success': True, 'new_wallet_balance': user_profile.wallet})
+
+@check_user_profile()
+def empty_cart(request):
+    user = request.user
+    cart_events = EventCart.objects.filter(user=user)
+    cart_merch = MerchCart.objects.filter(user=user)
+
+    cart_events.delete()
+    cart_merch.delete()
+
+    return JsonResponse({'success': True})

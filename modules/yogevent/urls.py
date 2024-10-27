@@ -19,5 +19,5 @@ urlpatterns = [
     path('load-ratings/<uuid:event_id>/', load_event_ratings, name='load_event_ratings'),
     path('get-rating-event/<uuid:uuid>/', get_rating_event, name='get_rating_event'),
     path('book-event', book_event, name='book_event'),
-    path('cancel-book', book_event, name='cancel_book'),
+    path('cancel-book', cancel_book, name='cancel_book'),
 ]

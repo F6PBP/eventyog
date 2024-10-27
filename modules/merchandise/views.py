@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpRequest, HttpResponse
 from .forms import MerchandiseForm
-from modules.main.models import Merchandise, Event
+from modules.main.models import Merchandise, Event, MerchCart
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from eventyog.decorators import check_user_profile
@@ -85,6 +85,8 @@ def delete_merchandise(request, id):
     merchandise.delete()
     return HttpResponseRedirect(reverse('yogevent:main'))
 
+@check_user_profile()
 def showMerch_json(request):
     data = Merchandise.objects.all()
+    
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")

@@ -300,6 +300,12 @@ def cancel_book(request):
     event = get_object_or_404(Event, uuid=event_id)
     user_profile = request.user_profile
     user_profile.registeredEvent.remove(event)
+    
+    ticket = TicketPrice.objects.filter(event=event)
+    event_cart = EventCart.objects.filter(user=user_profile, event=event)
+    if event_cart.exists():
+        event_cart.delete()
+        
     return JsonResponse({'status': True, 'message': 'Event cancelled successfully.'})
 
 def delete_event(request, uuid):

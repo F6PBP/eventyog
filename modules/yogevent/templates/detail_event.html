@@ -88,7 +88,6 @@
 </script>
 <script>
     function onBookFree() {
-        
         const formData = new FormData();
         formData.append('ticket_name', '');
         formData.append('event_uuid', "{{ event.uuid }}");
@@ -110,7 +109,23 @@
     }
 
     function onCancelBook() {
-        
+        const formData = new FormData();
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:cancel_book' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Booking cancelled successfully!', 'success');
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
     }
 </script>
 {% endblock %}

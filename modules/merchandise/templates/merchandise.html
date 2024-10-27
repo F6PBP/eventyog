@@ -1,41 +1,68 @@
 {% load static %}
-<main class="">
-    <div class="mx-auto">
-        <h1 class="font-bold text-3xl my-2">Merchandise Shop</h1>
+<main>
+    <style>
+        .hidden-cart {
+            opacity: 0;
+            transform: translateY(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .visible-cart {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .shrunk-cart {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+        .expanded-cart {
+            width: 400px;
+            min-height: 400px;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+    </style>
 
-        {% if is_admin %}
-            {% include "ds/button.html" with icon="fa fa-plus" text="Create Merchandise" class="w-fit h-fit z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" %}
-        {% endif %}
+    <div class="mx-auto">
+        <div class="flex justify-between">
+            <h1 class="font-bold text-3xl my-2">Merchandise Shop</h1>
+            {% if is_admin %}
+                {% include "ds/button.html" with icon="fa fa-plus" text="Create Merchandise" class="w-fit" id="openModalButton" specify="open-modal-2" %}
+            {% endif %}
+        </div>
 
         <div id="merchandise_cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10"></div>
         <div id="loading" class="loading-spinner hidden"></div>
+
+        <div id="cart" class="fixed z-50 bottom-10 right-10 bg-white shadow-xl p-8 hidden-cart rounded-xl flex flex-col justify-between expanded-cart">
+            <button id="toggleCartButton" class="absolute top-2 right-2 bg-gray-200 p-2 rounded-full px-5">
+                <i class="fa fa-arrow-right"></i>
+            </button>
+            <div>
+                <h3 class="font-bold text-xl">Your Cart</h3>
+                <div id="cart-items" class="max-h-[300px] overflow-y-scroll overflow-x-hidden"></div>
+            </div>
+            <div class="w-full flex items-end">
+                {% include "ds/button.html" with text="Go to Cart" icon="fa fa-shopping-cart" class="mt-4" %}
+            </div>
+        </div>
     </div>
 
     <script>
+        const cartItems = {};
+
         async function fetchMerchandiseEntries() {
             const merchandiseCards = document.getElementById("merchandise_cards");
             const loadingSpinner = document.createElement("loading");
             loadingSpinner.classList.remove("hidden");
             merchandiseCards.innerHTML = ""; // Clear existing cards
             const merchandiseEntries = await getMerchandise();
-            
-            const isAdmin = {{ is_admin|yesno:"true,false" }};
 
-            
+            const isAdmin = {{ is_admin|yesno:"true,false" }};
 
             merchandiseEntries.forEach((item) => {
                 let cardHTML = `
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative flex flex-col justify-between cursor-pointer" onclick="window.location.href='/merchandise/show/${item.pk}'">
-                        ${isAdmin ? `
-                            <div class="absolute top-2 right-2 flex space-x-1 z-10">
-                                <a href="/merchandise/edit/${item.pk}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
-                                    <i class="fa fa-pencil text-sm" aria-hidden="true"></i>
-                                </a>
-                                <a href="/merchandise/delete/${item.pk}" class="bg-red-700 hover:bg-red-600 text-white rounded-full transition duration-300 shadow-md flex items-center justify-center w-7 h-7" onclick="event.stopPropagation()">
-                                    <i class="fa fa-trash text-sm" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                        ` : ""}
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300" onclick="window.location.href='/merchandise/show/${item.pk}'">
                         <img src="${item.fields.image_url}" alt="${item.fields.name}" class="w-full h-44 object-cover">
                         <div class="flex flex-col justify-between p-8 flex-grow">
                             <div>
@@ -47,13 +74,10 @@
                                 
                                 <div class="flex justify-between items-center w-full mt-2">
                                     <div class="flex justify-center w-full gap-2">
-                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}'); event.stopPropagation();">-</button>
-                                        <input type="number" id="quantity-${item.pk}" value="1" min="1" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()">
-                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}'); event.stopPropagation();">+</button>
+                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.fields.name}', '${item.fields.price}'); event.stopPropagation();">-</button>
+                                        <input type="number" id="quantity-${item.pk}" value="0" min="0" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.fields.name}', '${item.fields.price}', this.value)">
+                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.fields.name}', '${item.fields.price}'); event.stopPropagation();">+</button>
                                     </div>
-                                    <a href="">
-                                        <button class="text-xs px-6" style="font-size: 5px; padding: 1px; width: 10px; height: 6px;" onclick="event.stopPropagation()">Buy</button>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -63,24 +87,87 @@
             });
             loadingSpinner.classList.add("hidden");
         }
-        
+
         async function getMerchandise() {
             return fetch("{% url 'merchandise:showMerch_json' %}").then((res) => res.json());
         }
 
-        function decreaseValue(id) {
-            let quantityInput = document.getElementById("quantity-" + id);
-            let currentValue = parseInt(quantityInput.value);
-            if (currentValue > 1) {
-                quantityInput.value = currentValue - 1;
+        function updateCart() {
+            const cartItemsDiv = document.getElementById("cart-items");
+            const cartDiv = document.getElementById("cart");
+            cartItemsDiv.innerHTML = "";
+
+            // Add items to cart
+            Object.keys(cartItems).forEach((id) => {
+                const item = cartItems[id];
+                const itemHTML = `
+                    <div class="grid grid-cols-5 items-center gap-4 mb-2">
+                        <p class="text-sm col-span-3">${item.name}</p>
+                        <p class="text-sm">x ${item.quantity}</p>
+                        <p class="text-sm font-bold">Rp ${item.price * item.quantity}</p>
+                    </div>
+                `;
+                cartItemsDiv.innerHTML += itemHTML;
+            });
+
+            // Toggle visibility of the cart div based on the presence of items
+            if (Object.keys(cartItems).length > 0) {
+                cartDiv.classList.remove("hidden-cart");
+                cartDiv.classList.add("visible-cart");
+            } else {
+                cartDiv.classList.remove("visible-cart");
+                cartDiv.classList.add("hidden-cart");
             }
         }
 
-        function increaseValue(id) {
-            let quantityInput = document.getElementById("quantity-" + id);
+        function decreaseValue(id, name, price) {
+            const quantityInput = document.getElementById("quantity-" + id);
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                cartItems[id].quantity -= 1;
+            } else {
+                quantityInput.value = 0;
+                delete cartItems[id];
+            }
+            updateCart();
+        }
+
+        function increaseValue(id, name, price) {
+            const quantityInput = document.getElementById("quantity-" + id);
             let currentValue = parseInt(quantityInput.value);
             quantityInput.value = currentValue + 1;
+
+            if (cartItems[id]) {
+                cartItems[id].quantity += 1;
+            } else {
+                cartItems[id] = { name: name, price: parseInt(price), quantity: 1 };
+            }
+            updateCart();
         }
+
+        function updateQuantity(id, name, price, value) {
+            const quantity = parseInt(value);
+            if (quantity > 0) {
+                cartItems[id] = { name: name, price: parseInt(price), quantity: quantity };
+            } else {
+                delete cartItems[id];
+            }
+            updateCart();
+        }
+
+        function toggleCart() {
+            const cartDiv = document.getElementById("cart");
+            if (cartDiv.classList.contains("shrunk-cart")) {
+                cartDiv.classList.remove("shrunk-cart");
+                cartDiv.classList.add("expanded-cart");
+            } else {
+                cartDiv.classList.remove("expanded-cart");
+                cartDiv.classList.add("shrunk-cart");
+            }
+        }
+
+        document.getElementById("toggleCartButton").addEventListener("click", toggleCart);
 
         // Call function to load merchandise entries
         fetchMerchandiseEntries();
