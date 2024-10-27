@@ -96,13 +96,3 @@
         });
     }
 </script>
-
-<!-- Nested Replies -->
-{% if reply.forumreply_set.all %}
-    <div class="ml-{{ level|add:"4" }}">
-        {% for nested_reply in reply.forumreply_set.all %}
-            {% include "components/reply.html" with reply=nested_reply level=level|add:1 %}
-        {% endfor %}
-    </div>
-{% endif %}
-
