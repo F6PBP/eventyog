@@ -33,7 +33,7 @@ class UserProfile(models.Model):
 class MerchCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     merchandise = models.ForeignKey('Merchandise', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -43,12 +43,12 @@ class MerchCart(models.Model):
 class EventCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey('TicketPrice', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def totalPrice(self):
-        return self.event.price * self.quantity
+        return self.ticket.price * self.quantity
 
 # Class for Event Category
 class EventCategory(models.TextChoices):
@@ -105,7 +105,6 @@ class Event(models.Model):
     image_urls = models.JSONField(null=True, blank=True)
     
 class Merchandise(models.Model):
-    # id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     id = models.AutoField(primary_key=True)
     image_url = models.URLField(max_length=500)
     name = models.CharField(max_length=200)
@@ -128,10 +127,10 @@ class Forum(models.Model):
         return self.title
     
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()
     
 class ForumReply(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -149,7 +148,7 @@ class ForumReply(models.Model):
 
         
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()

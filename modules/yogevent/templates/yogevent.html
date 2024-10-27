@@ -1,64 +1,123 @@
 {% extends "base.html" %}
 {% block content %}
-    <body class="bg-gray-100 text-gray-800 h-screen">
-        <div class="mx-auto p-8 mt-32 h-full">
-            <!-- Main Heading -->
-            <h1 class="text-5xl font-bold text-center mb-6 bg-gradient-to-b from-[#003FE2] to-[#00E2A1] text-transparent bg-clip-text">YogEvents!</h1>
-            <h3 class="text-gray-500 text-lg text-center mb-6">Your Gateway to Memorable Experiences</h3>
-
-            <!-- Search and Filter Section -->
-            <form method="GET" class="flex justify-center items-center mb-6" id="searchForm">
-                <div class="flex items-center overflow-hidden rounded-lg">
-                    
-                    <!-- Search Bar -->
-                    <div class="relative">
-                        <input type="text" name="q" placeholder="Search events..." value="{{ request.GET.q }}" 
-                               class="py-3 px-5 w-80 border-none focus:outline-none focus:bg-gray-400 rounded-r" autocomplete="off">
-                    </div>
-                    
-                    <!-- Category Dropdown -->
-                    <select name="category" 
-                            class="py-3 px-4 border-none focus:outline-none focus:bg-gray-400 rounded-none">
-                        <option value="">All Categories</option>
-                        <option value="OL" {% if request.GET.category == 'OL' %}selected{% endif %}>Olahraga</option>
-                        <option value="SN" {% if request.GET.category == 'SN' %}selected{% endif %}>Seni</option>
-                        <option value="MS" {% if request.GET.category == 'MS' %}selected{% endif %}>Musik</option>
-                        <option value="CP" {% if request.GET.category == 'CP' %}selected{% endif %}>Cosplay</option>
-                        <option value="LG" {% if request.GET.category == 'LG' %}selected{% endif %}>Lingkungan</option>
-                        <option value="VL" {% if request.GET.category == 'VL' %}selected{% endif %}>Volunteer</option>
-                        <option value="KL" {% if request.GET.category == 'KL' %}selected{% endif %}>Kuliner</option>
-                        <option value="PW" {% if request.GET.category == 'PW' %}selected{% endif %}>Pariwisata</option>
-                        <option value="FS" {% if request.GET.category == 'FS' %}selected{% endif %}>Festival</option>
-                        <option value="FM" {% if request.GET.category == 'FM' %}selected{% endif %}>Film</option>
-                        <option value="FN" {% if request.GET.category == 'FN' %}selected{% endif %}>Fashion</option>
-                        <option value="LN" {% if request.GET.category == 'LN' %}selected{% endif %}>Lainnya</option>
-                    </select>
-            
-                    <!-- Filter Button -->
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-3 rounded-r-lg hover:bg-blue-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Filter
-                    </button>
-                </div>
-            </form>         
-
-            <!-- Event Grid Section -->
-            {% if not events %}
-            <div class="flex items-center justify-center w-full h-64">
-                <p class="text-center text-gray-600">No events available at the moment.</p>
-            </div>
-            {% else %}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center mx-auto">
-                {% for event in events %}
-                    {% include 'event_card.html' with event=event %}
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <!-- Admin Controls -->
-            {% if is_admin %}
-                {% include "ds/button.html" with icon="fa fa-plus" text="Create Event" class="w-fit h-fit fixed right-10 bottom-10 z-50" id="openModalButton" specify="open-modal-1" %}
-                {% include "create_event.html" with modal_id="open-modal-1" modal_title="+ Create Event" modal_label="modal-label" modal_class="w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px]" %}
-            {% endif %}
+    <div class="p-8 mt-32 h-full px-10 md:20 lg:px-32 my-48 space-y-10">
+        <!-- Main Heading -->
+        <div>
+            <h1 class="font-bold text-3xl mb-2">Yog, Pilih Event!</h1>
+            <h3 class="text-gray-500 text-lg">Your Gateway to Memorable Experiences</h3>
         </div>
-    </body>
+
+        <div class="flex gap-10">
+            <div class="min-w-[200px]">
+                <h3 class="font-medium text-sm">Choose Event Category</h3>
+                <select name="category" id="category-select" class="py-3 px-4 pl-0 border-none focus:outline-none focus:bg-transparent focus:border-transparent rounded-none font-semibold text-sm">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.code }}" {% if request.GET.category == category.code %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <div>
+                    <label for="start-date" class="font-medium text-sm">Start Date</label>
+                    <input type="date" id="start-date" name="start_date" class="py-3 px-4 border rounded bg-gray-100 rounded-xl border-0 text-xs" value="{{ request.GET.start_date }}">
+                </div>
+                <div>
+                    <label for="end-date" class="font-medium text-sm">End Date</label>
+                    <input type="date" id="end-date" name="end_date" class="py-3 px-4 border rounded bg-gray-100 rounded-xl border-0 text-xs" value="{{ request.GET.end_date }}">
+                </div>
+            </div>
+            <div class="space-y-5">                
+                <!-- Event Grid Section -->
+                {% include "ds/input.html" with name="q" placeholder="Search events ..." value=request.GET.q class="w-[500px]" id="search-bar" %}
+                {% if not events %}
+                    <div class="flex items-center justify-center w-full h-64">
+                        <p class="text-center text-gray-600">No events available at the moment.</p>
+                    </div>
+                {% else %}
+                <div id="event-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mx-auto">
+                    {% comment %} {% for event in events %}
+                        {% include 'event_card.html' with event=event %}
+                    {% endfor %} {% endcomment %}
+                </div>
+                {% endif %}
+        
+                <!-- Admin Controls -->
+                {% if is_admin %}
+                    {% include "ds/button.html" with icon="fa fa-plus" text="Create Event" class="w-fit h-fit fixed right-10 bottom-10 z-50" id="openModalButton" specify="open-modal-1" %}
+                    {% include "create_event.html" with modal_id="open-modal-1" modal_title="+ Create Event" modal_label="modal-label" onsubmit="submitCreateEventForm" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('category-select').addEventListener('change', function() {
+            updateFilters();
+        });
+
+        document.getElementById('start-date').addEventListener('change', function() {
+            updateFilters();
+        });
+
+        document.getElementById('end-date').addEventListener('change', function() {
+            updateFilters();
+        });
+
+        document.getElementById('search-bar').addEventListener('input', function() {
+            updateFilters();
+        });
+
+        function updateFilters() {
+            const selectedCategory = document.getElementById('category-select').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const searchQuery = document.getElementById('search-bar').value;
+            fetchEventData(selectedCategory, startDate, endDate, searchQuery);
+        }
+
+        async function fetchEventData(category_query = '', start_date = '', end_date = '', search_query = '') {
+            const eventGrid = document.getElementById('event-grid');
+            eventGrid.innerHTML = ''; // Clear the grid before adding new events
+
+            const response = await fetch(`/yogevent/get-event?category=${category_query}&start_date=${start_date}&end_date=${end_date}&q=${search_query}`);
+            if (response.ok) {
+                const data = await response.json();
+                data.events.forEach(event => {
+                    const eventCard = `
+                        <a href="/yogevent/detail-event/${event.uuid}">
+                            <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden h-full">
+                                <img 
+                                    src="${event.image_urls}" 
+                                    class="h-[200px] object-cover"
+                                    alt="">
+                                <div class="flex gap-5 p-5 flex-grow">
+                                    <div class="flex flex-col items-center">
+                                        <h3 class="font-semibold text-[#3D37F1]">${event.month.slice(0, 3).toUpperCase()}</h3>
+                                        <h1 class="font-bold text-2xl">${event.day}</h1>
+                                    </div>
+                                    <div>
+                                        <h1 class="font-bold">${event.title}</h1>
+                                        <p class="text-sm font-regular line-clamp-3">
+                                            ${event.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                    eventGrid.insertAdjacentHTML('beforeend', eventCard);
+                });
+            } else {
+                console.error('Failed to fetch event data');
+            }
+        }
+
+        // Call the function to fetch data when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedCategory = document.getElementById('category-select').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const searchQuery = document.getElementById('search-bar').value;
+            fetchEventData(selectedCategory, startDate, endDate, searchQuery);
+        });
+
+    </script>
 {% endblock %}

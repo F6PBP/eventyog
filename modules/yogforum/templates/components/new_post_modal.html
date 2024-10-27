@@ -1,0 +1,23 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <div class="px-5">
+        <form method="POST" id="addPostForm" action="{% url 'yogforum:add_post' %}">
+            {% csrf_token %}
+            <div class="mt-4">
+                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                {% include "ds/input.html" with name="title" id="title" placeholder="Write about something big" %}
+            </div>
+            
+            <div class="mt-4">
+                <label for="content" class="block text-sm font-medium text-gray-700">Description</label>
+                {% include "ds/textarea.html" with name="content" id="content" placeholder="Content goes here" class="w-full min-h-[200px]" %}
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                {% include "ds/button.html" with text="Add to Forum" type="submit" class="w-fit" icon="fa fa-plus" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block modal_footer %}{% endblock %} <!-- Override the modal_footer to exclude Save/Cancel buttons -->

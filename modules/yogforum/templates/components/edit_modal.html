@@ -1,0 +1,15 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <form method="POST" action="{% url 'yogforum:edit_post' forum_post.id %}" class="space-y-4 p-6">
+        {% csrf_token %}
+        <div>
+            <label for="content" class="block text-sm font-medium text-gray-700">Edit Content</label>
+            <textarea name="content" id="content" rows="4" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">{{ forum_post.content }}</textarea>
+        </div>
+        <div class="flex justify-end space-x-4">
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save Changes</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block modal_footer %}{% endblock %}

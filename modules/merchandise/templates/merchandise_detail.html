@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <main class="px-4 md:px-48 my-48 flex gap-20">
+        <img 
+            src="{{merch.image_url}}" 
+            class="w-full max-w-[300px] h-96 object-contain"
+        >
+        <div
+            class="flex flex-col gap-2"
+        >
+            <h1 class="font-bold text-2xl">{{merch.name}}</h1>
+            <p>
+                {{merch.description}}
+            </p>
+            <h1 class="font-bold text-2xl">Rp{{merch.price}}</h1>
+            {% if is_admin %}
+                <div class="flex gap-4">
+                    <a href="{% url 'merchandise:edit_merchandise' merch.id %}" class="w-full">
+                        {% include "ds/button.html" with text="Edit Merch" icon="fa fa-pencil" %}
+                    </a>
+                    <a href="{% url 'merchandise:delete_merchandise' merch.id %}" class="w-full">
+                        {% include "ds/button.html" with text="Delete Merch" icon="fa fa-trash" variant="danger" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+{% endblock content %}

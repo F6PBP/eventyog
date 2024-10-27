@@ -213,6 +213,8 @@ class Command(BaseCommand):
             
             PRODUCTION = os.getenv('PRODUCTION') == 'True'
             
+            os.system('pip install -r requirements.txt')
+            
             # Remove db sqlite3
             if os.path.exists('db.sqlite3'):
                 os.remove('db.sqlite3')
