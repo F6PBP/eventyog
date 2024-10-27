@@ -35,15 +35,22 @@
             </div>
         </div>
         <p class="text-gray-700 mb-4">{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
-            <!-- Likes and Dislikes Section -->
-            <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500 flex items-center space-x-1">
-                    <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }}
-                </span>
-                <span class="text-sm text-gray-500 flex items-center space-x-1">
-                    <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }}
-                </span>
-            </div>
+        
+        <!-- Likes and Dislikes Section -->
+        <div class="flex items-center space-x-4">
+            <!-- Like Button -->
+            <button onclick="like({{ forum_post.id }})" class="flex items-center space-x-1 text-blue-500 hover:text-blue-700">
+                <i class="fas fa-thumbs-up"></i> 
+                <span id="like-count-{{ forum_post.id }}">{{ forum_post.totalLike }}</span>
+            </button>
+            
+            <!-- Dislike Button -->
+            <button onclick="dislike({{ forum_post.id }})" class="flex items-center space-x-1 text-red-500 hover:text-red-700">
+                <i class="fas fa-thumbs-down"></i>
+                <span id="dislike-count-{{ forum_post.id }}">{{ forum_post.totalDislike }}</span>
+            </button>
+        </div>
+
         <div class="flex justify-end mt-4">
             {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" button_type="primary" %}
         </div>
@@ -71,4 +78,47 @@
         </a>
     </div>
 </main>
+
+<!-- Script for Like and Dislike functions -->
+<script>
+    function like(id) {
+        fetch(`/yogforum/like_reply/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+
+                if (data.disliked) {
+                    document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+                }
+            }
+        });
+    }
+
+    function dislike(id) {
+        fetch(`/yogforum/dislike_reply/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+
+                if (data.liked) {
+                    document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+                }
+            }
+        });
+    }
+</script>
 {% endblock content %}

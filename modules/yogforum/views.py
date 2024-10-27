@@ -8,32 +8,111 @@ from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 
 @login_required
+def like_post(request, id):
+    post = get_object_or_404(Forum, id=id)
+    user_profile = request.user.userprofile
+
+    liked = False
+    disliked = False
+
+    if user_profile in post.like.all():
+        post.like.remove(user_profile)
+        liked = False
+    else:
+        post.like.add(user_profile)
+        liked = True
+        if user_profile in post.dislike.all():
+            post.dislike.remove(user_profile)
+            disliked = True
+
+    return JsonResponse({
+        'success': True,
+        'total_likes': post.totalLike(),
+        'liked': liked,
+        'disliked': disliked,
+        'total_dislikes': post.totalDislike() 
+    })
+
+@login_required
+def dislike_post(request, id):
+    post = get_object_or_404(Forum, id=id)
+    user_profile = request.user.userprofile
+
+    liked = False
+    disliked = False
+
+    if user_profile in post.dislike.all():
+        post.dislike.remove(user_profile)
+        disliked = False
+    else:
+        post.dislike.add(user_profile)
+        disliked = True
+        if user_profile in post.like.all():
+            post.like.remove(user_profile)
+            liked = True
+
+    return JsonResponse({
+        'success': True,
+        'total_dislikes': post.totalDislike(),
+        'disliked': disliked,
+        'liked': liked,
+        'total_likes': post.totalLike() 
+    })
+
+@login_required
 def like_reply(request, id):
     reply = get_object_or_404(ForumReply, id=id)
-    reply.like += 1  # Update like count (adjust logic as per your model's structure)
-    reply.save()
-    return JsonResponse({'success': True, 'total_likes': reply.like})
+    user_profile = request.user.userprofile  
+
+    liked = False
+    disliked = False
+
+    if user_profile in reply.like.all():
+        reply.like.remove(user_profile) 
+        liked = False
+    else:
+        reply.like.add(user_profile)  
+        liked = True
+        
+        if user_profile in reply.dislike.all():
+            reply.dislike.remove(user_profile)
+            disliked = True
+
+    return JsonResponse({
+        'success': True,
+        'total_likes': reply.totalLike(),
+        'total_dislikes': reply.totalDislike(),
+        'liked': liked,
+        'disliked': disliked,
+    })
 
 @login_required
 def dislike_reply(request, id):
     reply = get_object_or_404(ForumReply, id=id)
-    reply.dislike += 1  # Update dislike count (adjust logic as per your model's structure)
-    reply.save()
-    return JsonResponse({'success': True, 'total_dislikes': reply.dislike})
+    user_profile = request.user.userprofile
 
-@login_required
-def like_post(request, id):
-    reply = get_object_or_404(Forum, id=id)
-    reply.like += 1  # Update like count (adjust logic as per your model's structure)
-    reply.save()
-    return JsonResponse({'success': True, 'total_likes': reply.like})
+    liked = False
+    disliked = False
 
-@login_required
-def dislike_post(request, id):
-    reply = get_object_or_404(Forum, id=id)
-    reply.dislike += 1  # Update dislike count (adjust logic as per your model's structure)
-    reply.save()
-    return JsonResponse({'success': True, 'total_dislikes': reply.dislike})
+    if user_profile in reply.dislike.all():
+        reply.dislike.remove(user_profile) 
+        disliked = False
+    else:
+        reply.dislike.add(user_profile)  
+        disliked = True
+        
+        if user_profile in reply.like.all():
+            reply.like.remove(user_profile)
+            liked = True
+
+    return JsonResponse({
+        'success': True,
+        'total_dislikes': reply.totalDislike(),
+        'total_likes': reply.totalLike(),
+        'disliked': disliked,
+        'liked': liked,
+    })
+
 
 def viewforum(request, post_id):
     forum_post = get_object_or_404(Forum, id=post_id)
@@ -197,3 +276,32 @@ def edit_post(request, post_id):
         'object': post_object,
         'modal_id': f"edit-modal-{post_id}"
     })
+
+def forum_detail_json(request, forum_id):
+    forum = get_object_or_404(Forum, id=forum_id)
+    data = {
+        'id': forum.id,
+        'title': forum.title,
+        'content': forum.content,
+        'created_at': forum.created_at,
+        'updated_at': forum.updated_at,
+        'user': forum.user.user.username,
+        'total_likes': forum.totalLike(),
+        'total_dislikes': forum.totalDislike(),
+    }
+    return JsonResponse(data)
+
+def forum_reply_detail_json(request, reply_id):
+    reply = get_object_or_404(ForumReply, id=reply_id)
+    data = {
+        'id': reply.id,
+        'content': reply.content,
+        'created_at': reply.created_at,
+        'updated_at': reply.updated_at,
+        'user': reply.user.user.username,
+        'forum_id': reply.forum.id,
+        'reply_to': reply.reply_to.id if reply.reply_to else None,
+        'total_likes': reply.totalLike(),
+        'total_dislikes': reply.totalDislike(),
+    }
+    return JsonResponse(data)
