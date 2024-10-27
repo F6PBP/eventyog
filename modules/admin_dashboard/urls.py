@@ -9,4 +9,5 @@ urlpatterns = [
     path('user/<int:user_id>', see_user, name='see_user'),
     path('user/<int:user_id>/edit', edit_user, name='edit_user'),
     path('user/<int:user_id>/delete', delete_user, name='delete_user'),
+    path('create-user/', create_user, name='create_user'),
 ]
