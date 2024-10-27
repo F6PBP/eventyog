@@ -1,4 +1,43 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
-    
+<div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px]">
+    <h1 class="text-2xl font-bold">{{ event.title }} - Ticket Prices</h1>
+
+    {% if is_admin %}
+    <!-- Add New Ticket Price Form -->
+    <h2 class="text-lg font-semibold mt-4">Add New Ticket Price</h2>
+    <form method="post" class="space-y-4" id="ticket-form">
+        {% csrf_token %}
+            
+        <!-- Field for Ticket Name -->
+            <div class="flex flex-col">
+                <label for="id_name" class="font-medium">Ticket Name</label>
+                <input type="text" name="name" id="id_name" class="border border-gray-300 rounded p-2" placeholder="Enter ticket name">
+            </div>
+            
+            <!-- Field for Ticket Price -->
+            <div class="flex flex-col">
+                <label for="id_price" class="font-medium">Ticket Price</label>
+                <input type="number" name="price" id="id_price" step="500" class="border border-gray-300 rounded p-2" placeholder="Enter ticket price">
+            </div>
+        </form>
+    {% else %}
+        <!-- Display Existing Ticket Prices -->
+        <h2 class="text-lg font-semibold">Existing Ticket Prices</h2>
+        <ul class="list-disc pl-5">
+            {% for ticket in ticket_prices %}
+                <li>
+                    {{ ticket.name }} - 
+                    {% if ticket.isFree %}
+                        Free
+                    {% else %}
+                        ${{ ticket.price }}
+                    {% endif %}
+                </li>
+            {% empty %}
+                <p>No ticket prices available.</p>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    </div>
 {% endblock modal_body %}

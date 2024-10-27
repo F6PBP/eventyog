@@ -2,7 +2,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect, reverse
-from modules.yogevent.forms import EventForm
+from modules.yogevent.forms import EventForm, TicketPriceForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
@@ -447,3 +447,34 @@ def load_event_ratings(request, event_id):
         "average_rating": round(average_rating, 1),
         "ratings": list(ratings),
     })
+
+@csrf_exempt
+def ticket_price_list(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    ticket_prices = TicketPrice.objects.filter(event=event)
+
+    context = {
+        'event': event,
+        'ticket_prices': ticket_prices,
+    }
+    return render(request, 'ticket_price_list.html', context)
+
+def add_ticket_price(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        form = TicketPriceForm(request.POST)
+        if form.is_valid():
+            ticket_price = form.save(commit=False)
+            ticket_price.event = event
+            ticket_price.save()
+            return redirect('ticket_price_list', event_id=event.id)
+    else:
+        form = TicketPriceForm()
+
+    context = {
+        'event': event,
+        'form': form,
+    }
+    return render(request, 'add_ticket_price.html', context)
+

@@ -57,7 +57,7 @@
             {% else %}            
                 {% if tickets %}
                     {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
-                    {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" %}
+                    {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" onsubmit="buy_ticket();" %}
                 {% else %}
                     {% include "ds/button.html" with text="Book Event (Free)" class="w-fit mt-5" icon="fa fa-ticket" onclick="onBookFree();" %}
                 {% endif %}
@@ -101,9 +101,7 @@
             });
         });
     });
-
-</script>
-<script>
+    
     function onBookFree() {
         const formData = new FormData();
         formData.append('ticket_name', '');
@@ -144,5 +142,26 @@
         .then(data => console.log(data))
         .catch(error => console.error('There was a problem with the fetch operation:', error));
     }
+
+    function buy_ticket() {
+        const formData = new FormData();
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:ticket_price_list' event.uuid %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Buy Ticket!', 'success');
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+
 </script>
 {% endblock %}
