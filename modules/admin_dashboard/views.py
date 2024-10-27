@@ -17,6 +17,9 @@ from django.contrib.auth import login, logout, authenticate
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
 def show_main(request: AuthRequest) -> HttpResponse:
+    if request.user_profile.role != 'AD':
+        return redirect('main:main')
+    
     user_profiles = UserProfile.objects.all()
     
     context = {
@@ -45,7 +48,7 @@ def search_users(request: AuthRequest) -> HttpResponse:
 @check_user_profile(is_redirect=True)
 def see_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
    
     # Debug
     print(f"Requested user_id: {user_id}")
@@ -86,7 +89,7 @@ def see_user(request, user_id):
 @check_user_profile(is_redirect=True)
 def edit_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
        
     user = get_object_or_404(User, pk=user_id)
     user_profile = get_object_or_404(UserProfile, user=user)
@@ -100,6 +103,7 @@ def edit_user(request, user_id):
         user_profile.name = request.POST.get('name')
         user_profile.bio = request.POST.get('bio')
         user_profile.email = request.POST.get('email')
+        user_profile.wallet = request.POST.get('wallet')
         
         # Handle categories with debug logging
         categories = request.POST.get('categories', '')
@@ -124,7 +128,7 @@ def edit_user(request, user_id):
 @check_user_profile(is_redirect=True)
 def delete_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
         
     if request.method == 'POST':
         user = get_object_or_404(User, pk=user_id)
@@ -133,67 +137,6 @@ def delete_user(request, user_id):
         return redirect('admin_dashboard:main')  # Change this line to use the correct namespaced URL
         
     return redirect('admin_dashboard:see_user', user_id=user_id)  # Also use the namespaced URL here
-
-'''
-@login_required(login_url='auth:login')
-def create_user(request):
-    if request.user_profile.role != 'AD':  # Check if the user is an admin
-        return redirect('main:home')
-
-    if request.method == 'POST':
-        # Create User form
-        user_form = UserCreationForm(request.POST)
-        # Create Profile form
-        profile_form = UserProfileForm(request.POST, request.FILES)
-        
-        if user_form.is_valid() and profile_form.is_valid():
-            try:
-                # Save User
-                user = user_form.save()
-                
-                # Save Profile
-                profile = profile_form.save(commit=False)
-                profile.user = user
-                
-                # Handle profile picture
-                if 'profile_picture' in request.FILES:
-                    profile.profile_picture = request.FILES['profile_picture']
-                    
-                profile.save()
-                
-                messages.success(request, 'User created successfully.')
-
-                # Redirect to onboarding if profile is not complete
-                user_profile = UserProfile.objects.filter(user=user).first()
-                if not user_profile:
-                    return redirect('auth:onboarding')  # Redirect to onboarding if no profile
-
-                return redirect('admin_dashboard:see_user', user_id=user.id)  # Redirect to user details page
-
-            except Exception as e:
-                messages.error(request, f'Error creating user: {str(e)}')
-                if user:
-                    user.delete()  # Clean up if profile creation failed
-        else:
-            # Form validation errors
-            for error in user_form.errors.values():
-                messages.error(request, error)
-            for error in profile_form.errors.values():
-                messages.error(request, error)
-
-    else:
-        user_form = UserCreationForm()
-        profile_form = UserProfileForm()
-
-    context = {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'show_navbar': True,
-        'show_footer': True,
-    }
-
-    return render(request, 'user.html', context)
-'''
 
 @login_required(login_url='auth:login')
 def create_user(request):
@@ -209,13 +152,6 @@ def create_user(request):
             user = user_form.save()
             messages.success(request, 'Account created successfully.')
             
-            # Authenticate and log in the user
-            #username = user_form.cleaned_data.get('username')
-            #password = user_form.cleaned_data.get('password1')
-            #user = authenticate(username=username, password=password)
-            #if user is not None:
-            #    login(request, user)
-            
             # Save the user profile
             profile = profile_form.save(commit=False)
             profile.user = user  # Associate profile with the new user
@@ -225,9 +161,11 @@ def create_user(request):
         else:
             # Handle errors for user form or profile form
             if not user_form.is_valid():
-                messages.error(request, 'Account registration failed. Please fix the errors.')
+                messages.error(request, 'Error creating account: User form is not valid')
+                return redirect('admin_dashboard:main')
             if not profile_form.is_valid():
-                messages.error(request, 'Profile setup failed. Please pick a profile picture.')
+                messages.error(request, 'Error creating account: Profile form is not valid')
+                return redirect('admin_dashboard:main')
     
     context = {
     'user_form': user_form,

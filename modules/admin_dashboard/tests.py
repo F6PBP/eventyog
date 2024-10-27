@@ -6,6 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from django.contrib.messages import get_messages
 from modules.authentication.forms import UserProfileForm
+from django.contrib.auth.forms import UserCreationForm
 
 class UserViewsTest(TestCase):
     def setUp(self):

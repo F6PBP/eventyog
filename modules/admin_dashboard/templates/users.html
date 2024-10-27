@@ -22,8 +22,7 @@
                 <div>
                     <div class="mb-4">
                         <label for="id_username" class="block text-sm">Username:</label>
-                        {% include "ds/input.html" with id="username" name="username" type="text" props="{'required': True}" placeholder="Name" %}
-                        {{ user_form.username }}
+                        {% include "ds/input.html" with id="username" name="username" type="text" props="{'required': True}" placeholder="Username" %}
                         {% if user_form.username.errors %}
                             <p class="text-red-500 text-xs italic">{{ user_form.username.errors.0 }}</p>
                         {% endif %}
@@ -31,8 +30,7 @@
                     
                     <div class="mb-4">
                         <label for="id_password1" class="block text-sm">Password:</label>
-                        {% include "ds/input.html" with id="id_password1" name="password1" type="password" props="{'required': True}" placeholder="Name" %}
-                        {{ user_form.password1 }}
+                        {% include "ds/input.html" with id="id_password1" name="password1" type="password" props="{'required': True}" placeholder="Password" %}
                         {% if user_form.password1.errors %}
                             <p class="text-red-500 text-xs italic">{{ user_form.password1.errors.0 }}</p>
                         {% endif %}
@@ -40,8 +38,7 @@
 
                     <div class="mb-4">
                         <label for="id_password2" class="block text-sm">Confirm Password:</label>
-                        {% include "ds/input.html" with id="id_password2" name="password2" type="password" props="{'required': True}" placeholder="Name" %}
-                        {{ user_form.password2 }}
+                        {% include "ds/input.html" with id="id_password2" name="password2" type="password" props="{'required': True}" placeholder="Confirm password" %}
                         {% if user_form.password2.errors %}
                             <p class="text-red-500 text-xs italic">{{ user_form.password2.errors.0 }}</p>
                         {% endif %}
@@ -51,7 +48,6 @@
                         <label for="id_profile_picture" class="block text-sm">Profile Picture:</label>
                         {% include "ds/input.html" with id="profile_picture" name="profile_picture" type="file" props="{'required': True}" placeholder="Name" %}
                         <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewImage(event)">
-                        {{ profile_form.profile_picture }}
                         {% if profile_form.profile_picture.errors %}
                             <p class="text-red-500 text-xs italic">{{ profile_form.profile_picture.errors.0 }}</p>
                         {% endif %}
@@ -63,7 +59,6 @@
                     <div class="mb-4">
                         <label for="id_name" class="block text-sm">Name:</label>
                         {% include "ds/input.html" with id="name" name="name" type="text" props="{'required': True}" placeholder="Name" %}
-                        {{ profile_form.name }}
                         {% if profile_form.name.errors %}
                             <p class="text-red-500 text-xs italic">{{ profile_form.name.errors.0 }}</p>
                         {% endif %}
@@ -72,7 +67,6 @@
                     <div class="mb-4">
                         <label for="id_email" class="block text-sm">Email:</label>
                         {% include "ds/input.html" with id="email" name="email" type="email" props="{'required': True}" placeholder="Email" %}
-                        {{ profile_form.email }}
                         {% if profile_form.email.errors %}
                             <p class="text-red-500 text-xs italic">{{ profile_form.email.errors.0 }}</p>
                         {% endif %}
@@ -81,7 +75,6 @@
                     <div class="mb-4">
                         <label for="id_bio" class="block text-sm">Bio:</label>
                         {% include "ds/textarea.html" with class="w-full" id="bio" name="bio" props="{'required': True}" placeholder="Tell us about yourself" %}
-                        {{ profile_form.bio }}
                         {% if profile_form.bio.errors %}
                             <p class="text-red-500 text-xs italic">{{ profile_form.bio.errors.0 }}</p>
                         {% endif %}
@@ -335,6 +328,7 @@
         document.getElementById('createUserForm').addEventListener('submit', function(event) {
             const password1 = document.getElementById('id_password1').value;
             const password2 = document.getElementById('id_password2').value;
+            const username = document.getElementById('id_username').value;
 
             if (password1 !== password2) {
                 event.preventDefault();
@@ -347,59 +341,14 @@
                 showToast('Password must be at least 8 characters long', 'error');
                 return;
             }
+
+            if (password1 == username || password2 == username) {
+                event.preventDefault();
+                showToast('Password must be different from username', 'error');
+                return;
+            }
         });
     
-        // Handle form submission for user creation
-        /*
-        document.getElementById('createUserForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-
-            // Validate password
-            const password = formData.get('password');
-            const confirmPassword = formData.get('confirmPassword');
-            const username = formData.get('username');
-
-            if (password.length < 8) {
-                showToast('Password must be at least 8 characters long', 'error');
-                return;
-            }
-            if (password.toLowerCase().includes(username.toLowerCase())) {
-                showToast('Password cannot be similar to the username', 'error');
-                return;
-            }
-            if (password !== confirmPassword) {
-                showToast('Passwords do not match', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch("{% url 'admin_dashboard:create_user' %}", {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    },
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showToast('User created successfully', 'success');
-                    updateModalState(false); // Hide the modal
-                    this.reset(); // Reset the form
-                    fetchUser(''); // Refresh the user list
-                } else {
-                    showToast(data.message || 'Error creating user', 'error');
-                }
-            } catch (error) {
-                showToast('Error creating user', 'error');
-                console.error('Error:', error);
-            }
-        });
-        */
-    
-        // Initial fetch to load users
         fetchUser('');
     </script>
     
