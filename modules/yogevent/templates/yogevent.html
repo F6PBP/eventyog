@@ -16,14 +16,6 @@
                         <option value="{{ category.code }}" {% if request.GET.category == category.code %}selected{% endif %}>{{ category.name }}</option>
                     {% endfor %}
                 </select>
-                <div>
-                    <label for="start-date" class="font-medium text-sm">Start Date</label>
-                    <input type="date" id="start-date" name="start_date" class="py-3 px-4 border rounded bg-gray-100 rounded-xl border-0 text-xs" value="{{ request.GET.start_date }}">
-                </div>
-                <div>
-                    <label for="end-date" class="font-medium text-sm">End Date</label>
-                    <input type="date" id="end-date" name="end_date" class="py-3 px-4 border rounded bg-gray-100 rounded-xl border-0 text-xs" value="{{ request.GET.end_date }}">
-                </div>
             </div>
             <div class="space-y-5">                
                 <!-- Event Grid Section -->
@@ -56,19 +48,21 @@
             updateFilters();
         });
 
+        document.getElementById('category-select').addEventListener('change', function() {
+            updateFilters();
+        });
+
         function updateFilters() {
             const selectedCategory = document.getElementById('category-select').value;
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
             const searchQuery = document.getElementById('search-bar').value;
-            fetchEventData(selectedCategory, startDate, endDate, searchQuery);
+            fetchEventData(selectedCategory, searchQuery);
         }
 
-        async function fetchEventData(category_query = '', start_date = '', end_date = '', search_query = '') {
+        async function fetchEventData(category_query = '', search_query = '') {
             const eventGrid = document.getElementById('event-grid');
             eventGrid.innerHTML = ''; // Clear the grid before adding new events
 
-            let url = `/yogevent/get-event?category=${category_query}&start_date=${start_date}&end_date=${end_date}`;
+            let url = `/yogevent/get-event?category=${category_query}`;
             if (search_query) {
                 url += `&q=${search_query}`;
             }
@@ -109,10 +103,8 @@
         // Call the function to fetch data when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             const selectedCategory = document.getElementById('category-select').value;
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
             const searchQuery = document.getElementById('search-bar').value;
-            fetchEventData(selectedCategory, startDate, endDate, searchQuery);
+            fetchEventData(selectedCategory, searchQuery);
         });
 
     </script>

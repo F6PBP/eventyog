@@ -28,12 +28,8 @@ def main(request: HttpRequest) -> HttpResponse:
     if query:
         events = events.filter(Q(title__icontains=query))
     
-    print(len(events))
-
     if category:
         events = events.filter(category=category)
-    
-    print(len(events))
     
     for event in events:
         # Set image urls 
@@ -108,10 +104,6 @@ def get_events_by_queries(request):
     category = request.GET.get('category')
     start_time = request.GET.get('start_date')
     end_time = request.GET.get('end_date')
-    page = int(request.GET.get('page', 1))
-    limit = int(request.GET.get('limit', 10))
-    
-    print(f"Query: {query}, Category: {category}, Start Time: {start_time}, End Time: {end_time}, Page: {page}, Limit: {limit}")
     
     events = Event.objects.all()
     
@@ -150,11 +142,6 @@ def get_events_by_queries(request):
     categories = EventCategory.choices
     temp = []
     
-    paginator = Paginator(events, limit)
-    paginated_events = paginator.get_page(page)
-    
-    print(paginated_events.object_list)
-    
     for category in categories:
         temp.append({
             'code': category[0],
@@ -164,7 +151,7 @@ def get_events_by_queries(request):
     categories = temp
     
     events_list = []
-    for event in paginated_events.object_list:
+    for event in events:
         events_list.append({
             'uuid': event.uuid,
             'title': event.title,
@@ -181,9 +168,6 @@ def get_events_by_queries(request):
 
     response = {
         'events': events_list,
-        'total': paginator.count,
-        'page': paginated_events.number,
-        'num_pages': paginator.num_pages,
     }
     
     return JsonResponse(response)
