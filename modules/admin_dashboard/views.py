@@ -9,6 +9,8 @@ from eventyog.types import AuthRequest
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from modules.authentication.forms import UserProfileForm
+from django.http import JsonResponse
+from django.contrib.auth import login, logout, authenticate
 
 
 # Create your views here.
@@ -39,28 +41,13 @@ def search_users(request: AuthRequest) -> HttpResponse:
     
     return HttpResponse(data, content_type='application/json')
 
-'''
-def see_user(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    
-    user_profile = UserProfile.objects.get(user=user)
-    
-    context = {
-        'user_profile': user_profile,
-        'image_url': user_profile.profile_picture.url,
-        'show_navbar': True,
-        'show_footer': True,
-    }
-
-    return render(request, 'user.html', context)
-'''
-
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
 def see_user(request, user_id):
     if request.user_profile.role != 'AD':
         return redirect('main:home')
    
+    # Debug
     print(f"Requested user_id: {user_id}")
     user = get_object_or_404(User, pk=user_id)
     print(f"Found user: {user.username}, ID: {user.id}")
@@ -147,6 +134,7 @@ def delete_user(request, user_id):
         
     return redirect('admin_dashboard:see_user', user_id=user_id)  # Also use the namespaced URL here
 
+'''
 @login_required(login_url='auth:login')
 def create_user(request):
     if request.user_profile.role != 'AD':  # Check if the user is an admin
@@ -204,5 +192,47 @@ def create_user(request):
         'show_footer': True,
     }
 
-    return render(request, 'admin/create_user.html', context)
+    return render(request, 'user.html', context)
+'''
 
+@login_required(login_url='auth:login')
+def create_user(request):
+    user_form = UserCreationForm()
+    profile_form = UserProfileForm()
+    
+    if request.method == 'POST':
+        user_form = UserCreationForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            # Save the new user
+            user = user_form.save()
+            messages.success(request, 'Account created successfully.')
+            
+            # Authenticate and log in the user
+            #username = user_form.cleaned_data.get('username')
+            #password = user_form.cleaned_data.get('password1')
+            #user = authenticate(username=username, password=password)
+            #if user is not None:
+            #    login(request, user)
+            
+            # Save the user profile
+            profile = profile_form.save(commit=False)
+            profile.user = user  # Associate profile with the new user
+            profile.save()
+            
+            return redirect('admin_dashboard:main')
+        else:
+            # Handle errors for user form or profile form
+            if not user_form.is_valid():
+                messages.error(request, 'Account registration failed. Please fix the errors.')
+            if not profile_form.is_valid():
+                messages.error(request, 'Profile setup failed. Please pick a profile picture.')
+    
+    context = {
+    'user_form': user_form,
+    'profile_form': profile_form,
+    'show_navbar': True,
+    'show_footer': True,
+}
+    return render(request, 'users.html', context)

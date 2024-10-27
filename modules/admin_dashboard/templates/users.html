@@ -14,40 +14,244 @@
 
     <!-- User Creation Modal -->
     <div id="userCreationModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
             <h2 class="text-xl font-semibold mb-4">Create User</h2>
-            <form id="createUserForm">
-                <div class="mb-4">
-                    <label for="username" class="block text-sm">Username:</label>
-                    <input type="text" id="username" name="username" class="border rounded w-full p-2" required>
+            <form id="createUserForm" action="{% url 'admin_dashboard:create_user' %}" method="POST" enctype="multipart/form-data" class="grid grid-cols-2 gap-4">
+                {% csrf_token %}
+                <!-- Left Column -->
+                <div>
+                    <div class="mb-4">
+                        <label for="id_username" class="block text-sm">Username:</label>
+                        {% include "ds/input.html" with id="username" name="username" type="text" props="{'required': True}" placeholder="Name" %}
+                        {{ user_form.username }}
+                        {% if user_form.username.errors %}
+                            <p class="text-red-500 text-xs italic">{{ user_form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_password1" class="block text-sm">Password:</label>
+                        {% include "ds/input.html" with id="id_password1" name="password1" type="password" props="{'required': True}" placeholder="Name" %}
+                        {{ user_form.password1 }}
+                        {% if user_form.password1.errors %}
+                            <p class="text-red-500 text-xs italic">{{ user_form.password1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password2" class="block text-sm">Confirm Password:</label>
+                        {% include "ds/input.html" with id="id_password2" name="password2" type="password" props="{'required': True}" placeholder="Name" %}
+                        {{ user_form.password2 }}
+                        {% if user_form.password2.errors %}
+                            <p class="text-red-500 text-xs italic">{{ user_form.password2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_profile_picture" class="block text-sm">Profile Picture:</label>
+                        {% include "ds/input.html" with id="profile_picture" name="profile_picture" type="file" props="{'required': True}" placeholder="Name" %}
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewImage(event)">
+                        {{ profile_form.profile_picture }}
+                        {% if profile_form.profile_picture.errors %}
+                            <p class="text-red-500 text-xs italic">{{ profile_form.profile_picture.errors.0 }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="name" class="block text-sm">Name:</label>
-                    <input type="text" id="name" name="name" class="border rounded w-full p-2" required>
+
+                <!-- Right Column -->
+                <div>
+                    <div class="mb-4">
+                        <label for="id_name" class="block text-sm">Name:</label>
+                        {% include "ds/input.html" with id="name" name="name" type="text" props="{'required': True}" placeholder="Name" %}
+                        {{ profile_form.name }}
+                        {% if profile_form.name.errors %}
+                            <p class="text-red-500 text-xs italic">{{ profile_form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_email" class="block text-sm">Email:</label>
+                        {% include "ds/input.html" with id="email" name="email" type="email" props="{'required': True}" placeholder="Email" %}
+                        {{ profile_form.email }}
+                        {% if profile_form.email.errors %}
+                            <p class="text-red-500 text-xs italic">{{ profile_form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_bio" class="block text-sm">Bio:</label>
+                        {% include "ds/textarea.html" with class="w-full" id="bio" name="bio" props="{'required': True}" placeholder="Tell us about yourself" %}
+                        {{ profile_form.bio }}
+                        {% if profile_form.bio.errors %}
+                            <p class="text-red-500 text-xs italic">{{ profile_form.bio.errors.0 }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-sm">Email:</label>
-                    <input type="email" id="email" name="email" class="border rounded w-full p-2" required>
+
+                <!-- Full-width Category Selection Field -->
+                <div class="col-span-2">
+                    <label for="categories" class="block text-sm font-medium text-gray-700">Preferable Event Categories:</label>
+                    <div class="relative">
+                        <button type="button" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onclick="toggleDropdown()">Select Categories</button>
+                        <div id="dropdown" class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden transition-all duration-500 ease-in-out max-h-0 overflow-hidden">
+                            <ul class="max-h-36 overflow-auto" id='category-dropdown'>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="selected-categories" class="mt-2 flex flex-wrap gap-2"></div>
+                    <input type="hidden" name="categories" id="categoriesInput" value="{{ user_profile.categories }}">
                 </div>
-                <div class="mb-4">
-                    <label for="password" class="block text-sm">Password:</label>
-                    <input type="password" id="password" name="password" class="border rounded w-full p-2" required>
-                </div>
-                <div class="mb-4">
-                    <label for="confirmPassword" class="block text-sm">Confirm Password:</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" class="border rounded w-full p-2" required>
-                </div>
-                <div class="mb-4">
-                    <label for="bio" class="block text-sm">Bio:</label>
-                    <textarea id="bio" name="bio" class="border rounded w-full p-2"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="profilePicture" class="block text-sm">Profile Picture:</label>
-                    <input type="file" id="profilePicture" name="profile_picture" class="border rounded w-full p-2" accept="image/*">
-                </div>
-                <div class="flex justify-end">
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                    // Initialize categories from hidden input
+                    const initialCategories = document.getElementById('categoriesInput').value;
+                    console.log("Initial categories:", initialCategories);
+                    
+                    if (initialCategories) {
+                        const categoriesArray = initialCategories.split(',').map(cat => cat.trim());
+                        console.log("Categories array:", categoriesArray);
+                        
+                        // Check the corresponding checkboxes
+                        categoryDropdown.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                            if (categoriesArray.includes(checkbox.value)) {
+                                checkbox.checked = true;
+                            }
+                        });
+                        
+                        // Update the display
+                        updateSelectedCategories();
+                    }
+                });
+                    function toggleDropdown() {
+                        var dropdown = document.getElementById('dropdown');
+                        if (dropdown.classList.contains('hidden')) {
+                            dropdown.classList.remove('hidden');
+                            setTimeout(() => {
+                                dropdown.classList.remove('max-h-0');
+                                dropdown.classList.add('max-h-60');
+                            }, 10);
+                        } else {
+                            dropdown.classList.remove('max-h-60');
+                            dropdown.classList.add('max-h-0');
+                            setTimeout(() => {
+                                dropdown.classList.add('hidden');
+                            }, 500);
+                        }
+                    }
+
+                    document.addEventListener('click', function(event) {
+                        var dropdown = document.getElementById('dropdown');
+                        var button = dropdown.previousElementSibling;
+                        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                            dropdown.classList.remove('max-h-60');
+                            dropdown.classList.add('max-h-0');
+                            setTimeout(() => {
+                                dropdown.classList.add('hidden');
+                            }, 500);
+                        }
+                    });
+
+                    const categories = [
+                        "Music",
+                        "Sports",
+                        "Arts and Culture",
+                        "Food and Drink",
+                        "Business and Networking",
+                        "Tech and Innovation",
+                        "Fashion",
+                        "Health and Wellness",
+                        "Education and Workshops",
+                        "Festivals",
+                        "Comedy and Entertainment",
+                        "Family and Kids",
+                        "Charity and Causes",
+                        "Nightlife",
+                        "Film and Media",
+                    ];
+                    
+                    const categoryDropdown = document.getElementById('category-dropdown');
+                    const selectedCategoriesDiv = document.getElementById('selected-categories');
+
+                    categories.forEach(category => {
+                        const li = document.createElement('li');
+                        li.classList.add('px-4', 'py-2', 'text-sm', 'text-gray-700', 'hover:bg-gray-100');
+                        const label = document.createElement('label');
+                        label.classList.add('flex', 'items-center', 'cursor-pointer');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = category;
+                        checkbox.classList.add('mr-2');
+                        checkbox.addEventListener('change', function() {
+                            updateSelectedCategories();
+                        });
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(category));
+                        li.appendChild(label);
+                        categoryDropdown.appendChild(li);
+                    });
+
+                    function updateSelectedCategories() {
+                        selectedCategoriesDiv.innerHTML = '';
+                        const selectedCategories = [];
+                        
+                        // Debug log
+                        console.log("Updating selected categories");
+                        
+                        categoryDropdown.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                            selectedCategories.push(checkbox.value);
+                            const chip = document.createElement('div');
+                            chip.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full', 'text-sm', 'flex', 'items-center');
+                            chip.textContent = checkbox.value;
+                            
+                            const removeButton = document.createElement('button');
+                            removeButton.classList.add('ml-2', 'text-blue-500', 'hover:text-blue-700');
+                            removeButton.innerHTML = '<i class="fas fa-times"></i>';
+                            removeButton.addEventListener('click', function() {
+                                checkbox.checked = false;
+                                updateSelectedCategories();
+                            });
+                            chip.appendChild(removeButton);
+                            selectedCategoriesDiv.appendChild(chip);
+                        });
+
+                        // Update hidden input
+                        let hiddenInput = document.querySelector('input[name="categories"]');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'categories';
+                            document.querySelector('form').appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = selectedCategories.join(',');
+                        
+                        // Debug log
+                        console.log("Selected categories:", selectedCategories);
+                        console.log("Hidden input value:", hiddenInput.value);
+                    }
+
+                    // Add form submission handler
+                    document.querySelector('form').addEventListener('submit', function(event) {
+                        // Debug log
+                        console.log("Form submitting");
+                        const hiddenInput = document.querySelector('input[name="categories"]');
+                        console.log("Categories being submitted:", hiddenInput.value);
+                    });
+
+                    function previewImage(event) {
+                        const reader = new FileReader();
+                        reader.onload = function() {
+                            const imagePreview = document.getElementById('image_preview');
+                            imagePreview.src = reader.result;
+                            imagePreview.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(event.target.files[0]);
+                    }
+                </script>
+                <!-- Submit Buttons (spanning two columns) -->
+                <div class="col-span-2 flex justify-end">
                     <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded-full mr-2" onclick="updateModalState(false)">Cancel</button>
-                    <button type="submit" class="bg-[#003fe2] text-white px-4 py-2 rounded-full">Create User</button>
+                    {% include "ds/button.html" with text="Create User" variant="primary"  props="{'type': 'submit'}"%}
                 </div>
             </form>
         </div>
@@ -55,6 +259,7 @@
     
 
     <script>
+        
         // Function to fetch users based on search query
         async function fetchUser(query) {
             try {
@@ -120,22 +325,41 @@
             updateModalState(true);
         });
     
-        // Close the modal
+        // Show/hide modal functions
         function updateModalState(isOpen) {
             const modal = document.getElementById('userCreationModal');
-            modal.classList.toggle('hidden', !isOpen); // Show or hide the modal
+            modal.classList.toggle('hidden', !isOpen);
         }
+
+        // Function to handle form submission
+        document.getElementById('createUserForm').addEventListener('submit', function(event) {
+            const password1 = document.getElementById('id_password1').value;
+            const password2 = document.getElementById('id_password2').value;
+
+            if (password1 !== password2) {
+                event.preventDefault();
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            if (password1.length < 8) {
+                event.preventDefault();
+                showToast('Password must be at least 8 characters long', 'error');
+                return;
+            }
+        });
     
         // Handle form submission for user creation
+        /*
         document.getElementById('createUserForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault();
             const formData = new FormData(this);
-            
-            const username = formData.get('username');
+
+            // Validate password
             const password = formData.get('password');
             const confirmPassword = formData.get('confirmPassword');
-    
-            // Validate password
+            const username = formData.get('username');
+
             if (password.length < 8) {
                 showToast('Password must be at least 8 characters long', 'error');
                 return;
@@ -144,33 +368,36 @@
                 showToast('Password cannot be similar to the username', 'error');
                 return;
             }
-            if (password != confirmPassword) {
+            if (password !== confirmPassword) {
                 showToast('Passwords do not match', 'error');
                 return;
             }
-    
+
             try {
-                const response = await fetch('/admin/create-user/', {
+                const response = await fetch("{% url 'admin_dashboard:create_user' %}", {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                     },
                 });
-    
+
+                const data = await response.json();
+
                 if (response.ok) {
                     showToast('User created successfully', 'success');
                     updateModalState(false); // Hide the modal
+                    this.reset(); // Reset the form
                     fetchUser(''); // Refresh the user list
                 } else {
-                    const error = await response.json();
-                    showToast(error.message || 'Error creating user', 'error');
+                    showToast(data.message || 'Error creating user', 'error');
                 }
             } catch (error) {
                 showToast('Error creating user', 'error');
                 console.error('Error:', error);
             }
         });
+        */
     
         // Initial fetch to load users
         fetchUser('');
