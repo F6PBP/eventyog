@@ -87,10 +87,6 @@ def delete_merchandise(request, id):
 
 @check_user_profile()
 def showMerch_json(request, event_id: str):
-    event = Event.objects.get(uuid=event_id)
-    
-    print(event)
-    
-    data = Merchandise.objects.all()
+    data = Merchandise.objects.all().order_by('created_at')[::-1]
     
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")

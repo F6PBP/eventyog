@@ -10,5 +10,5 @@ urlpatterns = [
     path('delete/<int:id>/', delete_merchandise, name='delete_merchandise'),
     path('add_merchandise_ajax/', create_merchandise_ajax, name='create_merchandise_ajax'),
     path('show/<str:event_id>', showMerch_json, name='showMerch_json'),
-    path('show/<int:id>/', show_merchandise_by_id, name='showMerch_json'),
+    path('detail/<int:id>/', show_merchandise_by_id, name='showMerch_json'),
 ]

@@ -24,7 +24,7 @@
     </style>
 
     <div class="mx-auto">
-        <div class="flex justify-between">
+        <div class="flex flex-col md:flex-row justify-between">
             <h1 class="font-bold text-3xl my-2">Merchandise Shop</h1>
             {% if is_admin %}
                 {% include "ds/button.html" with icon="fa fa-plus" text="Create Merchandise" class="w-fit" id="openModalButton" specify="open-modal-2" %}
@@ -63,7 +63,7 @@
 
             merchandiseEntries.forEach((item) => {
                 let cardHTML = `
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300" onclick="window.location.href='/merchandise/show/${item.pk}'">
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300" onclick="window.location.href='/merchandise/detail/${item.pk}'">
                         <img src="${item.fields.image_url}" alt="${item.fields.name}" class="w-full h-44 object-cover">
                         <div class="flex flex-col justify-between p-8 flex-grow">
                             <div>
