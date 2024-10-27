@@ -10,10 +10,7 @@
 
     <!-- Event Items -->
     {% if not cart_events and not cart_merch %}
-        <div class="grid place-items-center text-center">
-            <img src={% static "assets/eventyog-icon-text.png" %} alt="" class="w-[400px] md:w-[500px]">
-        </div><br>
-        Maaf Event dan Merchandise Belum Tersedia, Mohon pilih sebuah <span class="font-bold">EventYog</span> terlebih dahulu
+        No items in your cart.
     {% else %}
         <div class="max-h-[500px] overflow-y-auto">
             {% if cart_events %}
@@ -145,6 +142,7 @@
 
             if (data.success) {
                 showToast("Checkout successful!", "success");
+                window.location.reload();
                 document.getElementById('wallet-balance').innerText = formatPrice(data.new_wallet_balance);
                 document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance - totalPrice);
             } else {
@@ -190,7 +188,8 @@
             localCart.event[{{ event.id }}] = {
                 quantity: {{ event.quantity }},
                 pricePerItem: {{ event.ticket.price }},
-                totalPrice: {{ event.totalPrice }}
+                totalPrice: {{ event.totalPrice }},
+                id: {{ event.id }}
             };
             
         {% endfor %}
@@ -199,7 +198,8 @@
             localCart.merch[{{ merch.id }}] = {
                 quantity: {{ merch.quantity }},
                 pricePerItem: {{ merch.merchandise.price }},
-                totalPrice: {{ merch.totalPrice }}
+                totalPrice: {{ merch.totalPrice }},
+                id: {{ merch.merchandise.id }}
             };
         {% endfor %}
     }
@@ -207,7 +207,6 @@
     function updateQuantity(type, id, action) {
         console.log(`${localCart[type][id].totalPrice}`);
         const cartItem = localCart[type][id];
-
 
         if (!cartItem) return;
 
@@ -280,11 +279,23 @@
     }
 
     function emptyCart() {
-        localCart = {
-            event: {},
-            merch: {}
-        };
-        updateTotalPrice();
+        alert("Are you sure you want to empty your cart?");
+
+        fetch("{% url 'cart:empty_cart' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.error);
+            }
+        })
+        
     }
 </script>
 

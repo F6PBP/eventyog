@@ -21,6 +21,10 @@
             min-height: 400px;
             transition: width 0.3s ease, height 0.3s ease;
         }
+        .disabled-card {
+            pointer-events: none;
+            opacity: 0.5;
+        }
     </style>
 
     <div class="mx-auto">
@@ -32,6 +36,7 @@
         </div>
 
         <div id="merchandise_cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10"></div>
+
         <div id="loading" class="loading-spinner hidden animate-spin">
         </div>
 
@@ -44,7 +49,7 @@
                 <div id="cart-items" class="max-h-[300px] overflow-y-scroll overflow-x-hidden"></div>
             </div>
             <div class="w-full flex items-end">
-                {% include "ds/button.html" with text="Go to Cart" icon="fa fa-shopping-cart" class="mt-4" %}
+                {% include "ds/button.html" with text="Go to Cart" icon="fa fa-shopping-cart" class="mt-4" onclick="addItemsToCart();" %}
             </div>
         </div>
     </div>
@@ -62,22 +67,27 @@
             const isAdmin = {{ is_admin|yesno:"true,false" }};
 
             merchandiseEntries.forEach((item) => {
+                console.log(item);
+                let cardClass = item.quantity === 0 ? 'disabled-card' : '';
                 let cardHTML = `
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300" onclick="window.location.href='/merchandise/detail/${item.pk}'">
-                        <img src="${item.fields.image_url}" alt="${item.fields.name}" class="w-full h-44 object-cover">
+                    <div class="relative bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300 ${cardClass}" ${item.quantity > 0 ? `onclick="window.location.href='/merchandise/detail/${item.pk}'"` : ''}>
+                        <div class="absolute top-5 right-5 h-5 w-5 bg-black p-5 text-white rounded-full flex items-center justify-center font-bold hover:scale-105 duration-300">
+                            ${item.quantity}
+                        </div>
+                        <img src="${item.image_url}" alt="${item.name}" class="w-full h-44 object-cover">
                         <div class="flex flex-col justify-between p-8 flex-grow">
                             <div>
-                                <h5 class="text-lg font-bold line-clamp-2" title="${item.fields.name}">${item.fields.name}</h5>
-                                <p class="text-gray-700 mb-2 overflow-auto max-h-16 text-xs line-clamp-3">${item.fields.description}</p>
+                                <h5 class="text-lg font-bold line-clamp-2" title="${item.name}">${item.name}</h5>
+                                <p class="text-gray-700 mb-2 overflow-auto max-h-16 text-xs line-clamp-3">${item.description}</p>
                             </div>
                             <div class="flex flex-col items-start mt-auto">
-                                <p class="text-base font-bold">Rp ${item.fields.price}</p>
+                                <p class="text-base font-bold">Rp ${item.price}</p>
                                 
                                 <div class="flex justify-between items-center w-full mt-2">
                                     <div class="flex justify-center w-full gap-2">
-                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.fields.name}', '${item.fields.price}'); event.stopPropagation();">-</button>
-                                        <input type="number" id="quantity-${item.pk}" value="0" min="0" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.fields.name}', '${item.fields.price}', this.value)">
-                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.fields.name}', '${item.fields.price}'); event.stopPropagation();">+</button>
+                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>-</button>
+                                        <input type="number" id="quantity-${item.pk}" value="${item.bought_quantity}" min="0" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.name}', '${item.price}', this.value)" ${item.quantity === 0 ? 'disabled' : ''}>
+                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>+</button>
                                     </div>
                                 </div>
                             </div>
@@ -85,8 +95,14 @@
                     </div>
                 `;
                 merchandiseCards.innerHTML += cardHTML;
+
+                // Add items with bought_quantity > 0 to cartItems
+                if (item.bought_quantity > 0) {
+                    cartItems[item.pk] = { name: item.name, price: parseInt(item.price), quantity: item.bought_quantity, id: item.pk };
+                }
             });
             loadingSpinner.classList.add("hidden");
+            updateCart(); // Update the cart after fetching merchandise entries
         }
 
         async function getMerchandise() {
@@ -143,7 +159,7 @@
             if (cartItems[id]) {
                 cartItems[id].quantity += 1;
             } else {
-                cartItems[id] = { name: name, price: parseInt(price), quantity: 1 };
+                cartItems[id] = { name: name, price: parseInt(price), quantity: 1, id: parseInt(id) };
             }
             updateCart();
         }
@@ -151,7 +167,7 @@
         function updateQuantity(id, name, price, value) {
             const quantity = parseInt(value);
             if (quantity > 0) {
-                cartItems[id] = { name: name, price: parseInt(price), quantity: quantity };
+                cartItems[id] = { name: name, price: parseInt(price), quantity: quantity, id: parseInt(id) };
             } else {
                 delete cartItems[id];
             }
@@ -173,5 +189,29 @@
 
         // Call function to load merchandise entries
         fetchMerchandiseEntries();
+
+        function addItemsToCart() {
+            const cartItemsArray = Object.values(cartItems);
+            const val = {
+                "items": cartItemsArray
+            }
+
+            const cartItemsJSON = JSON.stringify(val);
+
+            console.log(cartItemsJSON);
+            
+            fetch("{% url 'merchandise:add_to_cart' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: cartItemsJSON
+            }).then((res) => {
+            if (res.ok) {
+                window.location.href = "{% url 'cart:main' %}";
+            }
+            });
+        }
     </script>
 </main>

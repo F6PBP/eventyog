@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.core import serializers
 from django.http import JsonResponse
+import json
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> HttpResponse:
@@ -94,4 +95,60 @@ def showMerch_json(request, event_id: str):
     event = Event.objects.get(uuid=event_id)
     data = Merchandise.objects.filter(related_event=event).order_by('created_at')[::-1]
     
-    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+    merch_cart = MerchCart.objects.filter(user=request.user)
+    
+    temp = []
+    
+    
+    
+    for merch in data:
+        bought_quantity = 0
+        for cart_item in merch_cart:
+            if cart_item.merchandise.id == merch.id:
+                bought_quantity = cart_item.quantity
+                break
+
+        temp.append({
+            'pk': merch.id,
+            'name': merch.name,
+            'quantity': merch.quantity,
+            'description': merch.description,
+            'price': merch.price,
+            'image_url': merch.image_url,
+            'bought_quantity': bought_quantity,
+            'created_at': merch.created_at.isoformat(),
+            'updated_at': merch.updated_at.isoformat(),
+            'related_event': merch.related_event.uuid
+        })
+
+    return JsonResponse(temp, safe=False)
+
+
+@check_user_profile()
+def add_items_to_cart(request):
+    
+    items = json.loads(request.body)['items']
+    print(items)
+    
+    merch_cart = MerchCart.objects.filter(user=request.user)
+    
+    # Make sure theres no duplicate merch in cart
+    # if duplicate, just update the quantity
+    
+    for item in items:
+        merch = Merchandise.objects.get(pk=item['id'])
+        
+        for cart_item in merch_cart:
+            if cart_item.merchandise.id == merch.id:
+                cart_item.quantity = item['quantity']
+                cart_item.save()
+                break
+        else:
+            new_cart_item = MerchCart(
+                user=request.user,
+                merchandise=merch,
+                quantity=item['quantity']
+            )
+            new_cart_item.save()
+            
+    return JsonResponse({"status": "OK"}, status=200)

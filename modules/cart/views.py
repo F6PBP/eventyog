@@ -17,11 +17,6 @@ def main(request: HttpRequest) -> HttpResponse:
     # Get the merchandise the user has bought
     buyedM = user_profile.boughtMerch.all()
 
-    # Print the bought events
-    # Print the bought merchandise
-    for merch in buyedM:
-        print(merch.image_url)  # or any other field in the Merchandise model
-
     # Calculate cumulative total price
     priceEvent = 0
     priceCart = 0
@@ -75,18 +70,19 @@ def checkout(request):
     # Update cart items
     cart_events = EventCart.objects.filter(user=user)
     cart_merch = MerchCart.objects.filter(user=user)
-
-    for event_cart in cart_events:
-        event_id = str(event_cart.id)
-        if event_id in updated_events:
-            event_cart.quantity = updated_events[event_id]['quantity']
-            event_cart.save()
-
-    for merch_cart in cart_merch:
-        merch_id = str(merch_cart.id)
-        if merch_id in updated_merch:
-            merch_cart.quantity = updated_merch[merch_id]['quantity']
-            merch_cart.save()
+    
+    # Reduce merchandise quantity
+    for item in updated_merch.values():
+        print(item)
+        merch = Merchandise.objects.get(id=item['id'])
+        print(merch)
+        merch.quantity -= item['quantity']
+        merch.save()
+    
+    print(updated_events)
+    # Empty cart
+    cart_events.delete()
+    cart_merch.delete()
 
     # Deduct total price from wallet and save
     user_profile.wallet -= total_price
