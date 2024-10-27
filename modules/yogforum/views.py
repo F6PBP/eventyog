@@ -61,7 +61,7 @@ def dislike_post(request, id):
 
 @login_required
 def like_reply(request, id):
-    reply = get_object_or_404(ForumReply, id=id)
+    reply = get_object_or_404(ForumReply.objects.prefetch_related('like', 'dislike'), id=id)
     user_profile = request.user.userprofile  
 
     liked = False
