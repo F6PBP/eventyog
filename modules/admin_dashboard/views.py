@@ -17,6 +17,9 @@ from django.contrib.auth import login, logout, authenticate
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
 def show_main(request: AuthRequest) -> HttpResponse:
+    if request.user_profile.role != 'AD':
+        return redirect('main:main')
+    
     user_profiles = UserProfile.objects.all()
     
     context = {
@@ -45,7 +48,7 @@ def search_users(request: AuthRequest) -> HttpResponse:
 @check_user_profile(is_redirect=True)
 def see_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
    
     # Debug
     print(f"Requested user_id: {user_id}")
@@ -86,7 +89,7 @@ def see_user(request, user_id):
 @check_user_profile(is_redirect=True)
 def edit_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
        
     user = get_object_or_404(User, pk=user_id)
     user_profile = get_object_or_404(UserProfile, user=user)
@@ -125,7 +128,7 @@ def edit_user(request, user_id):
 @check_user_profile(is_redirect=True)
 def delete_user(request, user_id):
     if request.user_profile.role != 'AD':
-        return redirect('main:home')
+        return redirect('main:main')
         
     if request.method == 'POST':
         user = get_object_or_404(User, pk=user_id)
