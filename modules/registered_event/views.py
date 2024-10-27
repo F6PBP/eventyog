@@ -9,6 +9,10 @@ from eventyog.types import AuthRequest
 def main(request: AuthRequest) -> HttpResponse:
     registered_events = request.user_profile.registeredEvent.all()
     
+    registered_events = [
+        event.event for event in registered_events
+    ]    
+    
     context = {
         'user': request.user,
         'user_profile': request.user_profile,
@@ -26,6 +30,10 @@ def main(request: AuthRequest) -> HttpResponse:
 def fetch_registered_event(request: HttpRequest) -> JsonResponse:
     start_time = request.GET.get('start_time')
     registered_events = request.user_profile.registeredEvent.all()
+    
+    registered_events = [
+        event.event for event in registered_events
+    ]
 
     if start_time:
         registered_events = registered_events.filter(start_time__gte=start_time)

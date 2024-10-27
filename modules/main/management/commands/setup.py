@@ -105,7 +105,10 @@ class Command(BaseCommand):
                     bio=row['bio'],
                     categories='',
                 )
-                for event in self.events:
+                
+                tickets = TicketPrice.objects.all()
+                
+                for event in tickets:
                     user_profile.registeredEvent.add(event)
                     
                 user.save()
@@ -150,11 +153,12 @@ class Command(BaseCommand):
                 )
                 
                 eventcart.save()
-        
+
+        tickets = TicketPrice.objects.all()
         for user in users:
             for merch in merchs[:10]:
                 user.boughtMerch.add(merch)
-            for event in self.events[:10]:
+            for event in tickets[:10]:
                 user.registeredEvent.add(event)
             user.save()
             
