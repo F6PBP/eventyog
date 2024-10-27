@@ -21,10 +21,6 @@
                         <p class="text-sm text-gray-500">by {{ post.user.user.username }}</p>
                     </div>
                     <p class="text-gray-700 mb-4">{{ post.content|truncatewords:20 }}</p>
-                    <p class="text-gray-500 text-sm">
-                        <i class="fas fa-thumbs-up"></i> {{ post.totalLike }}  <!-- Jumlah like -->
-                        <i class="fas fa-thumbs-down ml-4"></i> {{ post.totalDislike }} <!-- Jumlah dislike -->
-                    </p>
                     <a href="{% url 'yogforum:viewforum' post_id=post.id %}" class="text-blue-500 hover:underline">Read more</a>
                 </div>
             {% endfor %}
