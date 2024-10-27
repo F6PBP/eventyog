@@ -19,6 +19,7 @@ from django.shortcuts import redirect
 def main(request: HttpRequest) -> HttpResponse:
     user_profile = UserProfile.objects.get(user=request.user)
     events = Event.objects.all()
+
     query = request.GET.get('q')
     category = request.GET.get('category')
 
@@ -27,7 +28,7 @@ def main(request: HttpRequest) -> HttpResponse:
 
     if category:
         events = events.filter(category=category)
-
+        
     context = {
         'user': request.user,
         'user_profile': user_profile,
@@ -36,6 +37,7 @@ def main(request: HttpRequest) -> HttpResponse:
         'is_admin': user_profile.role == 'AD' if user_profile else False,
         'events': events,
     }
+
     return render(request, 'yogevent.html', context)
 
 def show_event_xml(request):    
@@ -78,7 +80,7 @@ def create_event_entry_ajax(request):
 
     end_time = end_time if end_time != "" else None
 
-    if title == "" or description == "" or location == "" or image_url == "":
+    if title == "" or description == "" or location == "" or category =="":
         return JsonResponse({'status': False, 'message': 'Invalid input'})
 
     if end_time and start_time >= end_time:
@@ -128,20 +130,54 @@ def edit_event(request, uuid):
 
     event = get_object_or_404(Event, uuid=uuid) 
     user_profile = UserProfile.objects.get(user=request.user)
-    form = EventForm(request.POST or None, instance=event)
+    
 
-    if request.method == "POST" and form.is_valid():  
-        form.save()
+    if request.method == "POST":  
+        event.title = strip_tags(request.POST.get('title'))
+        event.description = strip_tags(request.POST.get('description'))
+        event.category = request.POST.get('category')
+        event.start_time = request.POST.get('start_time')
+        event.end_time = request.POST.get('end_time', '')
+        event.location = strip_tags(request.POST.get('location'))
+        event.image_urls = [request.POST.get('image_url')]
+        event.end_time = event.end_time if event.end_time != "" else None
+
+
+        if event.image_urls == [""]:
+            event.image_urls = []
+
+        if event.title == "" or event.category == "":
+            return render(request, "error.html", {
+                "message":"judul atau kategori tidak boleh kosong",
+                'user': request.user,
+                'user_profile': user_profile,
+                'image_url': user_profile.profile_picture,
+                'show_navbar': True,
+                'show_footer': True,
+                'is_admin': user_profile.role == 'AD' if user_profile else False,
+                })
+
+        if event.end_time and event.start_time >= event.end_time:
+            return render(request, "error.html", {
+                "message":"Acara berakhir sebelum dimulai.",
+                'user': request.user,
+                'user_profile': user_profile,
+                'image_url': user_profile.profile_picture,
+                'show_navbar': True,
+                'show_footer': True,
+                'is_admin': user_profile.role == 'AD' if user_profile else False,
+                })
+        
+        event.save()
         return HttpResponseRedirect(reverse('yogevent:main'))
-
+    
     context = {
         'user': request.user,
         'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
-        'event': event,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
-        'form': form,
+        'event': event,
     }
 
     return render(request, "edit_event.html", context)

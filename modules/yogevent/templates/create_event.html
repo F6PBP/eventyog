@@ -1,7 +1,7 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
     <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto">
-        <form method="post" action="{% url 'yogevent:create_event_entry_ajax' %}" id="event-form">
+        <form method="POST" action="{% url 'yogevent:create_event_entry_ajax' %}" id="event-form">
             {% csrf_token %}
             <div class="p-5 w-full">
                 <!-- Title Input -->
@@ -93,7 +93,6 @@
                 body: formData,
             })
             .then(response => {
-                console.log("Response status: ", response.status)
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -103,13 +102,11 @@
                 if (data.status) {
                     window.location.href = "{% url 'yogevent:main' %}";
                 } else {
-                    console.log(data.message)
                     document.getElementById("responseContainer").style.display = "block";
                     document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 alert('An error occurred: ' + error.message);
             });
         });

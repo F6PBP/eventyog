@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mx-auto mt-32">
-    <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row">
+    <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row ">
         <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
             {% if event.image_urls %}
                 <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
