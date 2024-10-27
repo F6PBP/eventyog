@@ -49,3 +49,50 @@
     </div>
 {% endif %}
 
+<script>
+    function likeReply(id) {
+        fetch(`/yogforum/like_reply/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+
+                if (data.disliked) {
+                    document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+                }
+
+                document.getElementById(`like-button-${id}`).classList.add('liked');
+                document.getElementById(`dislike-button-${id}`).classList.remove('disliked');
+            }
+        });
+    }
+
+    function dislikeReply(id) {
+        fetch(`/yogforum/dislike_reply/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+
+                if (data.liked) {
+                    document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+                }
+
+                document.getElementById(`dislike-button-${id}`).classList.add('disliked');
+                document.getElementById(`like-button-${id}`).classList.remove('liked');
+            }
+        });
+    }
+</script>
