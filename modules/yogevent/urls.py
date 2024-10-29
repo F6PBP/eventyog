@@ -21,6 +21,5 @@ urlpatterns = [
     path('book-event', book_event, name='book_event'),
     path('cancel-book', cancel_book, name='cancel_book'),
     path('ticket-prices/<uuid:uuid>/', ticket_price_list, name='ticket_price_list'),
-    
     path('buy-ticket', buy_ticket, name='buy_ticket'),
 ]

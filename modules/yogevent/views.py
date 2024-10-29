@@ -1,8 +1,4 @@
-from django.utils import timezone
-from datetime import datetime
-from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect, reverse
-from modules.yogevent.forms import EventForm, TicketPriceForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
@@ -24,7 +20,7 @@ def main(request: HttpRequest) -> HttpResponse:
     category = request.GET.get('category')
 
     if query:
-        events = events.filter(Q(title__icontains=query))
+        events = events.filter(Q(title__iexact=query))
     
     if category:
         events = events.filter(category=category)
@@ -119,7 +115,6 @@ def get_events_by_queries(request):
         events = events.filter(end_time__lte=end_time)
 
     for event in events:
-        # Set image urls 
         if event.image_urls:
             event.image_urls = event.image_urls[0]
         else:
@@ -179,11 +174,9 @@ def create_event_entry_ajax(request):
     description = strip_tags(request.POST.get('description'))
     category = request.POST.get('category')
     start_time = request.POST.get('start_time')
-    end_time = request.POST.get('end_time', '')
+    end_time = request.POST.get('end_time')
     location = strip_tags(request.POST.get('location'))
-    image_url = strip_tags(request.POST.get('image_url'))
-
-    end_time = end_time if end_time else None
+    image_url = [strip_tags(request.POST.get('image_url'))] if request.POST.get('image_url') else []
 
     if not title or not category or not start_time:
         return JsonResponse({'status': False, 'message': 'Invalid input'})
@@ -199,7 +192,7 @@ def create_event_entry_ajax(request):
             start_time=start_time,
             end_time=end_time,
             location=location,
-            image_urls=[image_url]
+            image_urls=image_url
         )
         new_event.save()
         return JsonResponse({'status': True, 'message': 'Event created successfully.'})
@@ -363,16 +356,12 @@ def edit_event(request, uuid):
         event.start_time = request.POST.get('start_time')
         event.end_time = request.POST.get('end_time', '')
         event.location = strip_tags(request.POST.get('location'))
-        event.image_urls = [request.POST.get('image_url')]
-        event.end_time = event.end_time if event.end_time != "" else None
+        event.image_urls = [strip_tags(request.POST.get('image_url'))] if request.POST.get('image_url') else []
+        event.end_time = event.end_time
 
-
-        if event.image_urls == [""]:
-            event.image_urls = []
-
-        if event.title == "" or event.category == "":
+        if event.title == "" or event.category == "" or event.start_time == "" or event.end_time == "":
             return render(request, "error.html", {
-                "message":"judul atau kategori tidak boleh kosong",
+                "message":"judul atau kategori atau tanggal tidak boleh kosong",
                 'user': request.user,
                 'user_profile': user_profile,
                 'image_url': user_profile.profile_picture,
@@ -434,7 +423,7 @@ def add_rating(request, event_id):
     }
     return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
 
-def create_rating_event(request, event_id): #Kemungkinan akan dihapus tapi keep dulu
+def create_rating_event(request, event_id):
     event = get_object_or_404(Event, uuid=event_id)
     average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
     user_profile = getattr(request.user, 'userprofile', None)
@@ -483,25 +472,6 @@ def ticket_price_list(request, event_id):
         'ticket_prices': ticket_prices,
     }
     return render(request, 'ticket_price_list.html', context)
-
-def add_ticket_price(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-
-    if request.method == 'POST':
-        form = TicketPriceForm(request.POST)
-        if form.is_valid():
-            ticket_price = form.save(commit=False)
-            ticket_price.event = event
-            ticket_price.save()
-            return redirect('ticket_price_list', event_id=event.id)
-    else:
-        form = TicketPriceForm()
-
-    context = {
-        'event': event,
-        'form': form,
-    }
-    return render(request, 'add_ticket_price.html', context)
 
 @check_user_profile()
 def buy_ticket(request):

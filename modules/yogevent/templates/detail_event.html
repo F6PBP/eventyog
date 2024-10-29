@@ -69,8 +69,6 @@
                 {% endif %}
             {% endif %}
             
-
-            
         </div>
     </div>
     <hr class="my-10">
@@ -152,7 +150,7 @@
         .catch(error => console.error('There was a problem with the fetch operation:', error));
     }
 
-    {% comment %} function buy_ticket() {
+    function buy_ticket() {
         const formData = new FormData();
         formData.append('event_uuid', "{{ event.uuid }}");
 
@@ -170,7 +168,6 @@
         })
         .then(data => console.log(data))
         .catch(error => console.error('There was a problem with the fetch operation:', error));
-    } {% endcomment %}
-
+    } 
 </script>
 {% endblock %}

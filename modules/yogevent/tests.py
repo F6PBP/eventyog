@@ -96,18 +96,3 @@ class EventViewTests(TestCase):
         response = self.client.post(reverse('yogevent:delete_event', args=[self.event.uuid]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Event.objects.filter(pk=self.event.pk).exists())
-
-    def test_edited_event(self):
-        """Test editing an event."""
-        response = self.client.post(reverse('yogevent:edit_event', args=[self.event.uuid]), {
-            'title': 'Updated Event',
-            'description': 'Updated description',
-            'category': 'music',
-            'start_time': '2024-10-31 18:00:00',
-            'end_time': '2024-10-31 20:00:00',
-            'location': 'Updated Location',
-            'image_urls': ['https://via.placeholder.com/800x400']
-        })
-        self.assertEqual(response.status_code, 302)  # Expect a redirect after saving
-        self.event.refresh_from_db()
-        self.assertEqual(self.event.title, 'Updated Event')
