@@ -88,6 +88,7 @@
                                         </p>
                                     </div>
                                 </div>
+                                {% if is_admin %}
                                 <div class="absolute top-2 right-2 flex space-x-1"> 
                                     <a href="edit-event/${event.uuid}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 transition duration-300 shadow-md">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -100,6 +101,7 @@
                                         </svg>
                                     </a>
                                 </div> 
+                                {% endif %}
                             </a>
                         </div>
                         `;
