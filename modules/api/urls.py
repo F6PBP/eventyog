@@ -3,5 +3,5 @@ from .views import admin_views, auth_views, cart_views, detail_event_views, even
 app_name = 'api'
 
 urlpatterns = [
-    path('auth/', auth_views.main, name='auth'),
+    path('auth/login/', auth_views.login, name='auth'),
 ]
