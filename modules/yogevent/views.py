@@ -69,25 +69,15 @@ def main(request: HttpRequest) -> HttpResponse:
     return render(request, 'yogevent.html', context)
 
 def show_event_xml(request):    
-    user_profile = UserProfile.objects.get(user=request.user)
-    if user_profile:
-        events = Event.objects.filter(userprofile=user_profile)
-    else:
-        events = Event.objects.all()
-
+    events = Event.objects.all()
     return HttpResponse(serializers.serialize("xml", events), content_type="application/json") 
 
 def show_event_json(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-    if user_profile:
-        events = Event.objects.filter(userprofile=user_profile)
-    else:
-        events = Event.objects.all()
-
+    events = Event.objects.all()
     return HttpResponse(serializers.serialize("json", events), content_type="application/json") 
 
 def show_xml_event_by_id(request, id):
-    data = Event.objects.filter(pk=id)  # Cari event berdasarkan primary key
+    data = Event.objects.filter(pk=id)
     return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
 
 def show_json_event_by_id(request, id):
@@ -183,6 +173,9 @@ def create_event_entry_ajax(request):
 
     if end_time and start_time >= end_time:
         return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
+    
+    if not image_url.endswith(('.jpg', '.jpeg', '.png')):
+        return JsonResponse({'status': False, 'message': "Thumbnail must be a valid image URL (.jpg, .jpeg, .png)."})
 
     try:
         new_event = Event(
@@ -277,22 +270,13 @@ def detail_event(request, uuid):
 def book_event(request):
     event_id = request.POST.get('event_uuid')
     ticket_name = request.POST.get('ticket_name')
-    
-    print(event_id)
-    
     event = Event.objects.get(uuid=event_id)
-    
-    print(event)
-    
     tickets = TicketPrice.objects.filter(event=event)
     user_profile = request.user_profile
     
     # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets.exclude(price=0)
-
-    print(tickets)
-
     if (len(tickets) == 0):
         tickets = None
     
