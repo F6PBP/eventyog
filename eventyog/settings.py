@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'modules.main',
+    'modules.api',
     'modules.authentication',
     'modules.yogpost',
     'modules.cart',
