@@ -58,12 +58,14 @@ class Command(BaseCommand):
         with open(f'{self.path}product-dataset.json', 'r', errors='ignore') as file:
             data = json.load(file)
             for row in data:
+                random_event = self.events[random.randint(0, len(self.events) - 1)]
                 try:
                     merch = Merchandise.objects.create(
                         image_url=row['image_url'],
                         name=row['name'],
                         description=row['description'],
                         price=row['price'],
+                        related_event=random_event
                     )
                     merch.save()
                 except Exception as e:
@@ -105,7 +107,10 @@ class Command(BaseCommand):
                     bio=row['bio'],
                     categories='',
                 )
-                for event in self.events:
+                
+                tickets = TicketPrice.objects.all()
+                
+                for event in tickets:
                     user_profile.registeredEvent.add(event)
                     
                 user.save()
@@ -150,11 +155,12 @@ class Command(BaseCommand):
                 )
                 
                 eventcart.save()
-        
+
+        tickets = TicketPrice.objects.all()
         for user in users:
             for merch in merchs[:10]:
                 user.boughtMerch.add(merch)
-            for event in self.events[:10]:
+            for event in tickets[:10]:
                 user.registeredEvent.add(event)
             user.save()
             

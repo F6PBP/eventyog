@@ -1,72 +1,71 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<section class="my-48 px-10 md:px-20 lg:px-32 ">
-    <h1 class="font-bold text-3xl mb-2">My Cart</h1>
+<section class="my-20 px-5 sm:px-10 md:px-20 lg:px-32">
+    <h1 class="font-bold text-2xl sm:text-3xl mb-2">My Cart</h1>
 
-    <div class="font-semibold text-lg my-10">
+    <div class="font-semibold text-lg my-5 sm:my-10">
         Wallet Balance: <span id="wallet-balance">{{ user_profile.wallet }}</span>
     </div>
 
     <!-- Event Items -->
     {% if not cart_events and not cart_merch %}
-        <div class="grid place-items-center text-center">
-            <img src={% static "assets/eventyog-icon-text.png" %} alt="" class="w-[400px] md:w-[500px]">
-        </div><br>
-        Maaf Event dan Merchandise Belum Tersedia, Mohon pilih sebuah <span class="font-bold">EventYog</span> terlebih dahulu
+        <p>No items in your cart.</p>
     {% else %}
         <div class="max-h-[500px] overflow-y-auto">
             {% if cart_events %}
-                <h2 class="text-xl font-semibold mb-4">Event Tickets</h2>
+                <h2 class="text-lg sm:text-xl font-semibold mb-4">Event Tickets</h2>
+                <div class="grid grid-cols-3 sm:grid-cols-5 px-5 sm:px-10">
+                    <h3 class="col-span-2 sm:col-span-4">Item</h3>
+                    <h3>Total Price</h3>
+                </div>
+                <hr class="my-5">
                 {% for event in cart_events %}
-                <div class="border border-gray-300 p-4 mb-5 rounded-lg flex justify-between items-center">
-                    <div class="flex justify-between items-center w-full">
-                        <div class="flex flex-col w-3/5">
-                            <h1 class="text-xl font-semibold mb-4">{{ event.ticket.event.title }}</h1>
-                            <span class="font-bold mb-1">{{ event.ticket.name }}</span>
-                            <span>Ticket Price: {{ event.ticket.price }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button class="bg-green-600 text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('event', {{ event.id }}, 'decrease')">-</button>
-                            <span id="quantity-event-{{ event.id }}">{{ event.quantity }}</span>
-                            <button class="bg-green-600 text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('event', {{ event.id }}, 'increase')">+</button>
-                        </div>
-                        <div class="font-bold w-1/5">
-                            Total<span id="price-event-{{ event.id }}">{{ event.totalPrice }}</span>
+                    <div class="p-5 sm:p-10 mb-5 rounded-lg flex flex-col sm:flex-row justify-between items-center hover:bg-gray-100 duration-300">
+                        <div class="flex flex-col sm:flex-row justify-between items-center w-full grid grid-cols-2 sm:grid-cols-5 gap-4">
+                            {% if event.image_url %}
+                                <img src="{{ event.image_url }}" alt="" class="w-full sm:w-auto max-w-[150px] sm:max-w-[200px] max-h-[100px] sm:max-h-[150px] rounded-xl">
+                            {% else %}
+                                <img src='https://via.placeholder.com/800x400' alt="" class="w-full sm:w-auto max-w-[150px] sm:max-w-[200px] max-h-[100px] sm:max-h-[150px] rounded-xl">
+                            {% endif %}
+                            <div class="flex flex-col col-span-2 sm:col-span-3">
+                                <h1 class="text-lg sm:text-xl font-semibold mb-2">{{ event.ticket.event.title }}</h1>
+                                <span class="font-bold mb-1">{{ event.ticket.name }}</span>
+                                <span>Ticket Price: {{ event.ticket.price }}</span>
+                            </div>
+                            <div class="font-bold w-full sm:w-1/5">
+                                Rp<span id="price-event-{{ event.id }}">{{ event.ticket.price }}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
                 {% endfor %}
             {% endif %}
 
             <!-- Merchandise Items -->
             {% if cart_merch %}
-                <div class="grid grid-cols-5 px-10">
-                    <h3 class="col-span-3">Item</h3>
+                <h2 class="text-lg sm:text-xl font-semibold mb-4">Merchandise</h2>
+                <div class="grid grid-cols-3 sm:grid-cols-5 px-5 sm:px-10">
+                    <h3 class="col-span-2 sm:col-span-3">Item</h3>
                     <h3>Quantity</h3>
                     <h3>Total Price</h3>
                 </div>
                 <hr class="my-5">
                 {% for merch in cart_merch %}
-                    <div class="p-10 mb-5 rounded-xl flex justify-between items-center hover:bg-gray-100 duration-300">
-                        <div class="grid grid-cols-5 w-full">
-                            <div class="flex items-center ">
-                                <img 
-                                    src="{{ merch.image_url }}" 
-                                    alt=""
-                                    class="max-w-[200px] max-h-[150px]"
-                                >
+                    <div class="p-5 sm:p-10 mb-5 rounded-xl flex flex-col sm:flex-row justify-between items-center hover:bg-gray-100 duration-300">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 w-full gap-4">
+                            <div class="flex items-center justify-center">
+                                <img src="{{ merch.image_url }}" alt="" class="w-full sm:w-auto max-w-[150px] sm:max-w-[200px] max-h-[100px] sm:max-h-[150px]">
                             </div>
-                            <div class="flex flex-col w-3/5 col-span-2">
-                                <span class="font-bold text-xl">{{ merch.merchandise.name }}</span>
+                            <div class="flex flex-col col-span-2 sm:col-span-2">
+                                <span class="font-bold text-lg sm:text-xl">{{ merch.merchandise.name }}</span>
                                 <span>Rp{{ merch.merchandise.price }}</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-center gap-2">
                                 <button class="bg-[#0047FE] text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('merch', {{ merch.id }}, 'decrease')">-</button>
                                 <span id="quantity-merch-{{ merch.id }}">{{ merch.quantity }}</span>
                                 <button class="bg-[#0047FE] text-white border-none py-1 px-3 text-lg rounded cursor-pointer hover:bg-green-500" onclick="updateQuantity('merch', {{ merch.id }}, 'increase')">+</button>
                             </div>
-                            <div class="font-bold flex items-center">
+                            <div class="font-bold flex items-center justify-center">
                                 Rp<span id="price-merch-{{ merch.id }}">{{ merch.totalPrice }}</span>
                             </div>
                         </div>
@@ -75,22 +74,24 @@
             {% endif %}
         </div>
 
-        <!-- Total Price -->
-        <div class="text-right font-bold text-xl mt-2">
-            Total Price: <span id="total-price">{{ total_price }}</span>
+        <!-- Price Details & Checkout Button -->
+        <div class="flex flex-col items-end mt-5">
+            {% include "ds/button.html" with text="Empty Cart" icon="fa fa-trash" variant="danger" class="w-fit" onclick="emptyCart();" %}
+            <div class="text-right font-bold text-lg sm:text-xl mt-2">
+                Total Price: <span id="total-price">{{ total_price }}</span>
+            </div>
+            <div class="text-right font-semibold text-lg">
+                Remaining Balance: <span id="remaining-balance">{{ remaining_balance }}</span>
+            </div>
         </div>
 
-        <div class="text-right font-semibold text-lg">
-            Remaining Balance: <span id="remaining-balance">{{ remaining_balance }}</span>
-        </div>
-
-        <!-- Checkout Button -->
         <div class="flex justify-center mt-5">
-            {% include "ds/button.html" with text="Checkout" class="w-fit h-fit" id="checkoutButton" %}
+            {% include "ds/button.html" with text="Checkout" class="w-fit h-fit" id="checkoutButton"%}
         </div>
     {% endif %}
 </section>
 
+<!-- Existing script unchanged -->
 <script>
     document.getElementById('checkoutButton').addEventListener('click', function(event) {
         event.preventDefault();
@@ -99,8 +100,9 @@
             return parseFloat(priceStr.replace(/\./g, '').replace(',', '.'));
         }
 
-        const walletBalance = parsePrice(document.getElementById('wallet-balance').innerText);
-        const totalPrice = parsePrice(document.getElementById('total-price').innerText);
+    // Check if the wallet balance is enough for the total price
+    const walletBalance = parsePrice(document.getElementById('wallet-balance').innerText);
+    const totalPrice = parsePrice(document.getElementById('total-price').innerText);
 
         if (walletBalance < totalPrice) {
             showToast("Insufficient wallet balance.", "error");
@@ -128,6 +130,7 @@
 
             if (data.success) {
                 showToast("Checkout successful!", "success");
+                window.location.reload();
                 document.getElementById('wallet-balance').innerText = formatPrice(data.new_wallet_balance);
                 document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance - totalPrice);
             } else {
@@ -171,9 +174,9 @@
         {% for event in cart_events %}
             console.log(`create for id {{event.id}} and quantity {{event.quantity}}`);
             localCart.event[{{ event.id }}] = {
-                quantity: {{ event.quantity }},
+                id: {{ event.id }},
                 pricePerItem: {{ event.ticket.price }},
-                totalPrice: {{ event.totalPrice }}
+                totalPrice: {{ event.totalPrice }},
             };
             
         {% endfor %}
@@ -182,7 +185,8 @@
             localCart.merch[{{ merch.id }}] = {
                 quantity: {{ merch.quantity }},
                 pricePerItem: {{ merch.merchandise.price }},
-                totalPrice: {{ merch.totalPrice }}
+                totalPrice: {{ merch.totalPrice }},
+                id: {{ merch.merchandise.id }}
             };
         {% endfor %}
     }
@@ -190,7 +194,6 @@
     function updateQuantity(type, id, action) {
         console.log(`${localCart[type][id].totalPrice}`);
         const cartItem = localCart[type][id];
-
 
         if (!cartItem) return;
 
@@ -243,7 +246,7 @@
         let remaining = initialWalletBalance;
 
         for (const eventId in localCart.event) {
-            totalPrice += localCart.event[eventId].totalPrice;
+            totalPrice += localCart.event[eventId].pricePerItem;
         }
         for (const merchId in localCart.merch) {
             totalPrice += localCart.merch[merchId].totalPrice;
@@ -260,6 +263,26 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(price);
+    }
+
+    function emptyCart() {
+        alert("Are you sure you want to empty your cart?");
+
+        fetch("{% url 'cart:empty_cart' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.error);
+            }
+        })
+        
     }
 </script>
 

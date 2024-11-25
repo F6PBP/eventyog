@@ -36,7 +36,7 @@ PRODUCTION = os.getenv('PROD') == "True"
 DEBUG = not PRODUCTION
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1', 'andrew-devito-eventyog.pbp.cs.ui.ac.id']
 
 # Application definition
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'modules.main',
+    'modules.api',
     'modules.authentication',
     'modules.yogpost',
     'modules.cart',
@@ -175,7 +176,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  # Make sure to adjust the path as needed
 
 cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+    cloud_name=os.getenv('CLOUDINARY_NAME', 'mxgpapp'),
+    api_key=os.getenv('CLOUDINARY_API_KEY', '378869596434125'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', 'RqY1H1Yqi4JysBVrTUaasuIWFes')
 )

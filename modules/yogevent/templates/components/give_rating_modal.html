@@ -1,0 +1,50 @@
+{% extends "ds/modal.html" %} 
+{% block modal_body %}
+<form
+    id="ratingForm"
+    method="POST"
+    action="{% url 'yogevent:add_rating' event.uuid %}"
+    class="w-full px-5 flex flex-col gap-4"
+>   
+    {% csrf_token %}
+    <label for="rating">Rating:</label>
+    <select
+        name="rating"
+        id="rating"
+        class="w-fit"
+    >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    {% include "ds/textarea.html" with name="review" class="w-full min-h-[200px]" placeholder="Write your review here!" %}
+    {% comment %} <button type="submit">Tambahkan Rating</button> {% endcomment %}
+</form>
+<script>
+    function submitRating() {
+        const form = document.getElementById("ratingForm");
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            alert("An error occurred. Please try again.");
+        });
+    }
+</script>
+{% endblock modal_body %}

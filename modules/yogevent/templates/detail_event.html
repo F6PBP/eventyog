@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mx-auto mt-32">
-    <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row">
+<div class="px-10 md:20 lg:px-32 my-48">
+    <div class="rounded-lg flex flex-col md:flex-row">
         <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
             {% if event.image_urls %}
                 <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
             {% else %}
-                <img class="w-full max-w-lg object-cover rounded-lg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFI7ygT65aVwQcrF_RPAqJQvfDXby3GVDyng&s" alt="{{ event.title }}">
+                <img class="w-full max-w-lg object-cover rounded-lg" 
+                    src="https://via.placeholder.com/800x400"
+                alt="{{ event.title }}">
             {% endif %}
         </div>
 
@@ -26,17 +28,149 @@
 
             <div class="rating-section mt-5">
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
-                <p id="averageRating">Average Rating: {{ total_rating.average_rating }}/5</p>
+                <p id="averageRating">{{ average_rating }} / 5.0</p>
             </div>
 
-            <div class="mt-5 flex justify-between">
-                <a href="{% url 'yogevent:main' %}" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200">Back to Events</a>
-            </div>
+            {% if is_rated and first_rating and is_booked %}
+                <div class="mt-4">
+                    <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
+                    <div class="">
+                        <b>
+                            {{first_rating.rating}}.0 / 5.0,
+                        </b>
+                        <span class="text-gray-500">
+                            {{first_rating.review}}
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if is_in_cart %}
+            <a href="{% url 'cart:main' %}">
+                {% include "ds/button.html" with text="Complete payment" %}
+            </a>
+            {% else %}
+                {% if is_booked %}
+                    <div class="flex gap-2">
+                        {% if not is_rated %}
+                            {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" id="openModalButton" specify="give-rating-modal" %}
+                            {% include "components/give_rating_modal.html" with modal_id="give-rating-modal" modal_title="Give Rating" modal_label="modal-label" onsubmit="submitRating" %}
+                        {% endif %}
+
+                        {% include "ds/button.html" with text="Cancel Booking" class="w-fit mt-5 h-fit" icon="fa fa-x" variant="danger" onclick="onCancelBook();" %}
+                    </div>
+                {% else %}            
+                    {% if tickets %}
+                        {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
+                        {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" onsubmit="buy_ticket" %}
+                    {% else %}
+                        {% include "ds/button.html" with text="Book Event (Free)" class="w-fit mt-5" icon="fa fa-ticket" onclick="onBookFree();" %}
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            
+
+            
         </div>
     </div>
-    <div class="w-full">
-        {% include 'merchandise.html' %}
-    </div>
-    {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed inset-0 flex items-center justify-center z-50 bg-white overflow-y-auto" %}
+    <hr class="my-10">
+    {% include 'merchandise.html' %}
+    {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed flex items-center justify-center z-50 bg-white overflow-y-auto" %}
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const messageDisplay = document.getElementById("averageRating");
+
+        submitButton.addEventListener("click", function() {
+            fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    messageDisplay.textContent = data.error;
+                    messageDisplay.classList.add("text-red-500");
+                } else {
+                    messageDisplay.textContent = data.message;
+                    messageDisplay.classList.add("text-green-500");
+                    
+                    if (data.average_rating) {
+                        document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
+                    }
+                }
+            })
+            .catch(error => {
+                messageDisplay.textContent = "An error occurred. Please try again.";
+                messageDisplay.classList.add("text-red-500");
+            });
+        });
+    });
+    
+    function onBookFree() {
+        const formData = new FormData();
+        formData.append('ticket_name', '');
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:book_event' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Event booked successfully!', 'success');
+
+            location.reload();
+        })
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+
+    function onCancelBook() {
+        const formData = new FormData();
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:cancel_book' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Booking cancelled successfully!', 'success');
+            window.location.reload();
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+
+    {% comment %} function buy_ticket() {
+        const formData = new FormData();
+        formData.append('event_uuid', "{{ event.uuid }}");
+
+        fetch("{% url 'yogevent:ticket_price_list' event.uuid %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            showToast('Buy Ticket!', 'success');
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+    } {% endcomment %}
+
+</script>
 {% endblock %}

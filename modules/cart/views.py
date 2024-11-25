@@ -17,15 +17,14 @@ def main(request: HttpRequest) -> HttpResponse:
     # Get the merchandise the user has bought
     buyedM = user_profile.boughtMerch.all()
 
-    # Print the bought events
-    # Print the bought merchandise
-    for merch in buyedM:
-        print(merch.image_url)  # or any other field in the Merchandise model
-
     # Calculate cumulative total price
     priceEvent = 0
     priceCart = 0
     for i in cart_events:
+        if i.ticket.event.image_urls:
+            i.image_url = i.ticket.event.image_urls[0]
+        else:
+            i.image_url = None
         priceEvent += i.totalPrice()
     
     for i in cart_merch:
@@ -61,7 +60,7 @@ def checkout(request):
     updated_merch = data.get('merch', {})
 
     # Calculate total cart price
-    total_price = sum(item['quantity'] * item['pricePerItem'] for item in updated_events.values()) + \
+    total_price = sum(1 * item['pricePerItem'] for item in updated_events.values()) + \
                   sum(item['quantity'] * item['pricePerItem'] for item in updated_merch.values())
 
     # Check if the wallet has enough balance
@@ -71,18 +70,19 @@ def checkout(request):
     # Update cart items
     cart_events = EventCart.objects.filter(user=user)
     cart_merch = MerchCart.objects.filter(user=user)
-
-    for event_cart in cart_events:
-        event_id = str(event_cart.id)
-        if event_id in updated_events:
-            event_cart.quantity = updated_events[event_id]['quantity']
-            event_cart.save()
-
-    for merch_cart in cart_merch:
-        merch_id = str(merch_cart.id)
-        if merch_id in updated_merch:
-            merch_cart.quantity = updated_merch[merch_id]['quantity']
-            merch_cart.save()
+    
+    # Reduce merchandise quantity
+    for item in updated_merch.values():
+        print(item)
+        merch = Merchandise.objects.get(id=item['id'])
+        print(merch)
+        merch.quantity -= item['quantity']
+        merch.save()
+    
+    print(updated_events)
+    # Empty cart
+    cart_events.delete()
+    cart_merch.delete()
 
     # Deduct total price from wallet and save
     user_profile.wallet -= total_price
@@ -90,3 +90,14 @@ def checkout(request):
 
     # Return success response with updated wallet balance
     return JsonResponse({'success': True, 'new_wallet_balance': user_profile.wallet})
+
+@check_user_profile()
+def empty_cart(request):
+    user = request.user
+    cart_events = EventCart.objects.filter(user=user)
+    cart_merch = MerchCart.objects.filter(user=user)
+
+    cart_events.delete()
+    cart_merch.delete()
+
+    return JsonResponse({'success': True})

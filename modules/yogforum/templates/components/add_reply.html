@@ -2,21 +2,18 @@
 {% block modal_body %}
     <form method="POST" id="replyPostForm" action="{% url 'yogforum:add_reply' forum_post.id %}" class="space-y-4 p-6">
         {% csrf_token %}
-        <!-- Reply to the post author -->
+
+        <!-- Updated to reply to the user instead of the title -->
         <div class="mt-2">
-            <h2 class="text-lg font-semibold">Reply to {{ forum_post.user.user.username }}</h2>
+            <h2 class="text-lg font-semibold">Reply to {{ forum_post.user.user.username }}</h2> <!-- Reply to the post author -->
         </div>
-
-        <!-- Textarea for the reply content -->
-        <textarea name="content" placeholder="Your Reply" class="w-full p-2 border border-gray-300 rounded-lg" required></textarea>
-
-        <!-- Submit button -->
-        <div class="mt-6 flex justify-end space-x-4">
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Reply to {{ forum_post.user.user.username }}
-            </button>
-        </div>
+        {% include "ds/textarea.html" with name="content" id="content" required="True" class="min-h-[200px] w-full" placeholder="Your reply goes here ..." %}
     </form>
+    <script>
+        function submitReplyForm() {
+            const form = document.getElementById('replyPostForm');
+            showToast('Replying to the post...', 'progress');
+            form.submit();
+        }
+    </script>
 {% endblock %}
-
-{% block modal_footer %}{% endblock %}

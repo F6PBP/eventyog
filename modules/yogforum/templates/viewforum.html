@@ -2,18 +2,25 @@
 {% load static %}
 {% block content %}
 <main class="w-full mb-20 px-10 md:20 lg:px-32 mt-32">
-    <div class="bg-gray-100 p-6 rounded-lg shadow-md mb-8 mt-4">
-        <!-- Profil pengguna dan Title -->
+    <div class="mt-10">
+        <a href="{% url 'yogforum:main' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Back
+        </a>
+    </div>
+    <div class="bg-gray-100 p-8 rounded-xl mb-8 mt-4">
         <div class="flex justify-between items-start">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-gray-300 rounded-full"></div> <!-- Placeholder untuk foto profil -->
+                {% if reply.user.profile_picture %}
+                    <img class="w-12 h-12 rounded-full" src="http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{{reply.user.profile_picture}}" alt="">
+                {% else %}
+                    <img class="w-12 h-12 rounded-full" src="https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png" alt="">
+                {% endif %}
                 <div>
-                    <h2 class="text-lg font-bold">{{ forum_post.title }}</h2> <!-- Adjusted font size -->
+                    <h2 class="text-lg font-bold">{{ forum_post.title }}</h2>
                     <p class="text-sm text-gray-500">by {{ forum_post.user.user.username }}</p>
                 </div>
             </div>
-    
-            <!-- Tombol Edit dan Delete -->
+
             {% if forum_post.user == request.user.userprofile %}
             <div class="flex space-x-2">
                 {% include "ds/button.html" with icon="fa fa-edit" text="Edit Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-1" variant="primary" %}
@@ -25,33 +32,33 @@
             </div>
             {% endif %}
         </div>
-    
-        <!-- Konten Post -->
+
         <p class="text-gray-700 mt-4 mb-2">{{ forum_post.content }}</p>
-    
-        <!-- Like/Dislike Section with timestamp -->
+
         <div class="flex justify-between items-center text-sm text-gray-500 mt-4">
-            <!-- Section kiri dengan waktu -->
             <div>
                 <p>{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
             </div>
-            <!-- Section tengah untuk like/dislike -->
             <div class="flex items-center space-x-4">
-                <span class="flex items-center space-x-1 gap-2">
-                    <i class="fas fa-thumbs-up"></i> {{ forum_post.totalLike }}
-                </span>
-                <span class="flex items-center space-x-1 gap-2">
-                    <i class="fas fa-thumbs-down"></i> {{ forum_post.totalDislike }}
-                </span>
+                <!-- Like Button -->
+                <button onclick="like({{ forum_post.id }})" class="flex items-center space-x-1 text-blue-500 hover:text-blue-700">
+                    <i class="fas fa-thumbs-up"></i> 
+                    <span id="like-count-{{ forum_post.id }}">{{ forum_post.totalLike }}</span>
+                </button>
+                
+                <!-- Dislike Button -->
+                <button onclick="dislike({{ forum_post.id }})" class="flex items-center space-x-1 text-red-500 hover:text-red-700">
+                    <i class="fas fa-thumbs-down"></i>
+                    <span id="dislike-count-{{ forum_post.id }}">{{ forum_post.totalDislike }}</span>
+                </button>
             </div>
         </div>
-    
-        <!-- Tombol reply dipindahkan ke bawah kanan -->
+
         <div class="flex justify-end mt-4">
-            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" id="openModalButton" specify="open-modal-2" variant="primary" %}
+            {% include "ds/button.html" with icon="fa fa-reply" text="Reply to this Post" class="w-fit h-fit" id="openModalButton" specify="open-modal-2" variant="primary" %}
         </div>
 
-        {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add a Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" %} 
+        {% include "components/add_reply.html" with modal_id="open-modal-2" modal_title="Add Reply" modal_class="w-[350px] max-w-[500px] lg:min-w-[1000px]" onsubmit="submitReplyForm"%} 
 
         <script>
             document.getElementById('replyPostForm').addEventListener('submit', function(e) {
@@ -137,17 +144,59 @@
     <h3 class="font-bold text-lg mb-4">Replies</h3>
     <div class="space-y-6">
         {% for reply in replies %}
-            <!-- Include template for replies with level 1 as starting point -->
             {% include "components/reply.html" with reply=reply level=1 %}
         {% endfor %}
     </div>
 
-    <!-- Button Back to Main Forum -->
-    <div class="mt-10 text-center">
-        <a href="{% url 'yogforum:main' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i> Back to Home
-        </a>
-    </div>
+
 </main>
+
+<script>
+    function like(id) {
+        fetch(`/yogforum/like_post/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+
+                if (data.disliked) {
+                    document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+                }
+
+                document.getElementById(`like-button-${id}`).classList.add('liked'); 
+                document.getElementById(`dislike-button-${id}`).classList.remove('disliked');
+            }
+        });
+    }
+
+    function dislike(id) {
+        fetch(`/yogforum/dislike_post/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
+
+                if (data.liked) {
+                    document.getElementById(`like-count-${id}`).textContent = data.total_likes;
+                }
+
+                document.getElementById(`dislike-button-${id}`).classList.add('disliked'); 
+                document.getElementById(`like-button-${id}`).classList.remove('liked'); 
+            }
+        });
+    }
+</script>
 
 {% endblock content %}

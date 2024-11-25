@@ -15,7 +15,7 @@ class UserProfile(models.Model):
     profile_picture = CloudinaryField('image', null=True, default=None, blank=True)
     categories = models.CharField(max_length=200, null=True, blank=True)
     
-    registeredEvent = models.ManyToManyField('Event', blank=True)
+    registeredEvent = models.ManyToManyField('TicketPrice', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
     friends = models.ManyToManyField('UserProfile', blank=True)
     
@@ -99,17 +99,16 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    merch = models.ManyToManyField('Merchandise', blank=True)
-    
     user_rating = models.ManyToManyField(Rating, blank=True)
     image_urls = models.JSONField(null=True, blank=True)
     
 class Merchandise(models.Model):
-    # id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     id = models.AutoField(primary_key=True)
     image_url = models.URLField(max_length=500)
     name = models.CharField(max_length=200)
     description = models.TextField()
+    related_event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='merchandise')
+    quantity = models.IntegerField(default=10)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -128,10 +127,10 @@ class Forum(models.Model):
         return self.title
     
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()
     
 class ForumReply(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -149,7 +148,7 @@ class ForumReply(models.Model):
 
         
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()

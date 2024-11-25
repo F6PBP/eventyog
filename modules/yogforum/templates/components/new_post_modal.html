@@ -1,6 +1,6 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
-    <div class="bg-white rounded-lg w-[350px] max-w-[350px] lg:min-w-[1000px] h-fit max-h-[500px] lg:max-h-[700px] p-6">
+    <div class="px-5">
         <form method="POST" id="addPostForm" action="{% url 'yogforum:add_post' %}">
             {% csrf_token %}
             <div class="mt-4">

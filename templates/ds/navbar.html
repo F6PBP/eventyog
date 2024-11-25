@@ -31,10 +31,10 @@
     </ul>
     {% if user.is_authenticated %}
         <div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
-        <p class="hidden lg:flex">Hello, {{user.username}}</p>
+        <p class="hidden lg:flex">Hello, {{request.user.username}}</p>
         <div class="w-8 h-8 bg-black rounded-full overflow-hidden">
             <img 
-                src="{% if image_url %}{{image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
+                src="{% if request.image_url %}{{request.image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
                 alt="profile" 
                 class="w-full h-full object-cover"
             >

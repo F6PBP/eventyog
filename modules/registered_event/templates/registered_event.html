@@ -1,24 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
-    <main class="my-32 mt-48 px-10 md:px-20 lg:px-32">
+    <main class="my-32 mt-48 px-4 sm:px-10 md:px-20 lg:px-32">
         <h1 class="font-bold text-3xl mb-2">Event History</h1>
         <h3 class="text-gray-500 text-lg mb-6">Relive your favorite events and memories</h3>
 
         <!-- Filter Form -->
-        <form id="filterForm" class="flex items-center mb-10 space-x-4">
-            <div>
+        <form id="filterForm" class="flex flex-col sm:flex-row items-center mb-10 space-y-4 sm:space-y-0 sm:space-x-4">
+            <div class="w-full sm:w-auto">
                 <label for="start_time" class="block text-sm font-medium text-gray-700">Filter by Start Time:</label>
-                <input type="date" id="start_time" name="start_time" 
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <div class="flex gap-4">
+                    <input type="date" id="start_time" name="start_time" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    {% include "ds/button.html" with type="submit" text="Apply Filter" class="w-full h-full sm:w-fit min-w-[200px]" %}
+                </div>
             </div>
-            <button type="submit" 
-                    class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Apply Filter
-            </button>
         </form>
 
         <!-- Event grid that will be populated via AJAX -->
-        <section id="eventGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <section id="eventGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <!-- AJAX loaded content goes here -->
         </section>
 
