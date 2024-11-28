@@ -77,7 +77,7 @@ def edit_merchandise(request, id):
 
     if form.is_valid() and request.method == "POST":
         form.save()
-        return HttpResponseRedirect(reverse('yogevent:main'))
+        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[merchandise.related_event.uuid]))
 
     context = {
         'form': form,
@@ -88,7 +88,7 @@ def edit_merchandise(request, id):
 def delete_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     merchandise.delete()
-    return HttpResponseRedirect(reverse('yogevent:main'))
+    return HttpResponseRedirect(reverse('yogevent:detail_event', args=[merchandise.related_event.uuid]))
 
 @check_user_profile()
 def showMerch_json(request, event_id: str):
@@ -131,9 +131,6 @@ def add_items_to_cart(request):
     print(items)
     
     merch_cart = MerchCart.objects.filter(user=request.user)
-    
-    # Make sure theres no duplicate merch in cart
-    # if duplicate, just update the quantity
     
     for item in items:
         merch = Merchandise.objects.get(pk=item['id'])
