@@ -38,6 +38,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1', 'andrew-devito-eventyog.pbp.cs.ui.ac.id']
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,6 +67,7 @@ INSTALLED_APPS = [
     'modules.registered_event',
     'whitenoise.runserver_nostatic',
     'cloudinary',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'eventyog.urls'

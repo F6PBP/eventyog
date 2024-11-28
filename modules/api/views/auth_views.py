@@ -14,10 +14,14 @@ def login(request):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)
+    
+    print(username, password)
+    
     if user is not None:
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
+            print('Login sukses!')
             return JsonResponse({
                 "username": user.username,
                 "status": True,
@@ -25,12 +29,14 @@ def login(request):
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
             }, status=200)
         else:
+            print('Login gagal, akun dinonaktifkan.')
             return JsonResponse({
                 "status": False,
                 "message": "Login gagal, akun dinonaktifkan."
             }, status=401)
 
     else:
+        print('Login gagal, periksa kembali email atau kata sandi.')
         return JsonResponse({
             "status": False,
             "message": "Login gagal, periksa kembali email atau kata sandi."
@@ -129,7 +135,6 @@ def onboarding(request):
             "message": "Invalid request method."
         }, status=400)
         
-
 @csrf_exempt        
 def profile(request):
     try:
