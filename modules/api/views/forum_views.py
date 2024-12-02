@@ -28,11 +28,14 @@ def like_post(request, id):
             disliked = True
 
     return JsonResponse({
-        'success': True,
-        'total_likes': post.totalLike(),
-        'liked': liked,
-        'disliked': disliked,
-        'total_dislikes': post.totalDislike() 
+        "status": True,
+        "message": "Berhasil Menyukai Post",
+        "data":{
+            "total_likes": post.totalLike(),
+            "liked": liked,
+            "disliked": disliked,
+            "total_dislikes": post.totalDislike()
+        }
     })
 
 @login_required
@@ -54,11 +57,14 @@ def dislike_post(request, id):
             liked = True
 
     return JsonResponse({
-        'success': True,
-        'total_dislikes': post.totalDislike(),
-        'disliked': disliked,
-        'liked': liked,
-        'total_likes': post.totalLike() 
+        "status": True,
+        "message": "Berhasil Dislike Post",
+        "data": {
+            'total_dislikes': post.totalDislike(),
+            'disliked': disliked,
+            'liked': liked,
+            'total_likes': post.totalLike()
+        }
     })
 
 @login_required
@@ -81,11 +87,14 @@ def like_reply(request, id):
             disliked = True
 
     return JsonResponse({
-        'success': True,
-        'total_likes': reply.totalLike(),
-        'total_dislikes': reply.totalDislike(),
-        'liked': liked,
-        'disliked': disliked,
+        "status": True,
+        "message": "Berhasil Like Reply",
+        "data": {
+            'total_likes': reply.totalLike(),
+            'total_dislikes': reply.totalDislike(),
+            'liked': liked,
+            'disliked': disliked,
+        }
     })
 
 @login_required
@@ -108,11 +117,14 @@ def dislike_reply(request, id):
             liked = True
 
     return JsonResponse({
-        'success': True,
-        'total_dislikes': reply.totalDislike(),
-        'total_likes': reply.totalLike(),
-        'disliked': disliked,
-        'liked': liked,
+        "status": True,
+        "message": "Berhasil Dislike Reply",
+        "data": {
+            'total_dislikes': reply.totalDislike(),
+            'total_likes': reply.totalLike(),
+            'disliked': disliked,
+            'liked': liked,
+        }
     })
 
 from eventyog.decorators import check_user_profile
@@ -131,7 +143,11 @@ def viewforum(request, post_id):
         'show_navbar': True,
         'show_footer': True,
     }
-    return render(request, 'viewforum.html', context)
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil View Forum",
+        "data": context
+    })
 
 def get_forum_by_ajax(request):
     search = request.GET.get('search')
@@ -168,6 +184,8 @@ def get_forum_by_ajax(request):
         })
     
     return JsonResponse({
+        "status": True,
+        "message": "Berhasil Get Forum",
         'forum_posts': temp
     })
 
