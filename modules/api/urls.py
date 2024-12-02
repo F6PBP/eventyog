@@ -5,4 +5,5 @@ app_name = 'api'
 urlpatterns = [
     path('auth/login/', auth_views.login, name='auth_login'),
     path('auth/register/', auth_views.register, name='auth_register'),
+    path('cart/', cart_views.main, name='cart'),
 ]
