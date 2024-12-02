@@ -8,13 +8,14 @@ from django.contrib import messages
 from modules.main.models import UserProfile
 from django.contrib.auth.decorators import login_required
 from eventyog.decorators import check_user_profile
+from eventyog.types import AuthRequest
 
 import datetime
 
 from .forms import UserProfileForm
 
 # Create your views here.
-def login_user(request):
+def login_user(request: AuthRequest):
     if (request.user.is_authenticated):return redirect('main:main')
     
     if request.method == 'POST':
@@ -69,6 +70,9 @@ def register(request):
 
 def onboarding(request):
     # Check if user has profile
+    if (request.user.is_authenticated == False):
+        return redirect('auth:login')
+    
     profile = UserProfile.objects.filter(user=request.user)
     if (len(profile) > 0):
         print('User has profile')
@@ -76,8 +80,6 @@ def onboarding(request):
         return redirect('main:main')
     elif (len(profile) == 0):
         print('User does not have profile')
-        
-    print("HELLOOOO")
         
     if request.method == 'POST':
         # Process the form data here
@@ -103,8 +105,8 @@ def onboarding(request):
 @check_user_profile(is_redirect=True)
 def profile(request):
     try:
-        if (request.user_profile.categories == None):
-            categories = []
+        if (request.user_profile.categories == ''):
+            categories = None
         else:
             categories = request.user_profile.categories.split(',')
             

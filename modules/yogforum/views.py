@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
 from modules.main.models import Forum, ForumReply
 from django.http import JsonResponse
-from django.http import HttpRequest, HttpResponse
-from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
@@ -113,20 +112,89 @@ def dislike_reply(request, id):
         'liked': liked,
     })
 
+from eventyog.decorators import check_user_profile
+from modules.main.models import UserProfile
+from django.utils.timesince import timesince
 
 def viewforum(request, post_id):
     forum_post = get_object_or_404(Forum, id=post_id)
-    replies = ForumReply.objects.filter(forum=forum_post)
-    return render(request, 'yogforum/viewforum.html', {'forum_post': forum_post, 'replies': replies})
+    
+    # Ambil semua reply yang terkait dengan post ini
+    replies = ForumReply.objects.filter(forum=forum_post, reply_to=None).order_by('created_at')
 
+    context = {
+        'forum_post': forum_post,
+        'replies': replies,
+        'show_navbar': True,
+        'show_footer': True,
+    }
+    return render(request, 'viewforum.html', context)
+
+def get_forum_by_ajax(request):
+    search = request.GET.get('search')
+    
+    forum_posts = Forum.objects.all().order_by('-created_at')
+    
+    if search:
+        forum_posts = Forum.objects.filter(title__icontains=search).order_by('-created_at')
+    
+        
+    for post in forum_posts:
+        post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+        if post.user.profile_picture:
+            post.user.profile_picture = f'{post.user.profile_picture}'
+    
+    temp = []
+    
+    for post in forum_posts:
+        replies_count = ForumReply.objects.filter(forum=post, reply_to=None).order_by('created_at').count()
+        user = UserProfile.objects.get(id=post.user.id)
+
+        print(user.user.username)   
+        
+        temp.append({
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'user': user.user.username,
+            'created_at': timesince(post.created_at),
+            'profile_picture': post.user.profile_picture,
+            'totalLike': post.totalLike(),    
+            'totalDislike': post.totalDislike(),
+            'comment_count': replies_count
+        })
+    
+    return JsonResponse({
+        'forum_posts': temp
+    })
+
+@check_user_profile()
 def main(request):
     # Ambil semua post
     forum_posts = Forum.objects.all().order_by('-created_at')
     
+    for post in forum_posts:
+        if post.user.profile_picture:
+            post.user.profile_picture = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{post.user.profile_picture}.jpg'
+        else:
+            post.user.profile_picture = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
+    top_creators = Forum.objects.values('user').annotate(total=Count('user')).order_by('-total')[:10]
+    
+    for creator in top_creators:
+        user = UserProfile.objects.get(id=creator['user'])
+        creator['username'] = user.user.username
+        if user.profile_picture:
+            creator['profile_picture'] = f'http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user.profile_picture}.jpg'
+        else:
+            creator['profile_picture'] = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+    
     context = {
         'forum_posts': forum_posts,
         'show_navbar': True,
-        'show_footer': True
+        'show_footer': True,
+        'is_admin': request.is_admin,
+        'top_creators': top_creators
     }
     return render(request, 'yogforum.html', context)
 

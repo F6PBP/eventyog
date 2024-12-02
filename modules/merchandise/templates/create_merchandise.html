@@ -1,0 +1,115 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto w-full">
+        <form id="merchandise-form" onsubmit="event.preventDefault(); submitCreateMerchForm();">
+            {% csrf_token %}
+            <div class="p-5 w-full h-full">
+                <!-- Image URL Input -->
+                <div class="mb-4 w-full">
+                    <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">
+                        Image Url
+                    </label>
+                    {% include "ds/input.html" with type="text" id="image_url" value=form.image_url.value name="image_url" placeholder="Image URL" required="True" %}
+                </div>
+
+                <!-- Name Input -->
+                <div class="mb-4 w-full">
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">
+                        Name
+                    </label>
+                    {% include "ds/input.html" with id="name" value=form.name.value name="name" placeholder="The name of the event" required="True" %}
+                    {% if form.name.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Description Input -->
+                <div class="mb-4 w-full">
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">
+                        Description
+                    </label>
+                    {% include "ds/textarea.html" with id="description" name="description" class="min-h-[200px] w-full" placeholder="The description goes here" value=form.description.value  %}
+                    {% if form.description.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Price Input -->
+                <div class="mb-4 w-full">
+                    <label for="price" class="block text-gray-700 text-sm font-bold mb-2">
+                        Price
+                    </label>
+                    {% include "ds/input.html" with type="number" id="price" name="price" value=form.price.value placeholder="Price" %}
+                    {% if form.price.errors %}
+                        <p class="text-red-500 text-xs italic">{{ form.price.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <div id="responseContainer" style="display: none;"></div>
+                
+                <div class="flex gap-4">
+                    <button
+                        class="flex items-center justify-center gap-2 w-full py-3 px-10 text-white text-xs md:text-sm font-semibold rounded-full h-full hover:scale-105 duration-300 bg-gray-500 text-white closeModalButton"
+                        data-modal-id="{{ modal_id }}"
+                        >
+                        Cancel
+                    </button>
+                    {% include "ds/button.html" with text="Create Merchandise" type="submit" %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function submitCreateMerchForm() {
+            const form = document.getElementById('merchandise-form');
+            const formData = new FormData(form);
+            eventId = "{{event.uuid}}"
+            formData.append("event_id", eventId);
+
+            fetch("{% url 'merchandise:create_merchandise_ajax' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+            })
+            .then(response => {
+                console.log(response);
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = "{% url 'merchandise:main' %}";
+                } else if (data.errors) {
+                    alert("Error in form submission: " + data.errors);
+                }
+            })
+            .catch(error => {
+                alert("An unexpected error occurred: " + error);
+            });
+            
+            modalId = 'open-modal-2';
+            closeModal(modalId)
+            
+            location.reload();
+            showToast('Merchandise created successfully!', 'success');
+        }
+
+        function closeEditModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            document.getElementById('merchandise-form').reset();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    </script>    
+{% endblock %}
+{% block modal_footer %}
+{% endblock modal_footer %}

@@ -1,1 +1,115 @@
-This is Yog Event
+{% extends "base.html" %}
+{% block content %}
+    <div class="p-4 md:p-8 mt-16 md:mt-32 h-full px-4 md:px-10 lg:px-32 my-24 md:my-48 space-y-6 md:space-y-10">
+        <!-- Main Heading -->
+        <div>
+            <h1 class="font-bold text-2xl md:text-3xl mb-2">Yog, Pilih Event!</h1>
+            <h3 class="text-gray-500 text-md md:text-lg">Your Gateway to Memorable Experiences</h3>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 md:gap-10">
+            <div class="min-w-full md:min-w-[200px]">
+                <h3 class="font-medium text-sm">Choose Event Category</h3>
+                <select name="category" id="category-select" class="py-2 md:py-3 px-3 md:px-4 pl-0 md:pl-0 border-none focus:outline-none focus:bg-transparent focus:border-transparent rounded-none font-semibold text-sm w-full md:w-auto">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.code }}" {% if request.GET.category == category.code %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="space-y-4 md:space-y-5 w-full">                
+                <!-- Event Grid Section -->
+                <div class="flex items-center gap-2">
+                    {% include "ds/input.html" with name="q" placeholder="Search events ..." value=request.GET.q class="w-full md:w-[500px]" id="search-bar" %}
+                </div>
+                <div id="no-events-message" class="hidden flex items-center justify-center w-full h-64">
+                    <p class="text-center text-gray-600">No events available at the moment.</p>
+                </div>
+                <div id="event-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mx-auto">
+                    {% comment %} {% for event in events %}
+                        {% include 'event_card.html' with event=event %}
+                    {% endfor %} {% endcomment %}
+                </div>
+        
+                <!-- Admin Controls -->
+                {% if is_admin %}
+                    {% include "ds/button.html" with icon="fa fa-plus" text="Create Event" class="w-fit h-fit fixed right-4 md:right-10 bottom-4 md:bottom-10 z-50" id="openModalButton" specify="open-modal-1" %}
+                    {% include "create_event.html" with modal_id="open-modal-1" modal_title="+ Create Event" modal_label="modal-label" onsubmit="submitCreateEventForm" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('category-select').addEventListener('change', function() {
+            updateFilters();
+        });
+
+        document.getElementById('search-bar').addEventListener('input', function() {
+            updateFilters();
+        });
+
+        function updateFilters() {
+            const selectedCategory = document.getElementById('category-select').value;
+            const searchQuery = document.getElementById('search-bar').value;
+            fetchEventData(selectedCategory, searchQuery);
+        }
+
+        async function fetchEventData(category_query = '', search_query = '') {
+            const eventGrid = document.getElementById('event-grid');
+            const noEventsMessage = document.getElementById('no-events-message');
+            eventGrid.innerHTML = ''; // Clear the grid before adding new events
+
+            let url = `/yogevent/get-event?category=${category_query}`;
+            if (search_query) {
+                url += `&q=${search_query}`;
+            }
+
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.events.length === 0) {
+                    noEventsMessage.classList.remove('hidden');
+                } else {
+                    noEventsMessage.classList.add('hidden');
+                    data.events.forEach(event => {
+                        const eventCard = `
+                            <a href="/yogevent/detail-event/${event.uuid}">
+                                <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden h-full">
+                                    <img 
+                                        src="${event.image_urls}" 
+                                        class="h-[200px] object-cover"
+                                        alt="">
+                                    <div class="flex gap-5 p-5 flex-grow">
+                                        <div class="flex flex-col items-center">
+                                            <h3 class="font-semibold text-[#3D37F1]">${event.month.slice(0, 3).toUpperCase()}</h3>
+                                            <h1 class="font-bold text-2xl">${event.day}</h1>
+                                        </div>
+                                        <div>
+                                            <h1 class="font-bold">${event.title}</h1>
+                                            <p class="text-sm font-regular line-clamp-3">
+                                                ${event.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                        eventGrid.insertAdjacentHTML('beforeend', eventCard);
+                    });
+                }
+            } else {
+                console.error('Failed to fetch event data');
+            }
+        }
+
+        // Call the function to fetch data when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedCategory = document.getElementById('category-select').value;
+            const searchQuery = document.getElementById('search-bar').value;
+            fetchEventData(selectedCategory, searchQuery);
+        });
+
+        
+
+    </script>
+{% endblock %}

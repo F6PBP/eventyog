@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="event-detail text-center">
+    <div class="font-bold text-xl mb-2 mt-32">{{ event.title }}</div>
+    <div class="average-rating">
+        <strong>Average Rating:</strong> <span id="average-rating">Loading...</span>
+    </div>
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'yogevent:add_rating' event.uuid %}" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md" id="rating-form">
+        {% csrf_token %}
+        
+        <div class="flex items-center mb-4">
+            <label for="rating" class="mr-2">Rate:</label>
+            <select name="rating" id="rating" class="border rounded p-1" required>
+                <option value="" disabled selected>Select a rating</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        
+        <!-- Review Textarea -->
+        <div class="mb-6">
+            <label for="review" class="block text-gray-700 font-semibold mb-2">Review</label>
+            <textarea name="review" id="review" rows="4" required 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    placeholder="Write your review here"></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center space-x-2">
+            <button type="submit" 
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Submit Rating
+            </button>
+            <a href="{% url 'yogevent:main' %}" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200">Back to Events</a>
+        </div>
+    </form>
+    {% else %}
+        <p>Anda harus login untuk memberikan rating.</p>
+    {% endif %}
+    <!-- Message placeholder for form submission -->
+    <p id="form-message"></p>
+</div>
+
+<style>
+    .comment-slide {
+        transition: opacity 0.5s ease;
+    }
+    .active {
+        display: block;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ratingsList = document.getElementById("ratings-list");
+        const formMessage = document.getElementById("form-message");
+        const averageRatingElement = document.getElementById("average-rating");
+
+        function loadRatings() {
+            fetch("{% url 'yogevent:load_event_ratings' event.uuid %}")
+                .then(response => response.json())
+                .then(data => {
+                    averageRatingElement.textContent = data.average_rating || "No ratings yet";
+                    ratingsList.innerHTML = "";
+                    data.ratings.forEach(rating => {
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `<br>${rating.review}`;
+                        ratingsList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading ratings:", error);
+                    ratingsList.innerHTML = "<li>Error loading ratings.</li>";
+                });
+        }
+
+        loadRatings(); // Load ratings initially
+
+        // Handle form submission with AJAX
+        document.getElementById("rating-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("{% url 'yogevent:add_rating' event.uuid %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    formMessage.textContent = data.message;
+                    formMessage.classList.add("text-green-500");
+                    loadRatings(); // Reload ratings
+                    this.reset(); // Reset the form after submission
+                    averageRatingElement.textContent = data.average_rating;
+                } else {
+                    formMessage.textContent = data.error;
+                    formMessage.classList.add("text-red-500");
+                }
+            })
+            .catch(error => {
+                console.error("Error submitting rating:", error);
+                formMessage.textContent = "An error occurred.";
+                formMessage.classList.add("text-red-500");
+            });
+        });
+    });
+</script>
+{% endblock %}

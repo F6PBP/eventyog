@@ -1,0 +1,113 @@
+{% extends "ds/modal.html" %}
+{% block modal_body %}
+    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px]">
+        <form id="event-form">
+            {% csrf_token %}
+            <div class="p-5 w-full flex flex-col gap-4">
+                <!-- Title Input -->
+                <div class="w-full">
+                    <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
+                    {% include "ds/input.html" with id="title" name="title" class="w-full" value=form.title.value required="True" placeholder="Title"%}
+                </div>
+                
+                <div class="w-full">
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                    {% include "ds/textarea.html" with id="description" name="description" class="w-full" placeholder="Description goes here" required="True" value=form.description.value class="min-h-[100px] w-full" %}
+                </div>
+                
+                <!-- Event Category Dropdown -->
+                 <div class="flex gap-2">
+                     <div class="w-full">
+                         <label for="category" class="block text-gray-700 text-sm font-bold">Event Category</label>
+                         <select name="category" id="category" class="shadow appearance-none border rounded-xl w-full px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                             <option value="OL">Olahraga</option>
+                             <option value="SN">Seni</option>
+                             <option value="MS">Musik</option>
+                             <option value="CP">Cosplay</option>
+                             <option value="LG">Lingkungan</option>
+                             <option value="VL">Volunteer</option>
+                             <option value="AK">Akademis</option>
+                             <option value="KL">Kuliner</option>
+                             <option value="PW">Pariwisata</option>
+                             <option value="FS">Festival</option>
+                             <option value="FM">Film</option>
+                             <option value="FN">Fashion</option>
+                             <option value="LN">Lainnya</option>
+                         </select>                                
+                     </div>
+                    <div class="w-full">
+                        <label for="location" class="block text-gray-700 text-sm font-bold">Location</label>
+                        {% include "ds/input.html" with id="location" name="location" placeholder="Event Location" %}
+                    </div>
+                 </div>
+
+                <!-- Event Start Time -->
+                <div class="w-full">
+                    <label for="start_time" class="block text-gray-700 text-sm font-bold">Start Time</label>
+                    {% include "ds/input.html" with type="datetime-local" id="start_time" name="start_time" required="True" class="w-full" %}
+                </div>
+
+                <!-- Event End Time -->
+                    <div class="w-full">
+                    <label for="start_time" class="block text-gray-700 text-sm font-bold">Start Time</label>
+                    {% include "ds/input.html" with type="datetime-local" id="end_time" name="end_time" required="True" class="w-full" %}
+                </div>
+
+                <!-- Image URL Input -->
+                <div class="mb-4">
+                    <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">Image URL</label>
+                    {% include "ds/input.html" with type="url" name="image_url" id="image_url" placeholder="https://example.com/image.jpg" %}
+                </div>
+
+                <div id="responseContainer" style="display: none;"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function submitCreateEventForm() {
+            form = document.getElementById('event-form');
+
+            if (form.checkValidity()) {
+                let formData = new FormData(form);
+            
+                fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                })
+                .then(response => {
+                    console.log("Response: ", response)
+                    console.log("Response status: ", response.status)
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    if (data.status) {
+                        window.location.href = "{% url 'yogevent:main' %}";
+                    } else {
+                        console.log(data.message)
+                        document.getElementById("responseContainer").style.display = "block";
+                        document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred: ' + error.message);
+                });
+            } else {
+                form.reportValidity();
+                throw new Error('Form is invalid');
+            }
+        }
+    </script>    
+{% endblock %}

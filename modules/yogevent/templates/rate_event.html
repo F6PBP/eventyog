@@ -1,0 +1,20 @@
+<div class="event-rating">
+    <h2>Rating Event</h2>
+    <p id="total-rating">Rating Keseluruhan: {{ total_rating }}/5</p>
+</div>
+
+<!-- Jika ada form untuk menambahkan rating -->
+<form method="POST" action="{% url 'yogevent:add_rating' event.uuid %}" class="w-full px-10">
+    {% csrf_token %}
+    <div>
+        <label for="rating">Rating:</label>
+        <select name="rating" id="rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button type="submit">Tambahkan Rating</button>
+    </div>
+</form>

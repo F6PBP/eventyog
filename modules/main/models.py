@@ -15,7 +15,7 @@ class UserProfile(models.Model):
     profile_picture = CloudinaryField('image', null=True, default=None, blank=True)
     categories = models.CharField(max_length=200, null=True, blank=True)
     
-    registeredEvent = models.ManyToManyField('Event', blank=True)
+    registeredEvent = models.ManyToManyField('TicketPrice', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
     friends = models.ManyToManyField('UserProfile', blank=True)
     
@@ -33,7 +33,7 @@ class UserProfile(models.Model):
 class MerchCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     merchandise = models.ForeignKey('Merchandise', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -43,12 +43,12 @@ class MerchCart(models.Model):
 class EventCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey('TicketPrice', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def totalPrice(self):
-        return self.event.price * self.quantity
+        return self.ticket.price * self.quantity
 
 # Class for Event Category
 class EventCategory(models.TextChoices):
@@ -58,6 +58,12 @@ class EventCategory(models.TextChoices):
     COSPLAY='CP', 'Cosplay',
     LINGKUNGAN='LG', 'Lingkungan',
     VOLUNTEER='VL', 'Volunteer',
+    AKADEMIS='AK', 'Akademis',
+    KULINER='KL', 'Kuliner',
+    PARIWISATA='PW', 'Pariwisata',
+    FESTIVAL='FS', 'Festival',
+    FILM='FM', 'Film',
+    FASHION='FN', 'Fashion',
     LAINNYA='LN', 'Lainnya'
 
 class TicketPrice(models.Model):
@@ -93,15 +99,16 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    merch = models.ManyToManyField('Merchandise', blank=True)
-    
     user_rating = models.ManyToManyField(Rating, blank=True)
     image_urls = models.JSONField(null=True, blank=True)
     
 class Merchandise(models.Model):
-    image_url = models.URLField()
+    id = models.AutoField(primary_key=True)
+    image_url = models.URLField(max_length=500)
     name = models.CharField(max_length=200)
     description = models.TextField()
+    related_event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='merchandise')
+    quantity = models.IntegerField(default=10)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -120,10 +127,10 @@ class Forum(models.Model):
         return self.title
     
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()
     
 class ForumReply(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -141,7 +148,7 @@ class ForumReply(models.Model):
 
         
     def totalLike(self):
-        return self.like.count()
+        return self.like.all().count()
 
     def totalDislike(self):
-        return self.dislike.count()
+        return self.dislike.all().count()

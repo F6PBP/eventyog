@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-    <main class="flex justify-center items-center min-h-screen p-4 sm:p-6 lg:p-8">
-        <div class="border border-gray-300/50 rounded-2xl p-6 sm:p-10 shadow-xl max-w-md w-full">
+    <main class="flex justify-center items-center min-h-screen p-4 sm:p-6 lg:p-8  bg-gradient-to-br from-[#00FF57] to-[#487BFF]">
+        <div class="border border-gray-300/50 rounded-2xl p-6 sm:p-10 shadow-xl max-w-md w-full bg-white">
             <h1 class="text-center text-xl font-bold mb-5">We need to know about you!</h1>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -162,7 +162,7 @@
                     }
                 </script>
 
-                {% include "ds/button.html" with text="Submit" button_type="primary"  props="{'type': 'submit'}"%}
+                {% include "ds/button.html" with text="Submit" variant="primary"  props="{'type': 'submit'}"%}
             </form>
         </div>
     </main>

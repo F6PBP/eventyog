@@ -6,13 +6,13 @@
 {% endblock meta %}
 
 {% block content %}
-<main class="flex items-center justify-center w-screen h-screen px-5 ">
+<main class="flex items-center justify-center w-screen h-screen px-5 font-DM-Sans bg-gradient-to-br from-[#00FF57] to-[#487BFF]">
   <div
-    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5"
+    class="shadow-xl bg-white p-10 rounded-3xl flex flex-col gap-10 items-center border-[2px] border-black/5 min-w-[300px]"
   >    
     <img src={% static "assets/icon.png" %} alt="icon" class="w-20 object-contain">
     <h1
-      class="font-semibold text-xl text-center"
+      class="font-bold text-xl text-center font-Catamaran"
     >Welcome to EventYog!</h1>
     <form method="POST" action="" class="flex flex-col gap-5 bg-white">
       {% csrf_token %}

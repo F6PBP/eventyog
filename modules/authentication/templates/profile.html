@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <main class="px-4 md:px-48 mt-32">
+    <main class="px-4 md:px-48 mt-48">
         <div class="flex flex-col gap-8">
+            <!-- Profile Picture Section -->
             <div class="flex w-32 h-32 rounded-full shadow-sm overflow-hidden border-[1px] shadow-sm mx-auto md:mx-0">
                 <img 
                     src="{% if image_url %}{{image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
@@ -10,6 +11,8 @@
                     class="w-full h-full object-cover"
                 />
             </div>
+            
+            <!-- User Information Section -->
             <div class="flex flex-col gap-2 text-left">
                 <div class="flex flex-col">
                     <h1 class="font-bold text-3xl">{{user_profile.name}}</h1>
@@ -20,20 +23,30 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-500">{{user_profile.bio}}</p>
+                <h3 class="font-bold mt-4">Wallet Balance</h3>
+                <p>Rp{{user_profile.wallet}}</p>
             </div>
+
+            <!-- Event Categories Section -->
             <div class="font-semibold flex flex-col gap-2">
                 <h3>Event Types</h3>
-                <div class="flex flex-wrap gap-2 font-normal text-sm justify-start">
-                    {% for category in categories %}
-                        <span class="px-3 py-1 bg-blue-200 text-blue-800 rounded-full">{{category}}</span>
-                    {% endfor %}
-                </div>
+                {% if categories %}
+                    <div class="flex flex-wrap gap-2 font-normal text-sm justify-start">
+                        {% for category in categories %}
+                            <span class="px-3 py-1 bg-blue-200 text-blue-800 rounded-full">{{category}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 font-semibold">No event categories selected yet.</p>
+                {% endif %}
             </div>
+
+            <!-- Edit and Delete Account Section -->
             <div class="flex items-center gap-2">
                 <a href="{% url 'auth:edit_profile' %}">
                     {% include "ds/button.html" with text="Edit Profile" icon="fas fa-user-edit" class="w-fit" %}
                 </a>
-                {% include "ds/button.html" with text="Delete Account" button_type="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" %}
+                {% include "ds/button.html" with text="Delete Account" variant="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" %}
             </div>
         </div>
     </main>
@@ -53,6 +66,7 @@
         </div>
     </div>
 
+    <!-- JavaScript for Modal -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const deleteButton = document.querySelector('.delete-account-button');

@@ -1,89 +1,99 @@
 {% load static %}
-<nav class="fixed top-0 left-0 right-0 z-50 px-4 sm:px-10 flex items-center py-5 justify-between border-b-[1px] border-black/10 bg-gray-100">
-    <a href="/" class="md:w-[400px]">
-        <img src={% static "assets/icon.png" %} alt="icon" class="w-8 object-contain">
-    </a>
-    <ul class="hidden md:flex w-full justify-center">
-        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm font-normal text-black hover:text-[#003FE2]">
-            <a href="{% url 'main:main' %}" >Home</a>
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 px-10 md:px-20 lg:px-32 flex items-center py-5 sm:py-10 justify-between duration-300 {% if isDark %}text-white backdrop-blur-md{% else %}bg-white text-black shadow-sm{% endif %} z-50">
+    <div class="flex gap-8 md:w-[400px] items-center">
+        <a href="/">
+            {% if isDark %}
+                <img src='https://res.cloudinary.com/mxgpapp/image/upload/v1729873299/eventyog/assets/logo-white.png' alt="icon" class="min-w-8 object-contain">
+            {% else %}
+                <img src={% static "assets/icon.png" %} alt="icon" class="w-8 object-contain">
+            {% endif %}
+        </a>
+        <h1 class="font-Catamaran {% if isDark %} text-white {% else %} text-[#0047FE] {% endif %} font-extrabold text-2xl hidden sm:block">EventYog</h1>
+    </div>
+    <ul class="hidden md:flex w-full justify-center font-normal {% if isDark %}text-white{% else %}text-[#626262]{% endif %}">
+        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm {% if isDark %}hover:text-white{% else %}hover:text-[#003FE2]{% endif %}">
+            <a href="{% url 'main:main' %}">Home</a>
         </li>
-        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm font-normal text-black hover:text-[#003FE2]">
-            <a href="{% url 'yogevent:main' %}">YogEvents!</a>
+        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm {% if isDark %}hover:text-white{% else %}hover:text-[#003FE2]{% endif %}">
+            <a href="{% url 'yogevent:main' %}">Events</a>
         </li>
-        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm font-normal text-black hover:text-[#003FE2]">
-            <a href="{% url 'yogpost:main' %}">YogPost!</a>
+        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm {% if isDark %}hover:text-white{% else %}hover:text-[#003FE2]{% endif %}">
+            <a href="{% url 'yogforum:main' %}">Forum</a>
         </li>
-        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm font-normal text-black hover:text-[#003FE2]">
+        <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm {% if isDark %}hover:text-white{% else %}hover:text-[#003FE2]{% endif %}">
             <a href="{% url 'main:about' %}">About</a>
         </li>
         {% if is_admin %}
-            <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm font-normal text-black hover:text-[#003FE2]">
+            <li class="inline-block px-3 sm:px-5 py-2 text-xs sm:text-sm">
                 <a href="{% url 'admin_dashboard:main' %}">Admin</a>
             </li>
         {% endif %}
     </ul>
-    {% if user %}
+    {% if user.is_authenticated %}
         <div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
-        <a href="#" class="hidden md:flex">
-            <i class="fas fa-shopping-cart text-black text-xs sm:text-sm cursor-pointer hover:text-[#003FE2] transition-colors duration-300 hover:scale-110 transform origin-center"></i>        
-        </a>
-        <p class="text-xs sm:text-sm min-w-[120px] text-right">Hello, {{user.username}}!</p>
-        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-full overflow-hidden">
+        <p class="hidden lg:flex">Hello, {{request.user.username}}</p>
+        <div class="w-8 h-8 bg-black rounded-full overflow-hidden">
             <img 
-                src="{% if image_url %}{{image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
+                src="{% if request.image_url %}{{request.image_url}}{% else %}{% static 'assets/profile-pic-placeholder.png' %}{% endif %}" 
                 alt="profile" 
                 class="w-full h-full object-cover"
             >
         </div>
         <div class="relative">
-            <button id="dropdownButton" class="flex items-center gap-1 sm:gap-2 text-black text-xs sm:text-sm font-semibold rounded-2xl h-full hover:scale-105 duration-300 px-3 py-2">
-                <i id="chevronIcon" class="fas fa-chevron-down transition-transform duration-300"></i>
+            <button id="dropdownButton-{{ nav_id }}" class="flex items-center gap-1 sm:gap-2 text-black text-xs sm:text-sm font-semibold rounded-2xl h-full hover:scale-105 duration-300 px-3 py-2">
+            <i id="chevronIcon-{{ nav_id }}" class="fas fa-chevron-down transition-transform duration-300 {% if isDark %} text-white {% else %} text-black {% endif %}"></i>
             </button>
-            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg transition-all duration-300 opacity-0 transform scale-95">
-                <a href="{% url 'main:main' %}"     class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Home</a>
-                <a href="about" class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">About</a>
-                <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 flex md:hidden">Cart</a>
-                <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                <a href="#" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Help</a>
-                <a href="">
-                    <form action="{% url 'auth:logout'%}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="block w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 font-semibold flex gap-2 items-center justify-center text-red-500">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
-                    </form>
-                </a>
+            <div id="dropdownMenu-{{ nav_id }}" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg transition-all duration-300 opacity-0 transform scale-95">
+            <p class="block px-4 py-2 text-xs sm:text-sm text-gray-700 lg:hidden">Hello, {{user.username}}!</p>
+            <a href="{% url 'main:main' %}"     class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Home</a>
+            <a href="about" class="flex md:hidden block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">About</a>
+            <a href="{% url 'auth:profile' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+            <a href="{% url 'friends:show_list' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Friends</a>
+            <a href="{% url 'registered_event:main' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Registered Event</a>
+            <a href="{% url 'cart:main' %}" class="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 flex">Cart</a>
+            <a href="">
+                <form action="{% url 'auth:logout'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="block w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 font-semibold flex gap-2 items-center justify-center text-red-500">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+                </form>
+            </a>
             </div>
         </div>
         <script>
-            document.getElementById('dropdownButton').addEventListener('click', function(event) {
-                event.stopPropagation();
-                var menu = document.getElementById('dropdownMenu');
-                var chevron = document.getElementById('chevronIcon');
-                menu.classList.toggle('hidden');
-                setTimeout(function() {
-                    menu.classList.toggle('opacity-0');
-                    menu.classList.toggle('scale-95');
-                }, 10); // Small delay to ensure the transition is applied
-                chevron.classList.toggle('fa-chevron-down');
-                chevron.classList.toggle('fa-chevron-up');
-                chevron.classList.toggle('rotate-180');
+            document.getElementById('dropdownButton-{{ nav_id }}').addEventListener('click', function(event) {
+            event.stopPropagation();
+            var menu = document.getElementById('dropdownMenu-{{ nav_id }}');
+            var chevron = document.getElementById('chevronIcon-{{ nav_id }}');
+            menu.classList.toggle('hidden');
+            setTimeout(function() {
+                menu.classList.toggle('opacity-0');
+                menu.classList.toggle('scale-95');
+            }, 10); // Small delay to ensure the transition is applied
+            chevron.classList.toggle('fa-chevron-down');
+            chevron.classList.toggle('fa-chevron-up');
+            chevron.classList.toggle('rotate-180');
             });
 
+            function addClick() {
             document.addEventListener('click', function(event) {
-                var menu = document.getElementById('dropdownMenu');
-                var chevron = document.getElementById('chevronIcon');
-                if (!menu.classList.contains('hidden') && !event.target.closest('#dropdownButton')) {
-                    menu.classList.add('hidden');
-                    menu.classList.add('opacity-0');
-                    menu.classList.add('scale-95');
-                    chevron.classList.add('fa-chevron-down');
-                    chevron.classList.remove('fa-chevron-up');
-                    chevron.classList.remove('rotate-180');
-                }
-            });
+                var menu = document.getElementById('dropdownMenu-{{ nav_id }}');
+                var chevron = document.getElementById('chevronIcon-{{ nav_id }}');
+                if (!menu.classList.contains('hidden') && !event.target.closest('#dropdownButton-{{ nav_id }}')) {
+                        menu.classList.add('hidden');
+                        menu.classList.add('opacity-0');
+                        menu.classList.add('scale-95');
+                        chevron.classList.add('fa-chevron-down');
+                        chevron.classList.remove('fa-chevron-up');
+                        chevron.classList.remove('rotate-180');
+                    }
+                });
+            }
+
+            addClick();
+
         </script>
         <style>
             .rotate-180 {
@@ -99,6 +109,4 @@
             </a>
         </div>
     {% endif %}
-
-
 </nav>

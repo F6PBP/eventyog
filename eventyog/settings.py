@@ -36,7 +36,14 @@ PRODUCTION = os.getenv('PROD') == "True"
 DEBUG = not PRODUCTION
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app', 'eventyog.vercel.app', '127.0.0.1', 'andrew-devito-eventyog.pbp.cs.ui.ac.id']
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 # Application definition
 
@@ -48,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'modules.main',
+    'modules.api',
     'modules.authentication',
     'modules.yogpost',
     'modules.cart',
@@ -55,9 +63,11 @@ INSTALLED_APPS = [
     'modules.yogevent',
     'modules.admin_dashboard',
     'modules.yogforum',
+    'modules.friends',
     'modules.registered_event',
     'whitenoise.runserver_nostatic',
     'cloudinary',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'eventyog.urls'
@@ -110,7 +121,7 @@ if not PRODUCTION:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': os.getenv('DB_NAME'),
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
@@ -174,7 +185,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  # Make sure to adjust the path as needed
 
 cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+    cloud_name=os.getenv('CLOUDINARY_NAME', 'mxgpapp'),
+    api_key=os.getenv('CLOUDINARY_API_KEY', '378869596434125'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', 'RqY1H1Yqi4JysBVrTUaasuIWFes')
 )

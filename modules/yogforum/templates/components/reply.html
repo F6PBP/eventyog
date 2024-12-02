@@ -1,12 +1,20 @@
-<div class="p-4 border border-gray-200 shadow-sm mb-4 rounded-lg">
+<div class="p-8 border border-gray-200 shadow-sm mb-4 rounded-lg">
     <div class="flex justify-between items-center mb-2">
-        <div>
-            <p class="font-semibold text-gray-700">
-                Replied by {{ reply.user.user.username }}
-            </p>
-            {% if reply.reply_to %}
-                <p class="text-gray-500">To {{ reply.reply_to.user.user.username }}</p>
+        <div class="flex gap-4 items-center">
+            {% if reply.user.profile_picture %}
+                <img class="w-8 h-8 rounded-full" src="http://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{{reply.user.profile_picture}}" alt="">
+            {% else %}
+                <img class="w-8 h-8 rounded-full" src="https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png" alt="">
             {% endif %}
+
+            <div>
+                <p class="font-semibold text-gray-700">
+                    Replied by {{ reply.user.user.username }}
+                </p>
+                {% if reply.reply_to %}
+                    <p class="text-gray-500 text-sm">To {{ reply.reply_to.user.user.username }}</p>
+                {% endif %}
+            </div>
         </div>
 
         <div class="flex items-center space-x-4">
