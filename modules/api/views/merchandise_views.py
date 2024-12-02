@@ -13,121 +13,126 @@ from django.core import serializers
 from django.http import JsonResponse
 import json
 
-def main(request: HttpRequest) -> ApiResponse:
-    return ApiResponse(status=200, content="Hello, World!")
-
-
-@check_user_profile(is_redirect=False)
-def main(request: HttpRequest) -> HttpResponse:
+def main(request: HttpRequest) -> JsonResponse:
     context = {
         'show_navbar': True,
-        'is_admin': request.is_admin,
+        'is_admin': getattr(request, 'is_admin', False),  # Default False jika tidak ada atribut
     }
-    return render(request, 'merchandise.html', context)
-
-def create_merchandise(request):
-    form = MerchandiseForm(request.POST or None)
-
-    if form.is_valid() and request.method == "POST":
-        merchandise = form.save(commit=False)
-        merchandise.user = request.user
-        merchandise.save()
-        return redirect('merchandise:main')
-
-    context = {
-        'form': form,
-        'show_navbar': True
-    }
-    return render(request, "create_merchandise.html", context)
+    return JsonResponse(context, status=200)
 
 @check_user_profile()
 def show_merchandise_by_id(request, id):
     try:
         merch = Merchandise.objects.get(id=id)
     except Merchandise.DoesNotExist:
-        return redirect('main:main')
-    
+        return JsonResponse({"status": "error", "message": "Merchandise not found"}, status=404)
+
     context = {
-        'merch': merch,
-        'show_navbar': True,
-        'show_footer': True,
-        'is_admin': request.is_admin,
+        'id': merch.id,
+        'name': merch.name,
+        'description': merch.description,
+        'price': merch.price,
+        'image_url': merch.image_url,
+        'quantity': merch.quantity,
+        'related_event': merch.related_event.uuid,
+        'created_at': merch.created_at.isoformat(),
+        'updated_at': merch.updated_at.isoformat(),
     }
-    return render(request, "merchandise_detail.html", context)
+    return JsonResponse({"status": "success", "data": context}, status=200)
 
 @csrf_exempt
 @require_POST
 def create_merchandise_ajax(request):
-    name = request.POST.get("name")
-    description = request.POST.get("description")
-    price = request.POST.get("price")
-    image_url = request.POST.get("image_url")
-    event_id = request.POST.get("event_id")
+    try:
+        data = json.loads(request.body)
+        event = Event.objects.get(uuid=data["event_id"])
 
-    event = Event.objects.get(uuid=event_id)
+        new_merchandise = Merchandise.objects.create(
+            name=data["name"],
+            description=data["description"],
+            price=data["price"],
+            image_url=data["image_url"],
+            related_event=event
+        )
 
-    new_merchandise = Merchandise(
-        name = name, 
-        description = description,
-        price = price,
-        image_url = image_url,
-        related_event = event
-    )
-    new_merchandise.save()
+        response = {
+            "status": "success",
+            "message": "Merchandise created successfully",
+            "data": {
+                "id": new_merchandise.id,
+                "name": new_merchandise.name,
+                "description": new_merchandise.description,
+                "price": new_merchandise.price,
+                "image_url": new_merchandise.image_url,
+                "related_event": new_merchandise.related_event.uuid,
+                "created_at": new_merchandise.created_at.isoformat(),
+                "updated_at": new_merchandise.updated_at.isoformat(),
+            }
+        }
+        return JsonResponse(response, status=201)
 
-    return JsonResponse({"status": "CREATED"}, status = 201)
+    except Event.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
+    except KeyError as e:
+        return JsonResponse({"status": "error", "message": f"Missing field: {str(e)}"}, status=400)
 
 def edit_merchandise(request, id):
-    merchandise = Merchandise.objects.get(pk = id)
-    form = MerchandiseForm(request.POST or None, instance=merchandise)
+    try:
+        merchandise = Merchandise.objects.get(pk=id)
+        data = json.loads(request.body)
 
-    if form.is_valid() and request.method == "POST":
-        form.save()
-        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[merchandise.related_event.uuid]))
+        # Update the merchandise fields
+        merchandise.name = data.get("name", merchandise.name)
+        merchandise.description = data.get("description", merchandise.description)
+        merchandise.price = data.get("price", merchandise.price)
+        merchandise.image_url = data.get("image_url", merchandise.image_url)
+        merchandise.save()
 
-    context = {
-        'form': form,
-        'show_navbar': True
-    }
-    return render(request, "edit_merchandise.html", context)
+        response = {
+            "status": "success",
+            "message": "Merchandise updated successfully",
+            "data": {
+                "id": merchandise.id,
+                "name": merchandise.name,
+                "description": merchandise.description,
+                "price": merchandise.price,
+                "image_url": merchandise.image_url,
+                "related_event": merchandise.related_event.uuid,
+                "created_at": merchandise.created_at.isoformat(),
+                "updated_at": merchandise.updated_at.isoformat(),
+            }
+        }
+        return JsonResponse(response, status=200)
+    except Merchandise.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "Merchandise not found"}, status=404)
 
 def delete_merchandise(request, id):
-    merchandise = Merchandise.objects.get(pk = id)
-    merchandise.delete()
-    return HttpResponseRedirect(reverse('yogevent:detail_event', args=[merchandise.related_event.uuid]))
+    try:
+        merchandise = Merchandise.objects.get(pk=id)
+        merchandise.delete()
+        return JsonResponse({"status": "success", "message": "Merchandise deleted successfully"}, status=200)
+    except Merchandise.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "Merchandise not found"}, status=404)
 
 @check_user_profile()
-def showMerch_json(request, event_id: str):
-    event = Event.objects.get(uuid=event_id)
-    data = Merchandise.objects.filter(related_event=event).order_by('created_at')[::-1]
-    
-    merch_cart = MerchCart.objects.filter(user=request.user)
-    
-    temp = []
-    
-    
-    
-    for merch in data:
-        bought_quantity = 0
-        for cart_item in merch_cart:
-            if cart_item.merchandise.id == merch.id:
-                bought_quantity = cart_item.quantity
-                break
-
-        temp.append({
-            'pk': merch.id,
-            'name': merch.name,
-            'quantity': merch.quantity,
-            'description': merch.description,
-            'price': merch.price,
-            'image_url': merch.image_url,
-            'bought_quantity': bought_quantity,
-            'created_at': merch.created_at.isoformat(),
-            'updated_at': merch.updated_at.isoformat(),
-            'related_event': merch.related_event.uuid
-        })
-
-    return JsonResponse(temp, safe=False)
+def showMerch_json(request, id):
+    try:
+        merchandise = Merchandise.objects.get(id=id)
+        return JsonResponse({
+            "status": True,
+            "message": "Berhasil mendapatkan merchandise",
+            "data": {
+                "id": merchandise.id,
+                "name": merchandise.name,
+                "price": merchandise.price,
+                "stock": merchandise.quantity,
+            }
+        }, status=200)
+    except Merchandise.DoesNotExist:
+        return JsonResponse({
+            "status": False,
+            "message": "Merchandise tidak ditemukan!"
+        }, status=404)
 
 
 @check_user_profile()
