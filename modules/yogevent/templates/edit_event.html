@@ -2,70 +2,59 @@
 {% block content %}
 <form action="{% url 'yogevent:edit_event' event.uuid %}" method="POST">
     {% csrf_token %}
-    <div class="flex flex-col gap-4 p-6 bg-white shadow-lg rounded-lg max-w-3xl mx-auto mt-32">
+    <div class="flex flex-col gap-4 p-6 bg-white shadow-lg rounded-lg max-w-3xl mx-10 md:mx-auto my-32">
         <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">Edit Event</h2>
         
         <!-- Title Input -->
         <div class="mb-4">
             <label for="title" class="block text-lg font-semibold text-gray-700 mb-2">Title</label>
-            <input type="text" id="title" name="title" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" required>
+            {% include "ds/input.html" with name="title" placeholder="Title" value=event.title %}
         </div>
 
         <!-- Description Input -->
         <div class="mb-4">
             <label for="description" class="block text-lg font-semibold text-gray-700 mb-2">Description:</label>
-            <textarea id="description" name="description" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" rows="3"></textarea>
+            {% include "ds/textarea.html" with id="description" name="description" placeholder="Description" value=event.description class="w-full" %}
         </div>
 
         <!-- Event Category Dropdown -->
         <div class="mb-4">
             <label for="category" class="block text-lg font-semibold text-gray-700 mb-2">Event Category</label>
             <select id="category" name="category" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out">
-                <option value="" selected>Category</option>
-                <option value="OL">Olahraga</option>
-                <option value="SN">Seni</option>
-                <option value="MS">Musik</option>
-                <option value="CP">Cosplay</option>
-                <option value="LG">Lingkungan</option>
-                <option value="VL">Volunteer</option>
-                <option value="AK">Akademis</option>
-                <option value="KL">Kuliner</option>
-                <option value="PW">Pariwisata</option>
-                <option value="FS">Festival</option>
-                <option value="FM">Film</option>
-                <option value="FN">Fashion</option>
-                <option value="LN">Lainnya</option>
+                {% for code, name in event.CATEGORY_CHOICES %}
+                    <option value="{{ code }}" {% if event.category == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
             </select>
         </div>
 
         <!-- Start Time, End Time, and Location -->
         <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
             <div class="w-full mb-4 md:mb-0">
-                <label for="start_time" class="block text-lg font-semibold text-gray-700 mb-2">Start Time</label>
-                <input type="datetime-local" id="start_time" name="start_time" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" value="{{ event.start_time }}" required>
+            <label for="start_time" class="block text-lg font-semibold text-gray-700 mb-2">Start Time</label>
+            {% include "ds/input.html" with id="start_time" name="start_time" type="datetime-local" value=event.start_time %}
             </div>
 
             <div class="w-full mb-4 md:mb-0">
-                <label for="end_time" class="block text-lg font-semibold text-gray-700 mb-2">End Time</label>
-                <input type="datetime-local" id="end_time" name="end_time" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" value="{{ event.end_time }}">
+            <label for="end_time" class="block text-lg font-semibold text-gray-700 mb-2">End Time</label>
+            {% include "ds/input.html" with id="end_time" name="end_time" type="datetime-local" value=event.end_time %}
             </div>
 
             <div class="w-full">
-                <label for="location" class="block text-lg font-semibold text-gray-700 mb-2">Location</label>
-                <input type="text" id="location" name="location" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" value="{{ event.location }}">
+            <label for="location" class="block text-lg font-semibold text-gray-700 mb-2">Location</label>
+            {% include "ds/input.html" with id="location" name="location" value=event.location %}
             </div>
         </div>
 
         <!-- Image URL Input -->
         <div class="mb-6">
             <label for="image_url" class="block text-lg font-semibold text-gray-700 mb-2">Image URL</label>
-            <input type="url" id="image_url" name="image_url" class="w-full border border-gray-300 rounded-lg py-2 px-4 bg-gray-100 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out" placeholder="https://example.com/image.jpg">
+            {% include "ds/input.html" with id="image_url" name="image_url" type="url" value=event.image_urls placeholder="https://example.com/image.jpg" %}
         </div>
 
         <!-- Action Buttons (Back & Edit Event) -->
         <div class="flex justify-end space-x-4">
-            <button type="button" onclick="history.back()" class="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-150 ease-in-out">Back</button>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-150 ease-in-out">Edit Event</button>
+            {% include "ds/button.html" with text="Back" icon="fa fa-arrow-left" onclick="" class="w-fit bg-gray-400" %}
+            {% include "ds/button.html" with variant="primary" type="submit" text="Edit" icon="fa fa-pencil"%}
         </div>
     </div>
 </form>

@@ -1,4 +1,5 @@
 <button 
+    {{ type|default:"button" }}
     class="flex items-center justify-center gap-2 w-full py-3 px-10 text-white text-xs md:text-sm font-semibold rounded-full h-full hover:scale-105 duration-300
     {% if variant == 'primary' %} bg-[#003FE2] {% elif variant == 'secondary' %} bg-black/0 border-white border-2 {% elif variant == 'danger' %} bg-[#E2003F] {% else %} bg-[#003FE2] {% endif %} {{class}}"
     {% if id %}
