@@ -143,14 +143,16 @@ def profile(request):
         else:
             categories = request.user_profile.categories.split(',')
 
-        context = {
-            'user': request.user,
-            'user_profile': request.user_profile,
-            'image_url': request.image_url,
-            'show_navbar': True,
-            'show_footer': True,
-            'categories': categories
-        }
+            context = {
+                'username': request.user.username,
+                'name': request.user_profile.name,
+                'email': request.user_profile.email,
+                'date_joined': request.user.date_joined,
+                'bio': request.user_profile.bio,
+                'image_url': request.image_url,
+                'categories': categories,
+                'is_admin': request.is_admin,
+            }
 
         return JsonResponse({
             "status": True,
