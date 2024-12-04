@@ -36,7 +36,7 @@ def like_post(request, id):
             "disliked": disliked,
             "total_dislikes": post.totalDislike()
         }
-    })
+    }, status=200)
 
 @login_required
 def dislike_post(request, id):
@@ -65,7 +65,7 @@ def dislike_post(request, id):
             'liked': liked,
             'total_likes': post.totalLike()
         }
-    })
+    }, status=200)
 
 @login_required
 def like_reply(request, id):
@@ -95,7 +95,7 @@ def like_reply(request, id):
             'liked': liked,
             'disliked': disliked,
         }
-    })
+    }, status=200)
 
 @login_required
 def dislike_reply(request, id):
@@ -125,7 +125,7 @@ def dislike_reply(request, id):
             'disliked': disliked,
             'liked': liked,
         }
-    })
+    }, status=200)
 
 from eventyog.decorators import check_user_profile
 from modules.main.models import UserProfile
@@ -143,11 +143,12 @@ def viewforum(request, post_id):
         'show_navbar': True,
         'show_footer': True,
     }
+
     return JsonResponse({
         "status": True,
         "message": "Berhasil View Forum",
         "data": context
-    })
+    }, status=200)
 
 def get_forum_by_ajax(request):
     search = request.GET.get('search')
@@ -182,12 +183,12 @@ def get_forum_by_ajax(request):
             'totalDislike': post.totalDislike(),
             'comment_count': replies_count
         })
-    
+
     return JsonResponse({
         "status": True,
         "message": "Berhasil Get Forum",
         'forum_posts': temp
-    })
+    }, status=200)
 
 @check_user_profile()
 def main(request):
@@ -217,7 +218,11 @@ def main(request):
         'is_admin': request.is_admin,
         'top_creators': top_creators
     }
-    return render(request, 'yogforum.html', context)
+    return JsonResponse({
+        "status": True,
+        "message": "Main Forum",
+        "data": context
+    }, status=200)
 
 def add_post(request):
     if request.method == 'POST':
@@ -229,20 +234,29 @@ def add_post(request):
             return redirect('yogforum:main')  # redirect to forum main page after adding post
     else:
         form = AddForm()
-    
-    return render(request, 'components/new_post_modal.html', {'form': form})
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil Add Post",
+        "data": {'form': form}
+    }, status=200)
 
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
     post.delete()
-    return redirect('yogforum:main')
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil Hapus Post",
+    }, status=200)
 
 @login_required
 def delete_reply(request, reply_id):
     reply = get_object_or_404(ForumReply, id=reply_id, user=request.user.userprofile)
     reply.delete()
-    return redirect('yogforum:viewforum', post_id=reply.forum.id)
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil Delete Reply",
+    }, status=200)
 
 def viewforum(request, post_id):
     # Cari post berdasarkan post_id
@@ -264,7 +278,11 @@ def viewforum(request, post_id):
         'show_navbar': True,
         'show_footer': True
     }
-    return render(request, 'viewforum.html', context)
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil Delete Reply",
+        "data": context
+    }, status=200)
 
 @login_required
 def add_reply(request, post_id):
@@ -281,7 +299,10 @@ def add_reply(request, post_id):
         content = request.POST.get('content')
         if not content:
             messages.error(request, "Content cannot be empty.")
-            return redirect('yogforum:viewforum', post_id=forum_post.id)
+            return JsonResponse({
+                "status": False,
+                "message": "Add Reply gagal!",
+            }, status=401)
 
         if reply_to_id:
             reply_to = get_object_or_404(ForumReply, id=reply_to_id)
@@ -289,7 +310,10 @@ def add_reply(request, post_id):
             # Check reply depth before creating a new reply
             if get_reply_depth(reply_to) >= 2:
                 messages.warning(request, "This post has reached the maximum number of replies.")
-                return redirect('yogforum:view_reply_as_post', reply_id=forum_reply.id if forum_reply else forum_post.id)
+                return JsonResponse({
+                    "status": False,
+                    "message": "Add Reply gagal!",
+                }, status=401)
             
             # Create the reply if depth is within the allowed limit
             ForumReply.objects.create(
@@ -309,11 +333,20 @@ def add_reply(request, post_id):
             messages.success(request, "Reply added successfully!")
 
         if forum_reply:
-            return redirect('yogforum:view_reply_as_post', reply_id=forum_reply.id)
+            return JsonResponse({
+                "status": True,
+                "message": "Berhasil Add Reply",
+            }, status=200)
         else:
-            return redirect('yogforum:viewforum', post_id=forum_post.id)
+            return JsonResponse({
+                "status": True,
+                "message": "Berhasil Add Reply",
+            }, status=200)
 
-    return redirect('yogforum:viewforum', post_id=forum_post.id)
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil Add Reply",
+    }, status=200)
 
 def get_reply_depth(reply):
     depth = 0
@@ -336,7 +369,11 @@ def view_reply_as_post(request, reply_id):
         'show_footer': True
     }
     
-    return render(request, 'components/view_reply_as_post.html', context)
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil",
+        "data": context
+    }, status=200)
 
 @login_required
 def edit_post(request, post_id):
@@ -360,11 +397,14 @@ def edit_post(request, post_id):
     else:
         form = EditPostForm(instance=post_object)
     
-    return render(request, 'components/edit_modal.html', {
-        'form': form,
-        'object': post_object,
-        'modal_id': f"edit-modal-{post_id}"
-    })
+    return JsonResponse({
+        "status": True,
+        "message": "Berhasil",
+        "data": {
+            'form': form,
+            'object': post_object,
+        }
+    }, status=200)
 
 def forum_detail_json(request, forum_id):
     forum = get_object_or_404(Forum, id=forum_id)
