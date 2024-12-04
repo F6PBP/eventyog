@@ -156,7 +156,8 @@ def profile(request):
                 'date_joined': request.user.date_joined,
                 'bio': request.user_profile.bio,
                 'image_url': request.image_url,
-                'categories': categories    
+                'categories': categories,
+                'is_admin': request.is_admin,
             }
 
             return JsonResponse({
