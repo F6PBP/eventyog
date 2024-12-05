@@ -14,14 +14,12 @@
                 <label for="profile_image_input" class="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow cursor-pointer w-10 h-10 flex items-center justify-center">
                     <i class="fas fa-pencil-alt text-gray-700"></i>
                 </label>
-                <input type="file" name="profile_image" class="hidden" id="profile_image_input" accept="image/*" onchange="previewImage(event)">
+                <input type="file" name="profile_picture" class="hidden" id="profile_image_input" accept="image/*" onchange="previewImage(event)">
             </div>  
             <div class="flex flex-col gap-2 text-left">
                 <div class="flex flex-col gap-2">
                     <label for="name" class="text-sm text-gray-500">Name</label>
                     {% include "ds/input.html" with id="name" name="name" type="text" props="{'required': True}" placeholder="Name" value=user_profile.name class="w-[200px]"%}
-                    <label for="username" class="text-sm text-gray-500">Username</label>
-                    {% include "ds/input.html" with id="username" name="username" type="text" value=user.username class="border rounded p-2 w-[200px]" %}
                     <label for="email" class="text-sm text-gray-500">Email</label>
                     {% include "ds/input.html" with id="email" name="email" type="email" value=user_profile.email class="border rounded p-2 w-[200px]" props="{'required': True}" %}
                 </div>

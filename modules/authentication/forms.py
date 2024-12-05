@@ -5,13 +5,7 @@ from cloudinary.forms import CloudinaryFileField
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['name', 'email', 'bio', 'profile_picture', 'categories']
-        
-    profile_picture = CloudinaryFileField(
-        options = {
-            'folder': 'eventyog/profile',
-        }
-    )
+        fields = ['name','email', 'bio', 'profile_picture', 'categories', 'profile_picture']
         
     def save(self, commit=True):
         user_profile = super().save(commit=False)
