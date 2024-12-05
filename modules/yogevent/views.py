@@ -285,11 +285,7 @@ def book_event(request):
     event_id = request.POST.get('event_uuid')
     ticket_name = request.POST.get('ticket_name')
     
-    print(event_id)
-    
     event = Event.objects.get(uuid=event_id)
-    
-    print(event)
     
     tickets = TicketPrice.objects.filter(event=event)
     user_profile = request.user_profile
@@ -297,9 +293,7 @@ def book_event(request):
     # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets.exclude(price=0)
-
-    print(tickets)
-
+    
     if (len(tickets) == 0):
         tickets = None
     
@@ -329,8 +323,6 @@ def book_event(request):
 def cancel_book(request):
     body = request.body.decode('utf-8')
     # body = json.loads(body)
-    
-    print(body)
     
     event_id = request.POST.get('event_uuid')
     event = get_object_or_404(Event, uuid=event_id)
@@ -393,8 +385,6 @@ def edit_event(request, uuid):
         event.save()
         return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
 
-    print(event.image_urls)
-    
     if (len(event.image_urls) == 0 ):
         event.image_urls = ""
         
