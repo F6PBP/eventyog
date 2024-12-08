@@ -102,12 +102,6 @@ def logout(request):
             
 @csrf_exempt
 def onboarding(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            "status": False,
-            "message": "User not authenticated."
-        }, status=401)
-
     profile = UserProfile.objects.filter(user=request.user)
     if profile.exists():
         return JsonResponse({
@@ -117,6 +111,7 @@ def onboarding(request):
         }, status=200)
     
     if request.method == 'POST':
+        print(request.POST)
         form = UserProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
@@ -127,6 +122,7 @@ def onboarding(request):
                 "message": "Profile created successfully!"
             }, status=200)
         else:
+            print(request.FILES)
             return JsonResponse({
                 "status": False,
                 "message": "Form is not valid.",
