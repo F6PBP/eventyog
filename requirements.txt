@@ -7,3 +7,4 @@ urllib3
 python-dotenv
 pillow
 cloudinary
+django-cors-headers

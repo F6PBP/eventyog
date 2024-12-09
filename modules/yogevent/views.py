@@ -31,7 +31,7 @@ def main(request: HttpRequest) -> HttpResponse:
         if event.image_urls:
             event.image_urls = event.image_urls[0]
         else:
-            event.image_urls = 'https://via.placeholder.com/800x400'
+            event.image_urls = 'https://via.placeholder.com/'
         
         event.month = event.start_time.strftime('%B')
         event.day = event.start_time.strftime('%d')

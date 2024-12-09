@@ -64,6 +64,17 @@
     </div>
 
     <script>
+        function validateEventTimes() {
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+
+            if (new Date(startTime) > new Date(endTime)) {
+                alert('Start time cannot be later than end time.');
+                return false;
+            }
+            return true;
+        }
+
         function submitCreateEventForm() {
             event.preventDefault(); 
             form = document.getElementById('event-form');
