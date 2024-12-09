@@ -34,7 +34,7 @@ def main(request: HttpRequest) -> HttpResponse:
         if event.image_urls:
             event.image_urls = event.image_urls[0]
         else:
-            event.image_urls = 'https://via.placeholder.com/800x400'
+            event.image_urls = 'https://via.placeholder.com/'
         
         event.month = event.start_time.strftime('%B')
         event.day = event.start_time.strftime('%d')
@@ -351,11 +351,9 @@ def delete_event(request, uuid):
     return HttpResponseRedirect(reverse('yogevent:main'))
 
 def edit_event(request, uuid):
-
     event = get_object_or_404(Event, uuid=uuid) 
     user_profile = UserProfile.objects.get(user=request.user)
     
-
     if request.method == "POST":  
         event.title = strip_tags(request.POST.get('title'))
         event.description = strip_tags(request.POST.get('description'))
@@ -393,7 +391,16 @@ def edit_event(request, uuid):
                 })
         
         event.save()
-        return HttpResponseRedirect(reverse('yogevent:main'))
+        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
+
+    print(event.image_urls)
+    
+    if (len(event.image_urls) == 0 ):
+        event.image_urls = ""
+        
+    event.CATEGORY_CHOICES = EventCategory.choices
+    event.start_time = event.start_time.strftime('%Y-%m-%dT%H:%M')
+    event.end_time = event.end_time.strftime('%Y-%m-%dT%H:%M') if event.end_time else ""
     
     context = {
         'user': request.user,

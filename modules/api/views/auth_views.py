@@ -1,5 +1,6 @@
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate, login as auth_login
+from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -8,6 +9,8 @@ from modules.main.models import UserProfile
 from modules.authentication.forms import UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from eventyog.decorators import check_user_profile, check_user_profile_api
+from django.forms.models import model_to_dict
 
 @csrf_exempt
 def login(request):
@@ -136,35 +139,40 @@ def onboarding(request):
         }, status=400)
         
 @csrf_exempt        
+@check_user_profile_api()
 def profile(request):
-    try:
-        if request.user_profile.categories == '':
-            categories = None
-        else:
-            categories = request.user_profile.categories.split(',')
+    if request.method == "GET":
+        print(request.user)
+        try:
+            if request.user_profile.categories == '':
+                categories = None
+            else:
+                categories = request.user_profile.categories.split(',')
 
-        context = {
-            'user': request.user,
-            'user_profile': request.user_profile,
-            'image_url': request.image_url,
-            'show_navbar': True,
-            'show_footer': True,
-            'categories': categories
-        }
+            context = {
+                'username': request.user.username,
+                'name': request.user_profile.name,
+                'email': request.user_profile.email,
+                'date_joined': request.user.date_joined,
+                'bio': request.user_profile.bio,
+                'image_url': request.image_url,
+                'categories': categories,
+                'is_admin': request.is_admin,
+            }
 
-        return JsonResponse({
-            "status": True,
-            "message": "Profile retrieved successfully.",
-            "data": context
-        }, status=200)
+            return JsonResponse({
+                "status": True,
+                "message": "Profile retrieved successfully.",
+                "data": context
+            }, status=200)
 
-    except Exception as e:
-        print(e)
-        print('User profile not found.')
-        return JsonResponse({
-            "status": False,
-            "message": "User profile not found."
-        }, status=404)
+        except Exception as e:
+            print(e)
+            print('User profile not found.')
+            return JsonResponse({
+                "status": False,
+                "message": "User profile not found."
+            }, status=404)
 
 @csrf_exempt        
 def edit_profile(request):

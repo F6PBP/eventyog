@@ -77,7 +77,7 @@ class TicketPrice(models.Model):
 class Rating(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     rated_event = models.ForeignKey('Event', on_delete=models.CASCADE)
-    rating = models.IntegerField(max)
+    rating = models.IntegerField(max, default=5)
     review = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
