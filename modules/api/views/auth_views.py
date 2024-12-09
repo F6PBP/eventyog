@@ -140,10 +140,10 @@ def profile(request):
     if request.method == "GET":
         print(request.user)
         try:
-            if request.user_profile.categories == '':
+            if request.user_profile.categories == '' or request.user_profile.categories == None:
                 categories = None
             else:
-                categories = request.user_profile.categories.split(',')
+                categories = request.user_profile.categories
 
             context = {
                 'username': request.user.username,
@@ -171,12 +171,15 @@ def profile(request):
             }, status=404)
 
 @csrf_exempt        
+@check_user_profile_api()
 def edit_profile(request):
+    print(request.POST)
     form = UserProfileForm(instance=request.user_profile)
 
     if request.method == 'POST':
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
+            print("HELLO")
             profile = form.save(commit=False)
             profile.user = request.user  # Associate profile with logged-in user
             profile.save()

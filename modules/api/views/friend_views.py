@@ -16,6 +16,7 @@ def show_list(request):
             user = friend.user
             friend.user_id = user.id
 
+
         friends_recommendation = UserProfile.objects.all().exclude(user=request.user)
 
         temp = []
@@ -23,7 +24,6 @@ def show_list(request):
         if request.user_profile.categories is None:
             request.user_profile.categories = ''
 
-            
         for friend in friends_recommendation:
             if friend not in friends and (set(friend.categories.split(',')) & set(request.user_profile.categories.split(',')) or friend.categories == ''):
                 temp.append(friend)
