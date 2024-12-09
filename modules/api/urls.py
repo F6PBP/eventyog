@@ -7,5 +7,4 @@ urlpatterns = [
     path('cart/', cart_views.main, name='cart'),
     path('yogevent/', event_views.main, name='yogevent'),
     path('detail-event', detail_event_views.main, name='detail-event-views'),
-    path(''),
 ]
