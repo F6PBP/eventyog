@@ -18,4 +18,5 @@ urlpatterns = [
     path('yogforum/dislike_post/<int:id>/', dislike_post, name='dislike_post'),
     path('yogforum/like_reply/<int:id>/', like_reply, name='like_reply'),
     path('yogforum/dislike_reply/<int:id>/', dislike_reply, name='dislike_reply'),
+    path('yogforum', search_forum, name='search_forum'),
 ]

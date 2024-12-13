@@ -123,6 +123,33 @@ def view_reply_as_post(request, reply_id):
     })
 
 @csrf_exempt
+def search_forum(request):
+    keyword = request.GET.get('keyword', '')
+
+    # Ambil semua forum post, lalu filter jika keyword tidak kosong
+    forum_posts = Forum.objects.all().order_by('-created_at')
+    if keyword:
+        forum_posts = forum_posts.filter(title__icontains=keyword)
+
+    posts_data = []
+    for post in forum_posts:
+        posts_data.append({
+            'id': post.id,
+            'title': post.title,
+            'user': post.user.user.username,
+            'content': post.content,
+            'created_at': post.created_at,
+            'total_likes': post.totalLike(),
+            'total_dislikes': post.totalDislike(),
+        })
+
+    return JsonResponse({
+        'forum_posts': posts_data,
+        'show_navbar': True,
+        'show_footer': True
+    })
+
+@csrf_exempt
 def add_post(request):
     if request.method == 'POST':
         data = json.loads(request.body)
