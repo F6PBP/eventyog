@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from modules.main.models import Forum, ForumReply
+from modules.main.models import Forum, ForumReply, UserProfile
 from django.http import JsonResponse
 from django.http import HttpRequest, HttpResponse
 from django.http import HttpResponseBadRequest
@@ -15,6 +15,7 @@ from django.contrib import messages
 from modules.main.models import Forum, ForumReply
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 
 
 def main(request):
@@ -39,7 +40,6 @@ def main(request):
     })
     
 @csrf_exempt
-@login_required
 def like_post(request, id):
     post = get_object_or_404(Forum, id=id)
     user_profile = request.user.userprofile
@@ -127,34 +127,44 @@ def dislike_reply(request, id):
     })
 
 @csrf_exempt
-@login_required
 def add_post(request):
     if request.method == 'POST':
-        # Parse data dari request body (untuk mendukung JSON jika diperlukan)
         data = json.loads(request.body)
+        
+        username = data.get('username')  # Ambil username dari JSON request
+        if not username:
+            return JsonResponse({
+                'success': False,
+                'message': 'Username is required.'
+            }, status=400)
 
-        # Validasi data menggunakan form
+        user, created = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        # Validasi form dan simpan post
         form = AddForm(data)
         if form.is_valid():
             post = form.save(commit=False)
-            post.user = request.user.userprofile  # Mengambil profil pengguna dari user yang login
+            post.user = user_profile
             post.save()
+
             return JsonResponse({
                 'success': True,
                 'message': 'Post added successfully!',
-                'post_id': post.id  # Mengembalikan ID post yang baru
+                'post_id': post.id
             }, status=201)
         else:
             return JsonResponse({
                 'success': False,
                 'message': 'Invalid form data.',
-                'errors': form.errors  # Kirim error jika form tidak valid
+                'errors': form.errors
             }, status=400)
 
     return JsonResponse({
         'success': False,
         'message': 'Invalid request method.'
     }, status=405)
+
 
 
 @csrf_exempt
