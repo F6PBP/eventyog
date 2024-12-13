@@ -2,8 +2,6 @@ from django.urls import path
 
 from modules.api.views import auth_views
 from .views.forum_views import *
-app_name = 'api'
-
 
 urlpatterns = [
     path('auth/login/', auth_views.login, name='auth_login'),
