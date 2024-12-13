@@ -38,148 +38,6 @@ def main(request):
         'show_navbar': True,
         'show_footer': True
     })
-    
-@csrf_exempt
-def like_post(request, id):
-    post = get_object_or_404(Forum, id=id)
-    user_profile = request.user.userprofile
-
-    if user_profile in post.like.all():
-        post.like.remove(user_profile)
-        liked = False
-    else:
-        post.like.add(user_profile)
-        liked = True
-        if user_profile in post.dislike.all():
-            post.dislike.remove(user_profile)
-
-    return JsonResponse({
-        'success': True,
-        'liked': liked,
-        'total_likes': post.totalLike(),
-        'total_dislikes': post.totalDislike(),
-    })
-
-@csrf_exempt
-@login_required
-def dislike_post(request, id):
-    post = get_object_or_404(Forum, id=id)
-    user_profile = request.user.userprofile
-
-    if user_profile in post.dislike.all():
-        post.dislike.remove(user_profile)
-        disliked = False
-    else:
-        post.dislike.add(user_profile)
-        disliked = True
-        if user_profile in post.like.all():
-            post.like.remove(user_profile)
-
-    return JsonResponse({
-        'success': True,
-        'disliked': disliked,
-        'total_likes': post.totalLike(),
-        'total_dislikes': post.totalDislike(),
-    })
-
-@csrf_exempt
-@login_required
-def like_reply(request, id):
-    reply = get_object_or_404(ForumReply, id=id)
-    user_profile = request.user.userprofile
-
-    if user_profile in reply.like.all():
-        reply.like.remove(user_profile)
-        liked = False
-    else:
-        reply.like.add(user_profile)
-        liked = True
-        if user_profile in reply.dislike.all():
-            reply.dislike.remove(user_profile)
-
-    return JsonResponse({
-        'success': True,
-        'liked': liked,
-        'total_likes': reply.totalLike(),
-        'total_dislikes': reply.totalDislike(),
-    })
-
-@csrf_exempt
-@login_required
-def dislike_reply(request, id):
-    reply = get_object_or_404(ForumReply, id=id)
-    user_profile = request.user.userprofile
-
-    if user_profile in reply.dislike.all():
-        reply.dislike.remove(user_profile)
-        disliked = False
-    else:
-        reply.dislike.add(user_profile)
-        disliked = True
-        if user_profile in reply.like.all():
-            reply.like.remove(user_profile)
-
-    return JsonResponse({
-        'success': True,
-        'disliked': disliked,
-        'total_likes': reply.totalLike(),
-        'total_dislikes': reply.totalDislike(),
-    })
-
-@csrf_exempt
-def add_post(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        
-        username = data.get('username')  # Ambil username dari JSON request
-        if not username:
-            return JsonResponse({
-                'success': False,
-                'message': 'Username is required.'
-            }, status=400)
-
-        user, created = User.objects.get_or_create(username=username)
-        user_profile, _ = UserProfile.objects.get_or_create(user=user)
-
-        # Validasi form dan simpan post
-        form = AddForm(data)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = user_profile
-            post.save()
-
-            return JsonResponse({
-                'success': True,
-                'message': 'Post added successfully!',
-                'post_id': post.id
-            }, status=201)
-        else:
-            return JsonResponse({
-                'success': False,
-                'message': 'Invalid form data.',
-                'errors': form.errors
-            }, status=400)
-
-    return JsonResponse({
-        'success': False,
-        'message': 'Invalid request method.'
-    }, status=405)
-
-
-
-@csrf_exempt
-@login_required
-def delete_post(request, post_id):
-    post = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
-    post.delete()
-    return JsonResponse({'success': True, 'message': 'Post deleted successfully!'})
-
-@csrf_exempt
-@login_required
-def delete_reply(request, reply_id):
-    reply = get_object_or_404(ForumReply, id=reply_id, user=request.user.userprofile)
-    reply.delete()
-    return JsonResponse({'success': True, 'message': 'Reply deleted successfully!'})
 
 @csrf_exempt
 def viewforum(request, post_id):
@@ -229,41 +87,6 @@ def viewforum(request, post_id):
         'replies': reply_data,
     })
 
-
-@csrf_exempt
-@login_required
-def add_reply(request, post_id):
-    forum_post = get_object_or_404(Forum, id=post_id)
-    reply_to_id = request.POST.get('reply_to')
-
-    if request.method == 'POST':
-        content = request.POST.get('content')
-        if not content:
-            return JsonResponse({'success': False, 'message': 'Content cannot be empty.'})
-
-        reply_to = get_object_or_404(ForumReply, id=reply_to_id) if reply_to_id else None
-        reply = ForumReply.objects.create(
-            user=request.user.userprofile,
-            forum=forum_post,
-            content=content,
-            reply_to=reply_to
-        )
-        return JsonResponse({'success': True, 'message': 'Reply added successfully!', 'reply_id': reply.id})
-
-    return JsonResponse({'success': False, 'message': 'Invalid request.'})
-
-@csrf_exempt
-@login_required
-def edit_post(request, post_id):
-    post_object = get_object_or_404(Forum, id=post_id, user=request.user.userprofile)
-
-    if request.method == 'POST':
-        form = EditPostForm(request.POST, instance=post_object)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True, 'message': 'Post edited successfully!'})
-    return JsonResponse({'success': False, 'message': 'Invalid form data.'})
-
 @csrf_exempt
 def view_reply_as_post(request, reply_id):
     reply = get_object_or_404(ForumReply, id=reply_id)
@@ -298,4 +121,293 @@ def view_reply_as_post(request, reply_id):
             'replies': get_nested_replies(reply),  
         },
     })
+
+@csrf_exempt
+def add_post(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        
+        username = data.get('username')  # Ambil username dari JSON request
+        if not username:
+            return JsonResponse({
+                'success': False,
+                'message': 'Username is required.'
+            }, status=400)
+
+        user, created = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        # Validasi form dan simpan post
+        form = AddForm(data)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = user_profile
+            post.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Post added successfully!',
+                'post_id': post.id
+            }, status=201)
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid form data.',
+                'errors': form.errors
+            }, status=400)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def like_post(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        post = get_object_or_404(Forum, id=id)
+
+        if user_profile in post.like.all():
+            post.like.remove(user_profile)
+            liked = False
+        else:
+            post.like.add(user_profile)
+            liked = True
+            if user_profile in post.dislike.all():
+                post.dislike.remove(user_profile)
+
+        return JsonResponse({
+            'success': True,
+            'liked': liked,
+            'total_likes': post.totalLike(),
+            'total_dislikes': post.totalDislike(),
+        })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def dislike_post(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+        
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        post = get_object_or_404(Forum, id=id)
+
+        if user_profile in post.dislike.all():
+            post.dislike.remove(user_profile)
+            disliked = False
+        else:
+            post.dislike.add(user_profile)
+            disliked = True
+            if user_profile in post.like.all():
+                post.like.remove(user_profile)
+
+        return JsonResponse({
+            'success': True,
+            'disliked': disliked,
+            'total_likes': post.totalLike(),
+            'total_dislikes': post.totalDislike(),
+        })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def like_reply(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        reply = get_object_or_404(ForumReply, id=id)
+
+        if user_profile in reply.like.all():
+            reply.like.remove(user_profile)
+            liked = False
+        else:
+            reply.like.add(user_profile)
+            liked = True
+            if user_profile in reply.dislike.all():
+                reply.dislike.remove(user_profile)
+
+        return JsonResponse({
+            'success': True,
+            'liked': liked,
+            'total_likes': reply.totalLike(),
+            'total_dislikes': reply.totalDislike(),
+        })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def dislike_reply(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        reply = get_object_or_404(ForumReply, id=id)
+
+        if user_profile in reply.dislike.all():
+            reply.dislike.remove(user_profile)
+            disliked = False
+        else:
+            reply.dislike.add(user_profile)
+            disliked = True
+            if user_profile in reply.like.all():
+                reply.like.remove(user_profile)
+
+        return JsonResponse({
+            'success': True,
+            'disliked': disliked,
+            'total_likes': reply.totalLike(),
+            'total_dislikes': reply.totalDislike(),
+        })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def delete_post(request, post_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        post = get_object_or_404(Forum, id=post_id, user=user_profile)
+        post.delete()
+        return JsonResponse({'success': True, 'message': 'Post deleted successfully!'})
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def delete_reply(request, reply_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        reply = get_object_or_404(ForumReply, id=reply_id, user=user_profile)
+        reply.delete()
+        return JsonResponse({'success': True, 'message': 'Reply deleted successfully!'})
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+@csrf_exempt
+def add_reply(request, post_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        forum_post = get_object_or_404(Forum, id=post_id)
+        reply_to_id = data.get('reply_to')
+        content = data.get('content')
+
+        if not content:
+            return JsonResponse({'success': False, 'message': 'Content cannot be empty.'}, status=400)
+
+        reply_to = get_object_or_404(ForumReply, id=reply_to_id) if reply_to_id else None
+        reply = ForumReply.objects.create(
+            user=user_profile,
+            forum=forum_post,
+            content=content,
+            reply_to=reply_to
+        )
+        return JsonResponse({'success': True, 'message': 'Reply added successfully!', 'reply_id': reply.id})
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request.'
+    }, status=405)
+
+@csrf_exempt
+def edit_post(request, post_id):
+    if request.method == 'POST':
+        data = request.POST if request.content_type == 'application/x-www-form-urlencoded' else json.loads(request.body)
+        
+        # Jika data diambil dari JSON, pastikan username juga diambil
+        username = data.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'message': 'Username is required.'}, status=400)
+
+        user, _ = User.objects.get_or_create(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        # Pastikan untuk mengambil post dengan user_profile
+        post_object = get_object_or_404(Forum, id=post_id, user=user_profile)
+        
+        # Jika data dari JSON, ubah jadi QueryDict untuk form
+        if not isinstance(data, dict):
+            # Jika masih bukan dict, berarti data = request.POST diatas
+            pass
+        else:
+            # Convert JSON data ke QueryDict untuk form 
+            from django.http import QueryDict
+            qd = QueryDict('', mutable=True)
+            for key, value in data.items():
+                qd[key] = value
+            data = qd
+
+        form = EditPostForm(data, instance=post_object)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True, 'message': 'Post edited successfully!'})
+
+        return JsonResponse({'success': False, 'message': 'Invalid form data.', 'errors': form.errors}, status=400)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
+
+
 
