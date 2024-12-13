@@ -14,8 +14,23 @@ def show_list(request):
         user = friend.user
         friend.user_id = user.id
         
+    # Get All User that has similar category with the current user
+    friends_recommendation = UserProfile.objects.all().exclude(user=request.user)
+    
+    temp = []
+
+    if request.user_profile.categories is None:
+        request.user_profile.categories = ''
+        
+    for friend in friends_recommendation:
+        if friend not in friends and (friend.categories.split(',') in request.user_profile.categories.split(',') or friend.categories == ''):
+            temp.append(friend)
+            
+    friends_recommendation = temp
+
     context = {
         'friends': friends,
+        'friends_recommendation': friends_recommendation,
         'user': request.user,
         'user_profile': request.user_profile,
         'image_url': request.image_url,
@@ -28,7 +43,6 @@ def show_list(request):
 
 @check_user_profile()
 def main(request: AuthRequest, user_id: int):
-    print(user_id == None)
     try:
         friend = get_object_or_404(User, id=user_id)
         friend_profile = get_object_or_404(UserProfile, user=friend)
@@ -45,8 +59,6 @@ def main(request: AuthRequest, user_id: int):
         
     is_friend = request.user_profile.friends.all().filter(user=friend).exists()
     
-    print(is_friend)
-        
     context = {
         'user_id': user_id,
         'friend': friend,

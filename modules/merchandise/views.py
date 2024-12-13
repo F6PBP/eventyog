@@ -74,6 +74,8 @@ def create_merchandise_ajax(request):
 def edit_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     form = MerchandiseForm(request.POST or None, instance=merchandise)
+    
+    event = merchandise.related_event
 
     if form.is_valid() and request.method == "POST":
         form.save()
@@ -128,8 +130,6 @@ def showMerch_json(request, event_id: str):
 def add_items_to_cart(request):
     
     items = json.loads(request.body)['items']
-    print(items)
-    
     merch_cart = MerchCart.objects.filter(user=request.user)
     
     for item in items:

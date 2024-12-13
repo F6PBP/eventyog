@@ -86,8 +86,8 @@
                                 <div class="flex justify-between items-center w-full mt-2">
                                     <div class="flex justify-center w-full gap-2">
                                         <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>-</button>
-                                        <input type="number" id="quantity-${item.pk}" value="${item.bought_quantity}" min="0" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.name}', '${item.price}', this.value)" ${item.quantity === 0 ? 'disabled' : ''}>
-                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>+</button>
+                                        <input type="number" id="quantity-${item.pk}" value="${item.bought_quantity}" min="0" max="${item.quantity}" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.name}', '${item.price}', this.value, ${item.quantity})" ${item.quantity === 0 ? 'disabled' : ''}>
+                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.name}', '${item.price}', ${item.quantity}); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>+</button>
                                     </div>
                                 </div>
                             </div>
@@ -151,23 +151,28 @@
             updateCart();
         }
 
-        function increaseValue(id, name, price) {
+        function increaseValue(id, name, price, maxQuantity) {
             const quantityInput = document.getElementById("quantity-" + id);
             let currentValue = parseInt(quantityInput.value);
-            quantityInput.value = currentValue + 1;
+            if (currentValue < maxQuantity) {
+                quantityInput.value = currentValue + 1;
 
-            if (cartItems[id]) {
-                cartItems[id].quantity += 1;
-            } else {
-                cartItems[id] = { name: name, price: parseInt(price), quantity: 1, id: parseInt(id) };
+                if (cartItems[id]) {
+                    cartItems[id].quantity += 1;
+                } else {
+                    cartItems[id] = { name: name, price: parseInt(price), quantity: 1, id: parseInt(id) };
+                }
+                updateCart();
             }
-            updateCart();
         }
 
-        function updateQuantity(id, name, price, value) {
+        function updateQuantity(id, name, price, value, maxQuantity) {
             const quantity = parseInt(value);
-            if (quantity > 0) {
+            if (quantity > 0 && quantity <= maxQuantity) {
                 cartItems[id] = { name: name, price: parseInt(price), quantity: quantity, id: parseInt(id) };
+            } else if (quantity > maxQuantity) {
+                document.getElementById("quantity-" + id).value = maxQuantity;
+                cartItems[id] = { name: name, price: parseInt(price), quantity: maxQuantity, id: parseInt(id) };
             } else {
                 delete cartItems[id];
             }

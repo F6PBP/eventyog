@@ -150,8 +150,6 @@ def get_forum_by_ajax(request):
         replies_count = ForumReply.objects.filter(forum=post, reply_to=None).order_by('created_at').count()
         user = UserProfile.objects.get(id=post.user.id)
 
-        print(user.user.username)   
-        
         temp.append({
             'id': post.id,
             'title': post.title,
