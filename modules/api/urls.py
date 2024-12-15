@@ -3,8 +3,11 @@ from .views import admin_views, auth_views, cart_views, detail_event_views, even
 app_name = 'api'
 
 urlpatterns = [
-    path('auth/', auth_views.main, name='auth'),
-    path('cart/', cart_views.main, name='cart'),
-    path('yogevent/', event_views.main, name='yogevent'),
-    path('detail-event', detail_event_views.main, name='detail-event-views'),
+    path('auth/login/', auth_views.login, name='auth_login'),
+    path('auth/register/', auth_views.register, name='auth_register'),
+    path('auth/logout/', auth_views.logout, name='auth_logout'),
+    path('auth/profile/', auth_views.profile, name='auth_profile'),
+    path('yogevent/', event_views.create_event_flutter, name='yogevent'),
+    path('detail-event-rating/', detail_event_views.create_rating_flutter, name='detail-event-views'),
+    path('detail-event-ticket/', detail_event_views.buy_ticket_flutter, name='detail-event-ticket'),
 ]

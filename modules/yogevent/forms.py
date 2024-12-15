@@ -10,7 +10,7 @@ class EventForm(forms.ModelForm):
             'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'category': forms.Select(choices=EventCategory.choices),
-            'image_urls': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Paste image URLs as JSON'}),
+            'image_urls': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Paste image URL'}),
         }
     
     def clean_title(self):

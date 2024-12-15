@@ -4,25 +4,16 @@
     <div class="rounded-lg flex flex-col md:flex-row">
         <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
             {% if event.image_urls %}
-                <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls.0 }}" alt="{{ event.title }}">
+                <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls }}" alt="{{ event.title }}">
             {% else %}
                 <img class="w-full max-w-lg object-cover rounded-lg" 
-                    src="https://via.placeholder.com/800x400"
+                    src="https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg"
                 alt="{{ event.title }}">
             {% endif %}
         </div>
 
         <div class="md:w-1/2 flex flex-col justify-center pl-0 md:pl-6">
-            <div class="flex gap-2 items-center">
             <h1 class="text-4xl font-bold text-center md:text-left mb-2">{{ event.title }}</h1>
-                {% if is_admin %}
-                <a href="{% url 'yogevent:edit_event' event.uuid %}">
-                    <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:scale-105 duration-300">
-                        <i class="fa fa-pencil text-blue-500 w-4"></i>
-                    </div>
-                </a>
-                {% endif %}
-            </div>
             <div class="event-details">
                 <p class="text-gray-700 mb-2">{{ event.description }}</p>
                 <div class="text-sm text-gray-600 flex items-center gap-2 mb-2">
@@ -54,32 +45,39 @@
                 </div>
             {% endif %}
 
-            <div class="flex gap-4 mt-4 items-center">
-                {% if is_in_cart %}
-                    <a href="{% url 'cart:main' %}">
-                        {% include "ds/button.html" with text="Complete payment" icon="fa fa-ticket" %}
-                    </a>
+            {% if is_in_cart %}
+                {% if not is_rated %}
+                    <div class="flex gap-2">
+                        {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" id="openModalButton" specify="give-rating-modal" %}
+                        {% include "components/give_rating_modal.html" with modal_id="give-rating-modal" modal_title="Give Rating" modal_label="modal-label" onsubmit="submitRating" %}
+
+                        <a href="{% url 'cart:main' %}">
+                            {% include "ds/button.html" with text="Complete payment" class="w-fit mt-5 h-fit" %}
+                        </a>
+                    </div>
                 {% else %}
-                    {% if is_booked %}
-                        <div class="flex flex-col md:flex-row gap-2 items-center">
-                            {% if not is_rated %}
-                                {% include "ds/button.html" with text="Give Rating" class="w-fit bg-yellow-500 h-fit" icon="fa fa-star" id="openModalButton" specify="give-rating-modal" %}
-                                {% include "components/give_rating_modal.html" with modal_id="give-rating-modal" modal_title="Give Rating" modal_label="modal-label" onsubmit="submitRating" %}
-                            {% endif %}
-    
-                            {% include "ds/button.html" with text="Cancel Booking" class="w-fit h-fit" icon="fa fa-x" variant="danger" onclick="onCancelBook();" %}
-                        </div>
-                    {% else %}            
-                        {% if tickets %}
-                            {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
-                            {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" onsubmit="buy_ticket" %}
-                        {% else %}
-                            {% include "ds/button.html" with text="Book Event (Free)" class="w-fit min-w-[200px]" icon="fa fa-ticket" onclick="onBookFree();" %}
+                    <a href="{% url 'cart:main' %}">
+                        {% include "ds/button.html" with text="Complete payment"%}
+                    </a>
+                {% endif %}
+            {% else %}
+                {% if is_booked %}
+                    <div class="flex gap-2">
+                        {% if not is_rated %}
+                            {% include "ds/button.html" with text="Give Rating" class="w-fit mt-5 bg-yellow-500 h-fit" icon="fa fa-star" id="openModalButton" specify="give-rating-modal" %}
+                            {% include "components/give_rating_modal.html" with modal_id="give-rating-modal" modal_title="Give Rating" modal_label="modal-label" onsubmit="submitRating" %}
                         {% endif %}
+                        {% include "ds/button.html" with text="Cancel Booking" class="w-fit mt-5 h-fit" icon="fa fa-x" variant="danger" onclick="onCancelBook();" %}
+                    </div>
+                {% else %}            
+                    {% if tickets %}
+                        {% include "ds/button.html" with text="Buy Ticket" class="w-fit mt-5" icon="fa fa-ticket" id="openModalButton" specify="open-modal-1" %}
+                        {% include "components/buy_ticket.html" with modal_id="open-modal-1" modal_title="Buy Ticket" modal_label="modal-label" onsubmit="buy_ticket" %}
+                    {% else %}
+                        {% include "ds/button.html" with text="Book Event (Free)" class="w-fit mt-5" icon="fa fa-ticket" onclick="onBookFree();" %}
                     {% endif %}
                 {% endif %}
             {% endif %}
-            
         </div>
     </div>
     <hr class="my-10">
@@ -89,34 +87,37 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const messageDisplay = document.getElementById("averageRating");
-
-        submitButton.addEventListener("click", function() {
-            fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    messageDisplay.textContent = data.error;
-                    messageDisplay.classList.add("text-red-500");
-                } else {
-                    messageDisplay.textContent = data.message;
-                    messageDisplay.classList.add("text-green-500");
-                    
-                    if (data.average_rating) {
-                        document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
+        const submitButton = document.getElementById("give-rating-modal");
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const parentElement = document.body; 
+        
+        parentElement.addEventListener("click", function() {
+                console.log("Hi aku di dalam buat check, blm fetch sih");
+                fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        messageDisplay.textContent = data.error;
+                        messageDisplay.classList.add("text-red-500");
+                    } else {
+                        messageDisplay.textContent = data.message;
+                        messageDisplay.classList.add("text-green-500");
+                        if (data.average_rating) {
+                            document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
+                        }
                     }
-                }
-            })
-            .catch(error => {
-                messageDisplay.textContent = "An error occurred. Please try again.";
-                messageDisplay.classList.add("text-red-500");
+                })
+                .catch(error => {
+                    messageDisplay.textContent = "An error occurred. Please try again.";
+                    messageDisplay.classList.add("text-red-500");
+                });
             });
-        });
     });
     
     function onBookFree() {
@@ -162,23 +163,29 @@
     }
 
     function buy_ticket() {
-        const formData = new FormData();
-        formData.append('event_uuid', "{{ event.uuid }}");
+        var ticket = document.getElementById('ticket').value;
 
-        fetch("{% url 'yogevent:ticket_price_list' event.uuid %}", {
+        fetch('{% url "yogevent:buy_ticket" %}', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: formData
+            body: JSON.stringify({
+                'event': '{{ event.uuid }}',
+                'ticket_id': ticket
+            })
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok.');
-            showToast('Buy Ticket!', 'success');
-            return response.json();
-        })
-        .then(data => console.log(data))
-        .catch(error => console.error('There was a problem with the fetch operation:', error));
-    } 
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                alert('Ticket purchased successfully.');
+                location.reload();
+            } else {
+                location.reload();
+            }
+        });
+    }
 </script>
 {% endblock %}

@@ -28,9 +28,7 @@ def main(request: HttpRequest) -> HttpResponse:
     
     for event in events:
         # Set image urls 
-        if event.image_urls:
-            event.image_urls = event.image_urls[0]
-        else:
+        if not event.image_urls:
             event.image_urls = 'https://via.placeholder.com/'
         
         event.month = event.start_time.strftime('%B')
@@ -112,7 +110,6 @@ def get_events_by_queries(request):
     category = request.GET.get('category')
     start_time = request.GET.get('start_date')
     end_time = request.GET.get('end_date')
-    
     events = Event.objects.all()
     
     if query:
@@ -128,10 +125,8 @@ def get_events_by_queries(request):
         events = events.filter(end_time__lte=end_time)
 
     for event in events:
-        if event.image_urls:
-            event.image_urls = event.image_urls[0]
-        else:
-            event.image_urls = 'https://via.placeholder.com/800x400'
+        if not event.image_urls:
+            event.image_urls = 'https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg'
         
         event.month = event.start_time.strftime('%B')
         event.day = event.start_time.strftime('%d')
@@ -189,7 +184,7 @@ def create_event_entry_ajax(request):
     start_time = request.POST.get('start_time')
     end_time = request.POST.get('end_time')
     location = strip_tags(request.POST.get('location'))
-    image_url = [strip_tags(request.POST.get('image_url'))] if request.POST.get('image_url') else []
+    image_url = request.POST.get('image_url') if request.POST.get('image_url') else ""
 
     if not title or not category or not start_time:
         return JsonResponse({'status': False, 'message': 'Invalid input'})
@@ -197,7 +192,7 @@ def create_event_entry_ajax(request):
     if end_time and start_time >= end_time:
         return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
         
-    if image_url and not any(img.endswith(('.jpg', '.jpeg', '.png')) for img in image_url):
+    if image_url and not image_url.endswith(('.jpg', '.jpeg', '.png')):
         return JsonResponse({'status': False, 'message': "Thumbnail must be a valid image URL (.jpg, .jpeg, .png)."})
 
     try:
@@ -214,7 +209,6 @@ def create_event_entry_ajax(request):
         return JsonResponse({'status': True, 'message': 'Event created successfully.'})
     
     except Exception as e:
-        print("NAH LOH")
         return JsonResponse({'status': False, 'message': 'Error creating event.'})
 
 def detail_event(request, uuid):
@@ -224,7 +218,6 @@ def detail_event(request, uuid):
     average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
     merchandise = Merchandise.objects.all()
     
-    # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets if len(tickets) > 0 else None
 
@@ -327,15 +320,9 @@ def book_event(request):
 @csrf_exempt
 @require_POST
 def cancel_book(request):
-    body = request.body.decode('utf-8')
-    # body = json.loads(body)
-    
-    print(body)
-    
     event_id = request.POST.get('event_uuid')
     event = get_object_or_404(Event, uuid=event_id)
     user_profile = request.user_profile
-    
     registered_ticket = user_profile.registeredEvent.filter(event=event)
     
     if registered_ticket.exists():
@@ -372,7 +359,6 @@ def edit_event(request, uuid):
 
 @check_user_profile(is_redirect=True)
 @require_POST
-@csrf_exempt
 def add_rating(request, event_id):
     event = get_object_or_404(Event, uuid=event_id)
     rating_value = request.POST.get('rating')
@@ -421,7 +407,6 @@ def get_rating_event(request, event_uuid):
         'user_name': user_profile.user.username, 
         'average_rating': round(average_rating, 1),
     }
-
     return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
 
 def load_event_ratings(request, event_id):
@@ -438,15 +423,35 @@ def load_event_ratings(request, event_id):
     })
 
 @csrf_exempt
-def ticket_price_list(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    ticket_prices = TicketPrice.objects.filter(event=event)
+def ticket_price_list(request, uuid):
+    if request.method == "POST":
+        event = get_object_or_404(Event, uuid=uuid)
+        tickets = TicketPrice.objects.filter(event=event)
 
-    context = {
-        'event': event,
-        'ticket_prices': ticket_prices,
-    }
-    return render(request, 'ticket_price_list.html', context)
+        if tickets.exists():
+            ticket_data = []
+            for ticket in tickets:
+                ticket_data.append({
+                    "name" : event.title,
+                    "uuid" : event.uuid,
+                    "price": ticket.price,
+                })
+
+            return JsonResponse({
+                "success": True,
+                "message": "Tickets retrieved successfully.",
+                "data": ticket_data
+            })
+        else:
+            return JsonResponse({
+                "success": False,
+                "message": "No tickets available for this event."
+            }, status=404)
+
+    return JsonResponse({
+        "success": False,
+        "message": "Invalid request method."
+    }, status=400)
 
 @check_user_profile()
 def buy_ticket(request):

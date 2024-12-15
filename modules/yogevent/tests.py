@@ -21,7 +21,7 @@ class EventViewTests(TestCase):
             start_time=datetime(2024, 10, 30, 18, 0),
             end_time=datetime(2024, 10, 30, 20, 0),
             location='Test Location',
-            image_urls=['https://via.placeholder.com/800x400']
+            image_urls='https://via.placeholder.com/800x400'
         )
 
     def test_main_view(self):
@@ -44,7 +44,7 @@ class EventViewTests(TestCase):
             'start_time': '2024-10-31 18:00:00',
             'end_time': '2024-10-31 20:00:00',
             'location': 'New Location',
-            'image_urls': ['https://via.placeholder.com/800x400']
+            'image_urls': 'https://via.placeholder.com/800x400'
         })
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {'status': True, 'message': 'Event created successfully.'})
@@ -75,7 +75,7 @@ class EventViewTests(TestCase):
             'start_time': '2024-10-31 18:00:00',
             'end_time': '2024-10-31 20:00:00',
             'location': 'Updated Location',
-            'image_urls': ['https://via.placeholder.com/800x400']
+            'image_urls': 'https://via.placeholder.com/800x400'
         })
         self.assertEqual(response.status_code, 302)  # Expect a redirect after saving
         self.event.refresh_from_db()
