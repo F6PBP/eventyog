@@ -5,7 +5,7 @@ from modules.main.models import Merchandise
 class MerchandiseForm(ModelForm):
     class Meta:
         model = Merchandise
-        fields = ["image_url", "name", "description", "price"]
+        fields = ["image_url", "name", "description", "price", "quantity"]
         
     def clean_price(self):
         price = self.cleaned_data.get('price')

@@ -39,7 +39,7 @@ def show_merchandise_by_id(request, id):
         'created_at': merch.created_at.isoformat(),
         'updated_at': merch.updated_at.isoformat(),
     }
-    return JsonResponse({"status": "success", "data": context}, status=200)
+    return JsonResponse({"status": "success", "data": context, "is_admin": request.is_admin}, status=200)
 
 @csrf_exempt
 @require_POST
@@ -48,13 +48,18 @@ def create_merchandise_ajax(request):
         data = json.loads(request.body)
         event = Event.objects.get(uuid=data["event_id"])
 
+        if int(data["quantity"]) <= 0:
+            return JsonResponse({"status": "error", "message": "Quantity must be greater than zero"}, status=400)
+        if float(data["price"]) <= 0:
+            return JsonResponse({"status": "error", "message": "Price must be greater than zero"}, status=400)
 
         new_merchandise = Merchandise.objects.create(
             name=data["name"],
             description=data["description"],
             price=data["price"],
             image_url=data["image_url"],
-            related_event=event
+            related_event=event,
+            quantity=data["quantity"]
         )
 
         response = {
@@ -66,6 +71,7 @@ def create_merchandise_ajax(request):
                 "description": new_merchandise.description,
                 "price": new_merchandise.price,
                 "image_url": new_merchandise.image_url,
+                "quantity": new_merchandise.quantity,
                 "related_event": new_merchandise.related_event.uuid,
                 "created_at": new_merchandise.created_at.isoformat(),
                 "updated_at": new_merchandise.updated_at.isoformat(),
@@ -84,11 +90,17 @@ def edit_merchandise(request, id):
         merchandise = Merchandise.objects.get(pk=id)
         data = json.loads(request.body)
 
+        if int(data.get("quantity", merchandise.quantity)) <= 0:
+            return JsonResponse({"status": "error", "message": "Quantity must be greater than zero"}, status=400)
+        if float(data.get("price", merchandise.price)) <= 0:
+            return JsonResponse({"status": "error", "message": "Price must be greater than zero"}, status=400)
+
         # Update the merchandise fields
         merchandise.name = data.get("name", merchandise.name)
         merchandise.description = data.get("description", merchandise.description)
         merchandise.price = data.get("price", merchandise.price)
         merchandise.image_url = data.get("image_url", merchandise.image_url)
+        merchandise.quantity = data.get("quantity", merchandise.quantity)
         merchandise.save()
 
         response = {
@@ -100,6 +112,7 @@ def edit_merchandise(request, id):
                 "description": merchandise.description,
                 "price": merchandise.price,
                 "image_url": merchandise.image_url,
+                "quantity": merchandise.quantity,
                 "related_event": merchandise.related_event.uuid,
                 "created_at": merchandise.created_at.isoformat(),
                 "updated_at": merchandise.updated_at.isoformat(),
@@ -120,6 +133,7 @@ def delete_merchandise(request, id):
 
 @check_user_profile_api()
 def showMerch_json(request, event_id: str):
+    
     try:
         event = Event.objects.get(uuid=event_id)
         data = Merchandise.objects.filter(related_event=event).order_by('created_at')[::-1]
@@ -148,7 +162,11 @@ def showMerch_json(request, event_id: str):
                 'related_event': merch.related_event.uuid
             })
 
-        return JsonResponse({"status": "success", "data": temp}, status=200)
+        return JsonResponse({
+            "status": "success",
+            "data": temp,
+            "is_admin": request.is_admin  # Default False if attribute does not exist
+        }, status=200)
     except Event.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
 
@@ -174,7 +192,7 @@ def add_items_to_cart(request):
                 )
                 new_cart_item.save()
                 
-        return JsonResponse({"status": "success", "message": "Items added to cart successfully"}, status=200)
+        return JsonResponse({"status": "success", "message": "Items added to cart successfully", "is_admin": request.is_admin}, status=200)
     except Merchandise.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Merchandise not found"}, status=404)
     except KeyError as e:

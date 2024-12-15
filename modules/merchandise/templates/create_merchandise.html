@@ -1,8 +1,15 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
-    <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto w-full">
+    <div class="relative flex flex-col gap-4 overflow-y-auto overflow-x-hidden w-full max-h-[80vh]">
         <form id="merchandise-form" onsubmit="event.preventDefault(); submitCreateMerchForm();">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+              <div class="text-red-600">
+                {% for error in form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="p-5 w-full h-full">
                 <!-- Image URL Input -->
                 <div class="mb-4 w-full">
@@ -10,6 +17,10 @@
                         Image Url
                     </label>
                     {% include "ds/input.html" with type="text" id="image_url" value=form.image_url.value name="image_url" placeholder="Image URL" required="True" %}
+                    <p id="image_url_error" class="text-red-500 text-xs italic" style="display: none;">Please enter a valid URL for the image.</p>
+                    {% for error in form.image_url.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
                 <!-- Name Input -->
@@ -18,9 +29,9 @@
                         Name
                     </label>
                     {% include "ds/input.html" with id="name" value=form.name.value name="name" placeholder="The name of the event" required="True" %}
-                    {% if form.name.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p>
-                    {% endif %}
+                    {% for error in form.name.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
                 <!-- Description Input -->
@@ -29,9 +40,9 @@
                         Description
                     </label>
                     {% include "ds/textarea.html" with id="description" name="description" class="min-h-[200px] w-full" placeholder="The description goes here" value=form.description.value  %}
-                    {% if form.description.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
-                    {% endif %}
+                    {% for error in form.description.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
                 <!-- Price Input -->
@@ -40,9 +51,22 @@
                         Price
                     </label>
                     {% include "ds/input.html" with type="number" id="price" name="price" value=form.price.value placeholder="Price" %}
-                    {% if form.price.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.price.errors }}</p>
-                    {% endif %}
+                    <p id="price_error" class="text-red-500 text-xs italic" style="display: none;">Price must be greater than zero.</p>
+                    {% for error in form.price.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Quantity Input -->
+                <div class="mb-4 w-full">
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">
+                        Quantity
+                    </label>
+                    {% include "ds/input.html" with type="number" id="quantity" name="quantity" value=form.quantity.value placeholder="Quantity" %}
+                    <p id="quantity_error" class="text-red-500 text-xs italic" style="display: none;">Quantity must be greater than zero.</p>
+                    {% for error in form.quantity.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
                 <div id="responseContainer" style="display: none;"></div>
@@ -78,19 +102,37 @@
             const name = formData.get('name');
             const description = formData.get('description');
             const price = formData.get('price');
+            const quantity = formData.get('quantity');
 
-            if (!imageUrl || !name || !description || !price) {
+            let isValid = true;
+
+            if (!imageUrl || !name || !description || !price || !quantity) {
                 alert("All fields are required.");
                 return;
             }
 
             if (!isValidURL(imageUrl)) {
-                alert("Please enter a valid URL for the image.");
-                return;
+                document.getElementById('image_url_error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('image_url_error').style.display = 'none';
             }
 
-            if (price < 0) {
-                alert("Price cannot be less than 0.");
+            if (price <= 0) {
+                document.getElementById('price_error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('price_error').style.display = 'none';
+            }
+
+            if (quantity <= 0) {
+                document.getElementById('quantity_error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('quantity_error').style.display = 'none';
+            }
+
+            if (!isValid) {
                 return;
             }
 
