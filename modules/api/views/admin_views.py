@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from modules.authentication.forms import UserProfileForm
 from django.contrib.auth import login, logout, authenticate
+from django.http import JsonResponse
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
@@ -92,13 +93,6 @@ def edit_user(request, user_id) -> JsonResponse:
         return JsonResponse({"status": True, "message": "User profile updated successfully."}, status=200)
     
     return JsonResponse({"status": False, "message": "Invalid request method."}, status=405)
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from eventyog.decorators import check_user_profile
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
