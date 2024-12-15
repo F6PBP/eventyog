@@ -74,10 +74,12 @@ def create_merchandise_ajax(request):
 def edit_merchandise(request, id):
     merchandise = Merchandise.objects.get(pk = id)
     form = MerchandiseForm(request.POST or None, instance=merchandise)
+    
+    event = merchandise.related_event
 
     if form.is_valid() and request.method == "POST":
         form.save()
-        return HttpResponseRedirect(reverse('yogevent:main'))
+        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
 
     context = {
         'form': form,

@@ -61,9 +61,39 @@
     </div>
 
     <script>
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;  
+            }
+        }
+
         function submitCreateMerchForm() {
             const form = document.getElementById('merchandise-form');
             const formData = new FormData(form);
+
+            const imageUrl = formData.get('image_url');
+            const name = formData.get('name');
+            const description = formData.get('description');
+            const price = formData.get('price');
+
+            if (!imageUrl || !name || !description || !price) {
+                alert("All fields are required.");
+                return;
+            }
+
+            if (!isValidURL(imageUrl)) {
+                alert("Please enter a valid URL for the image.");
+                return;
+            }
+
+            if (price < 0) {
+                alert("Price cannot be less than 0.");
+                return;
+            }
+
             eventId = "{{event.uuid}}"
             formData.append("event_id", eventId);
 
