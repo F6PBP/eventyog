@@ -16,28 +16,44 @@ from modules.main.models import Forum, ForumReply
 from modules.yogforum.forms import AddForm, AddReplyForm, EditPostForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-
+from eventyog.decorators import check_user_profile_api
 
 def main(request):
-    forum_posts = Forum.objects.all().order_by('-created_at')
-    
-    posts_data = []
-    for post in forum_posts:
-        posts_data.append({
-            'id': post.id,
-            'title': post.title,
-            'user': post.user.user.username,
-            'content': post.content,
-            'created_at': post.created_at,
-            'total_likes': post.totalLike(),
-            'total_dislikes': post.totalDislike(),
+    try:
+        forum_posts = Forum.objects.all().order_by('-created_at')
+        
+        posts_data = []
+        for post in forum_posts:
+            user_profile = UserProfile.objects.get(user=post.user.user.id)
+            image_url = (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            
+            posts_data.append({
+                'id': post.id,
+                'title': post.title,
+                'user': post.user.user.username,
+                'profile_picture': image_url,
+                'content': post.content,
+                'created_at': post.created_at,
+                'total_likes': post.totalLike(),
+                'total_dislikes': post.totalDislike(),
+            })
+        
+        return JsonResponse({
+            'forum_posts': posts_data,
+            'show_navbar': True,
+            'show_footer': True
         })
-    
-    return JsonResponse({
-        'forum_posts': posts_data,
-        'show_navbar': True,
-        'show_footer': True
-    })
+        
+    except Exception as e:
+        print('Error in main:', e)
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)
 
 @csrf_exempt
 def viewforum(request, post_id):
