@@ -87,11 +87,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const messageDisplay = document.getElementById("averageRating");
-        const submitButton = document.getElementById("give-rating-modal");
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const parentElement = document.body; 
-        
-        parentElement.addEventListener("click", function() {
+        submitButton.addEventListener("click", function() {
                 console.log("Hi aku di dalam buat check, blm fetch sih");
                 fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
                     method: "POST",

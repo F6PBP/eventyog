@@ -14,13 +14,10 @@ class UserProfile(models.Model):
     bio = models.TextField()
     profile_picture = CloudinaryField('image', null=True, default=None, blank=True)
     categories = models.CharField(max_length=200, null=True, blank=True)
-    
     registeredEvent = models.ManyToManyField('TicketPrice', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
     friends = models.ManyToManyField('UserProfile', blank=True)
-    
     wallet = models.DecimalField(max_digits=10, decimal_places=2, default=1000000)
-    
     role = models.CharField(
         choices=UserRoles.choices,
         default=UserRoles.USER,

@@ -422,36 +422,36 @@ def load_event_ratings(request, event_id):
         "ratings": list(ratings),
     })
 
-@csrf_exempt
-def ticket_price_list(request, uuid):
-    if request.method == "POST":
-        event = get_object_or_404(Event, uuid=uuid)
-        tickets = TicketPrice.objects.filter(event=event)
+# @csrf_exempt
+# def ticket_price_list(request, uuid):
+#     if request.method == "POST":
+#         event = get_object_or_404(Event, uuid=uuid)
+#         tickets = TicketPrice.objects.filter(event=event)
 
-        if tickets.exists():
-            ticket_data = []
-            for ticket in tickets:
-                ticket_data.append({
-                    "name" : event.title,
-                    "uuid" : event.uuid,
-                    "price": ticket.price,
-                })
+#         if tickets.exists():
+#             ticket_data = []
+#             for ticket in tickets:
+#                 ticket_data.append({
+#                     "name" : event.title,
+#                     "uuid" : event.uuid,
+#                     "price": ticket.price,
+#                 })
 
-            return JsonResponse({
-                "success": True,
-                "message": "Tickets retrieved successfully.",
-                "data": ticket_data
-            })
-        else:
-            return JsonResponse({
-                "success": False,
-                "message": "No tickets available for this event."
-            }, status=404)
+#             return JsonResponse({
+#                 "success": True,
+#                 "message": "Tickets retrieved successfully.",
+#                 "data": ticket_data
+#             })
+#         else:
+#             return JsonResponse({
+#                 "success": False,
+#                 "message": "No tickets available for this event."
+#             }, status=404)
 
-    return JsonResponse({
-        "success": False,
-        "message": "Invalid request method."
-    }, status=400)
+#     return JsonResponse({
+#         "success": False,
+#         "message": "Invalid request method."
+#     }, status=400)
 
 @check_user_profile()
 def buy_ticket(request):
@@ -463,8 +463,6 @@ def buy_ticket(request):
     
     user = request.user
     
-    # Add to EventCart
-    # Check if the ticket is already in the event cart
     if not EventCart.objects.filter(user=user, ticket=ticket).exists():
         event_cart = EventCart(user=user, ticket=ticket)
         event_cart.save()
