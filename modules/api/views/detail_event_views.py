@@ -9,10 +9,6 @@ from django.db.models import Avg
 
 @csrf_exempt
 def add_rating(request, event_id: uuid.UUID):
-    print("\nDebug Rating : ")
-    print(f"LAGI DIAKSES SAMA USER : {request.user.username}")
-    print(f"Method {request.method}")
-
     try:
         if not request.user.is_authenticated:
             return JsonResponse({'error': 'Please login first'}, status=401)
@@ -27,20 +23,12 @@ def add_rating(request, event_id: uuid.UUID):
         if request.method == 'GET':
             # Get all ratings using related_name if defined in Rating model
             ratings = Rating.objects.filter(rated_event=event)
-            
-            print(f"Debug Get - Ratings queryset: {ratings}")  # Debug print
-            
-
             # Calculate average rating
             if ratings.exists():
                 avg_rating = ratings.aggregate(Avg('rating'))['rating__avg']
                 avg_rating = round(float(avg_rating), 1)  # Round to 1 decimal place
             else:
                 avg_rating = 0.0
-
-            print(f"Total ratings: {ratings.count()}")
-            print(f"Average rating: {avg_rating}")
-
             # Format ratings data
             ratings_data = [{
                 'username': rating.user.user.username,
@@ -65,18 +53,13 @@ def add_rating(request, event_id: uuid.UUID):
                 'total_ratings': ratings.count(),
                 'user_rating': user_rating_data
             }
-            
-            print(f"Debug - Response data: {response_data}")  # Debug print
-            
             return JsonResponse(response_data)
 
         elif request.method == 'POST':
             try:
                 # Ubah dari json.loads ke request.POST
-                print("Received POST data:", request.POST)
                 rating_value = request.POST.get('rating')
                 review = request.POST.get('review', '').strip()
-                print(f"Received rating data: rating={rating_value}, review={review}")
 
                 if Rating.objects.filter(user=user_profile, rated_event=event).exists():
                     return JsonResponse({'error': 'You have already rated this event'}, status=400)
@@ -144,10 +127,8 @@ def get_tickets(request, event_id):
             'tickets': ticket_data
         })
     except Event.DoesNotExist:
-        print(f"Debug - Event not found: {event_id}")
         return JsonResponse({'error': 'Event not found'}, status=404)
     except Exception as e:
-        print(f"Debug - Error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
@@ -155,10 +136,6 @@ def get_tickets(request, event_id):
 @require_POST
 def buy_ticket_flutter(request):
     try:
-        # Debug prints
-        print("Request POST:", request.POST)
-        print("Request body:", request.body)
-        
         # Coba ambil ticket_id dari POST data dulu
         ticket_id = request.POST.get('ticket_id')
         
@@ -212,7 +189,6 @@ def buy_ticket_flutter(request):
         )
             
     except Exception as e:
-        print("Error:", str(e))
         return JsonResponse(
             {'status': False, 'message': str(e)},
             status=500
@@ -224,12 +200,7 @@ def delete_user_ticket(request):
         try:
             # Get ticket_id from POST data
             ticket_id = request.POST.get('ticket_id')
-            print(f"Attempting to delete cart with ID: {ticket_id}")
-            
-            # Print existing carts for debugging
-            existing_carts = EventCart.objects.filter(user=request.user)
-            for cart in existing_carts:
-                print(f"Cart ID: {cart.id}, Event: {cart.ticket.event.title}")
+
 
             try:
                 # Get the cart item first to ensure it exists
@@ -240,7 +211,6 @@ def delete_user_ticket(request):
                 
                 cart_item.delete()
                 
-                print(f"Successfully deleted cart item {ticket_id}")
                 return JsonResponse(
                     {
                         'status': True,
@@ -250,7 +220,6 @@ def delete_user_ticket(request):
                 )
                 
             except EventCart.DoesNotExist:
-                print(f"Cart item {ticket_id} not found")
                 return JsonResponse(
                     {
                         'status': False,
@@ -260,7 +229,6 @@ def delete_user_ticket(request):
                 )
                 
         except Exception as e:
-            print(f"Error deleting cart item: {str(e)}")
             return JsonResponse(
                 {
                     'status': False,
@@ -325,37 +293,6 @@ def get_user_ticket_status(request, event_id):
         return JsonResponse({
             'error': str(e)
         }, status=500)
-
-# Optional: Add a view to get cart items for an event
-@csrf_exempt
-def get_user_event_cart(request, event_id):
-    try:
-        event = Event.objects.get(uuid=event_id)
-        cart_items = EventCart.objects.filter(
-            user=request.user,
-            ticket__event=event
-        )
-        
-        return JsonResponse({
-            'status': True,
-            'has_ticket': cart_items.exists(),
-            'cart_items': [{
-                'id': item.id,
-                'ticket_name': item.ticket.name,
-                'price': float(item.ticket.price),
-                'is_free': item.ticket.isFree()
-            } for item in cart_items]
-        })
-    except Event.DoesNotExist:
-        return JsonResponse({
-            'status': False,
-            'message': 'Event not found'
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': False,
-            'message': str(e)
-        })
     
 @csrf_exempt
 def get_user_event_tickets(request, event_id):    

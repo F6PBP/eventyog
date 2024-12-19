@@ -1,7 +1,6 @@
 from datetime import datetime
 import uuid
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from modules.main.models import Event
@@ -12,14 +11,12 @@ from django.db.models import Q
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> JsonResponse:
     try:
-
         data = {
             'show_navbar': True,
-            'is_admin': request.user.is_staff or request.user.is_superuser
+            'is_admin' : getattr(request, 'is_admin', False),
         }
         return JsonResponse(data)
     except Exception as e:
-        print("Error in show_main:", str(e))
         return JsonResponse({'error': str(e)}, status=500)
 
 @check_user_profile(is_redirect=False)
@@ -110,6 +107,9 @@ def create_event_flutter(request):
             if end_time and start_time >= end_time:
                 return JsonResponse({"error": "Event berakhir sebelum dimulai"}, status=400)
             
+            if not location:
+                location =  None
+            
             new_event = Event.objects.create(
                 title=title,
                 description=description,
@@ -144,7 +144,6 @@ def edit_event_flutter(request, event_id):
         try:
             event = Event.objects.get(uuid=event_id)
             data = json.loads(request.body)
-
             # Convert string dates to datetime objects if they exist
             start_time_str = data.get("start_time", event.start_time)
             end_time_str = data.get("end_time", event.end_time)
@@ -152,8 +151,11 @@ def edit_event_flutter(request, event_id):
             # Parse datetime strings if they're not None
             if start_time_str:
                 event.start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00'))
-            if end_time_str:
-                event.end_time = datetime.fromisoformat(end_time_str.replace('Z', '+00:00'))
+            if "end_time" in data:
+                if data["end_time"] is None:
+                    event.end_time = None
+                else:
+                    event.end_time = datetime.fromisoformat(end_time_str.replace('Z', '+00:00'))
 
             # Handle other fields
             event.title = data.get("title", event.title)
@@ -172,6 +174,8 @@ def edit_event_flutter(request, event_id):
                 return JsonResponse({"error": "Start time is required"}, status=400)   
             if event.end_time and event.start_time >= event.end_time:
                 return JsonResponse({"error": "Event berakhir sebelum dimulai"}, status=400)
+            if not event.location:
+                event.location = None
             
             event.save()
 
@@ -197,52 +201,3 @@ def edit_event_flutter(request, event_id):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
-
-@csrf_exempt
-def search_events(request):
-    try:
-        # Get search query from GET parameters
-        query = request.GET.get('query', '').strip()
-        category = request.GET.get('category', '').strip()
-        
-        # Base queryset
-        events = Event.objects.all()
-        
-        # Apply search filters if query exists
-        if query:
-            events = events.filter(
-                Q(title__icontains=query) |
-                Q(description__icontains=query)
-            )
-            
-        # Apply category filter if specified
-        if category and category != 'ALL':
-            events = events.filter(category=category)
-            
-        # Format the response
-        events_data = []
-        for event in events:
-            event_data = {
-                'pk': str(event.uuid),
-                'fields': {
-                    'title': event.title,
-                    'description': event.description,
-                    'category': event.category,
-                    'start_time': event.start_time.isoformat() if event.start_time else None,
-                    'end_time': event.end_time.isoformat() if event.end_time else None,
-                    'location': event.location,
-                    'image_urls': event.image_urls,
-                }
-            }
-            events_data.append(event_data)
-            
-        return JsonResponse({
-            'status': 'success',
-            'events': events_data
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)

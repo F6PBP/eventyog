@@ -19,6 +19,4 @@ urlpatterns = [
     path('yogevent/delete-user-ticket/', detail_event_views.delete_user_ticket, name='delete_user_ticket'),
     path('yogevent/tickets/<uuid:event_id>/', detail_event_views.get_tickets, name='get_tickets'),
     path('yogevent/user-ticket/<uuid:event_id>/', detail_event_views.get_user_ticket_status, name='get_user_ticket_status'),
-    path('yogevent/user-cart/<uuid:event_id>/', detail_event_views.get_user_event_cart, name='get_user_event_cart'),
-    path('yogevent/search/', event_views.search_events, name='search_events'),
 ]
