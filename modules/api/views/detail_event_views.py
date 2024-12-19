@@ -238,7 +238,6 @@ def delete_user_ticket(request):
                     user=request.user
                 )
                 
-                # Delete the cart item
                 cart_item.delete()
                 
                 print(f"Successfully deleted cart item {ticket_id}")
