@@ -53,6 +53,7 @@ class Command(BaseCommand):
                     pass
         
         print('Seeding event done')
+
         
     def seed_merch(self):
         with open(f'{self.path}product-dataset.json', 'r', errors='ignore') as file:

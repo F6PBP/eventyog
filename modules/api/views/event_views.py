@@ -19,15 +19,8 @@ def main(request: HttpRequest) -> JsonResponse:
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@check_user_profile(is_redirect=False)
 def show_event_json(request):
     try:
-        # Jika perlu membatasi akses hanya untuk user yang sudah login
-        if not request.user.is_authenticated:
-            return JsonResponse({
-                'error': 'Authentication required'
-            }, status=401)
-
         events = Event.objects.all()
         
         events_json = serializers.serialize("json", events)

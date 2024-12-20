@@ -2,7 +2,7 @@ import json
 import uuid
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from modules.main.models import Rating, Event, EventCart, TicketPrice
+from modules.main.models import Rating, Event, EventCart, TicketPrice, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Avg
@@ -114,13 +114,24 @@ def get_tickets(request, event_id):
     try:
         event = Event.objects.get(uuid=event_id)
         tickets = TicketPrice.objects.filter(event=event)
+        ticket_data = []
+        free_ticket_data = None
         
-        ticket_data = [{
-            'id': ticket.id,
-            'name': ticket.name,
-            'price': float(ticket.price),
-            'is_free': ticket.isFree()
-        } for ticket in tickets]
+        for ticket in tickets:
+            ticket_dict = {
+                'id': ticket.id,
+                'name': ticket.name,
+                'price': float(ticket.price),
+                'is_free': ticket.isFree()
+            }
+            
+            if ticket.isFree():
+                free_ticket_data = ticket_dict
+            else:
+                ticket_data.append(ticket_dict)
+        
+        if free_ticket_data:
+            ticket_data.append(free_ticket_data)
         
         return JsonResponse({
             'status': 'success',
@@ -201,15 +212,21 @@ def delete_user_ticket(request):
             # Get ticket_id from POST data
             ticket_id = request.POST.get('ticket_id')
 
-
             try:
                 # Get the cart item first to ensure it exists
                 cart_item = EventCart.objects.get(
                     id=ticket_id,
                     user=request.user
                 )
+
+                # Get the event from this cart item
+                event = cart_item.ticket.event
                 
-                cart_item.delete()
+                # Delete all cart items for this user and event
+                EventCart.objects.filter(
+                    user=request.user,
+                    ticket__event=event
+                ).delete()
                 
                 return JsonResponse(
                     {
@@ -336,3 +353,141 @@ def get_user_event_tickets(request, event_id):
             'status': False,
             'message': str(e)
         }, status=500)
+    
+@csrf_exempt
+@login_required
+@require_POST
+def book_free_ticket_flutter(request):
+    try:
+        ticket_id = request.POST.get('ticket_id')
+        
+        if not ticket_id:
+            try:
+                body = request.body.decode('utf-8')
+                data = json.loads(body)
+                ticket_id = data.get('ticket_id')
+            except json.JSONDecodeError:
+                ticket_id = request.POST.get('ticket_id')
+
+        if not ticket_id:
+            return JsonResponse(
+                {'status': False, 'message': 'No ticket ID provided'},
+                status=400
+            )
+
+        try:
+            ticket = TicketPrice.objects.get(id=ticket_id)
+        except TicketPrice.DoesNotExist:
+            return JsonResponse(
+                {'status': False, 'message': 'Ticket not found.'},
+                status=404
+            )
+        
+        # Cek apakah tiket gratis
+        if not ticket.isFree():
+            return JsonResponse(
+                {'status': False, 'message': 'This ticket is not free. Please use buy_ticket endpoint.'},
+                status=400
+            )
+            
+        user_profile = UserProfile.objects.get(user=request.user)
+        
+        # Cek apakah user sudah terdaftar di event
+        if ticket in user_profile.registeredEvent.all():
+            return JsonResponse(
+                {
+                    'status': False, 
+                    'message': 'You have already booked this event.'
+                },
+                status=400
+            )
+        
+        # Tambahkan ke registeredEvent
+        user_profile.registeredEvent.add(ticket)
+
+        print("Sending response with ticket data:")
+        # Response harus sesuai format yang dibutuhkan di Flutter
+        response_data = {
+            'status': True,
+            'message': 'Event booked successfully!',
+            'has_ticket': True,  # Tambahkan ini
+            'ticket': {
+                'cart_id': str(ticket.id),  # Pastikan ini string
+                'ticket_id': str(ticket.id),
+                'name': ticket.name,
+                'price': 0,
+                'event_title': ticket.event.title,
+                'is_free': True
+            }
+        }
+        print(response_data)
+        
+        return JsonResponse(response_data, status=201)
+            
+    except Exception as e:
+        return JsonResponse(
+            {'status': False, 'message': str(e)},
+            status=500
+        )
+
+@csrf_exempt
+@login_required
+def cancel_free_booking(request):
+    if request.method == 'POST':
+        try:
+            ticket_id = request.POST.get('ticket_id')
+            
+            if not ticket_id:
+                try:
+                    body = request.body.decode('utf-8')
+                    data = json.loads(body)
+                    ticket_id = data.get('ticket_id')
+                except json.JSONDecodeError:
+                    pass
+
+            if not ticket_id:
+                return JsonResponse(
+                    {'status': False, 'message': 'No ticket ID provided'},
+                    status=400
+                )
+
+            try:
+                ticket = TicketPrice.objects.get(id=ticket_id)
+            except TicketPrice.DoesNotExist:
+                return JsonResponse(
+                    {'status': False, 'message': 'Ticket not found'},
+                    status=404
+                )
+
+            if not ticket.isFree():
+                return JsonResponse(
+                    {'status': False, 'message': 'This is not a free ticket'},
+                    status=400
+                )
+
+            user_profile = UserProfile.objects.get(user=request.user)
+            
+            if ticket not in user_profile.registeredEvent.all():
+                return JsonResponse(
+                    {'status': False, 'message': 'You have not booked this event'},
+                    status=404
+                )
+
+            # Hapus dari registeredEvent
+            user_profile.registeredEvent.remove(ticket)
+            
+            return JsonResponse({
+                'status': True,
+                'message': 'Event booking cancelled successfully',
+            }, status=200)
+                
+        except Exception as e:
+            return JsonResponse(
+                {'status': False, 'message': f'Error: {str(e)}'},
+                status=500
+            )
+    
+    return JsonResponse(
+        {'status': False, 'message': 'Invalid request method'},
+        status=405
+    )

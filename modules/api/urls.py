@@ -17,6 +17,8 @@ urlpatterns = [
     path('yogevent/rate/<uuid:event_id>/', detail_event_views.add_rating, name='add_rating'),
     path('yogevent/buy-ticket-flutter/', detail_event_views.buy_ticket_flutter, name='buy_ticket_flutter'),
     path('yogevent/delete-user-ticket/', detail_event_views.delete_user_ticket, name='delete_user_ticket'),
+    path('yogevent/book-free-ticket/', detail_event_views.book_free_ticket_flutter, name='book_free_ticket'),
+    path('yogevent/cancel-free-booking/', detail_event_views.cancel_free_booking, name='cancel_free_booking'),
     path('yogevent/tickets/<uuid:event_id>/', detail_event_views.get_tickets, name='get_tickets'),
     path('yogevent/user-ticket/<uuid:event_id>/', detail_event_views.get_user_ticket_status, name='get_user_ticket_status'),
 ]
