@@ -287,13 +287,16 @@ def detail_event(request, uuid):
 def book_event(request):
     event_id = request.POST.get('event_uuid')
     ticket_name = request.POST.get('ticket_name')
+    
     event = Event.objects.get(uuid=event_id)
+    
     tickets = TicketPrice.objects.filter(event=event)
     user_profile = request.user_profile
     
     # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets.exclude(price=0)
+    
     if (len(tickets) == 0):
         tickets = None
     
@@ -320,6 +323,9 @@ def book_event(request):
 @csrf_exempt
 @require_POST
 def cancel_book(request):
+    body = request.body.decode('utf-8')
+    # body = json.loads(body)
+    
     event_id = request.POST.get('event_uuid')
     event = get_object_or_404(Event, uuid=event_id)
     user_profile = request.user_profile
@@ -340,12 +346,53 @@ def delete_event(request, uuid):
 def edit_event(request, uuid):
     event = Event.objects.get(uuid = uuid)
     user_profile = UserProfile.objects.get(user=request.user)
-    form = EventForm(request.POST or None, instance=event)
+    
+    if request.method == "POST":  
+        event.title = strip_tags(request.POST.get('title'))
+        event.description = strip_tags(request.POST.get('description'))
+        event.category = request.POST.get('category')
+        event.start_time = request.POST.get('start_time')
+        event.end_time = request.POST.get('end_time', '')
+        event.location = strip_tags(request.POST.get('location'))
+        event.image_urls = [request.POST.get('image_url')]
+        event.end_time = event.end_time if event.end_time != "" else None
 
-    if form.is_valid() and request.method == "POST":
-        form.save()
-        return HttpResponseRedirect(reverse('yogevent:main'))
 
+        if event.image_urls == [""]:
+            event.image_urls = []
+
+        if event.title == "" or event.category == "":
+            return render(request, "error.html", {
+                "message":"judul atau kategori tidak boleh kosong",
+                'user': request.user,
+                'user_profile': user_profile,
+                'image_url': user_profile.profile_picture,
+                'show_navbar': True,
+                'show_footer': True,
+                'is_admin': user_profile.role == 'AD' if user_profile else False,
+                })
+
+        if event.end_time and event.start_time >= event.end_time:
+            return render(request, "error.html", {
+                "message":"Acara berakhir sebelum dimulai.",
+                'user': request.user,
+                'user_profile': user_profile,
+                'image_url': user_profile.profile_picture,
+                'show_navbar': True,
+                'show_footer': True,
+                'is_admin': user_profile.role == 'AD' if user_profile else False,
+                })
+        
+        event.save()
+        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
+
+    if (len(event.image_urls) == 0 ):
+        event.image_urls = ""
+        
+    event.CATEGORY_CHOICES = EventCategory.choices
+    event.start_time = event.start_time.strftime('%Y-%m-%dT%H:%M')
+    event.end_time = event.end_time.strftime('%Y-%m-%dT%H:%M') if event.end_time else ""
+    
     context = {
         'user': request.user,
         'user_profile': user_profile,
