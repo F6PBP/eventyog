@@ -73,13 +73,10 @@ def checkout(request):
     
     # Reduce merchandise quantity
     for item in updated_merch.values():
-        print(item)
         merch = Merchandise.objects.get(id=item['id'])
-        print(merch)
         merch.quantity -= item['quantity']
         merch.save()
     
-    print(updated_events)
     # Empty cart
     cart_events.delete()
     cart_merch.delete()

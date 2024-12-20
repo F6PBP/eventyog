@@ -105,7 +105,7 @@ def onboarding(request):
 @check_user_profile(is_redirect=True)
 def profile(request):
     try:
-        if (request.user_profile.categories == ''):
+        if (request.user_profile.categories == '' or request.user_profile.categories == None):
             categories = None
         else:
             categories = request.user_profile.categories.split(',')
@@ -136,9 +136,11 @@ def edit_profile(request):
         if form.is_valid():
             profile = form.save(commit=False)
             profile.user = request.user  # Associate profile with logged-in user
+            
+            if 'profile_picture' in request.FILES:
+                profile.profile_picture = request.FILES['profile_picture']
+            
             profile.save()
-
-            print(request.FILES)
                         
             return redirect('auth:profile')
         else:
