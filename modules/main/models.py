@@ -147,4 +147,3 @@ class ForumReply(models.Model):
     def totalDislike(self):
         return self.dislike.all().count()
     
-    

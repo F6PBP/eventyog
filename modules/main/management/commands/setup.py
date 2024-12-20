@@ -261,3 +261,4 @@ class Command(BaseCommand):
         except Exception as e:
             print('Error: ', e)
             pass
+        
