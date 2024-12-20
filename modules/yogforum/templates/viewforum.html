@@ -40,17 +40,12 @@
                 <p>{{ forum_post.created_at|date:"H:i" }} • {{ forum_post.created_at|date:"d/m/Y" }}</p>
             </div>
             <div class="flex items-center space-x-4">
-                <!-- Like Button -->
-                <button onclick="like({{ forum_post.id }})" class="flex items-center space-x-1 text-blue-500 hover:text-blue-700">
-                    <i class="fas fa-thumbs-up"></i> 
-                    <span id="like-count-{{ forum_post.id }}">{{ forum_post.totalLike }}</span>
-                </button>
-                
-                <!-- Dislike Button -->
-                <button onclick="dislike({{ forum_post.id }})" class="flex items-center space-x-1 text-red-500 hover:text-red-700">
-                    <i class="fas fa-thumbs-down"></i>
-                    <span id="dislike-count-{{ forum_post.id }}">{{ forum_post.totalDislike }}</span>
-                </button>
+                <span class="flex items-center space-x-1">
+                    <i class="fas fa-thumbs-up"></i> <span id="like-count-{{ forum_post.id }}">{{ forum_post.like.count }}</span>
+                </span>
+                <span class="flex items-center space-x-1">
+                    <i class="fas fa-thumbs-down"></i> <span id="dislike-count-{{ forum_post.id }}">{{ forum_post.dislike.count }}</span>
+                </span>
             </div>
         </div>
 
@@ -153,7 +148,7 @@
 
 <script>
     function like(id) {
-        fetch(`/yogforum/like_post/${id}/`, {
+        fetch(`/like_reply/${id}/`, {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -164,19 +159,12 @@
         .then(data => {
             if (data.success) {
                 document.getElementById(`like-count-${id}`).textContent = data.total_likes;
-
-                if (data.disliked) {
-                    document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
-                }
-
-                document.getElementById(`like-button-${id}`).classList.add('liked'); 
-                document.getElementById(`dislike-button-${id}`).classList.remove('disliked');
             }
         });
     }
 
     function dislike(id) {
-        fetch(`/yogforum/dislike_post/${id}/`, {
+        fetch(`/dislike_reply/${id}/`, {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -187,13 +175,6 @@
         .then(data => {
             if (data.success) {
                 document.getElementById(`dislike-count-${id}`).textContent = data.total_dislikes;
-
-                if (data.liked) {
-                    document.getElementById(`like-count-${id}`).textContent = data.total_likes;
-                }
-
-                document.getElementById(`dislike-button-${id}`).classList.add('disliked'); 
-                document.getElementById(`like-button-${id}`).classList.remove('liked'); 
             }
         });
     }

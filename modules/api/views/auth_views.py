@@ -24,9 +24,22 @@ def login(request):
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
-            print('Login sukses!')
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                request.is_admin = user_profile.role == 'AD'
+                request.image_url = (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            except:
+                request.is_admin = False
+                request.image_url = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+            
             return JsonResponse({
                 "username": user.username,
+                "isAdmin": request.is_admin,
+                "imageUrl": request.image_url,
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
@@ -111,7 +124,6 @@ def onboarding(request):
         }, status=200)
     
     if request.method == 'POST':
-        print(request.POST)
         form = UserProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
@@ -173,13 +185,10 @@ def profile(request):
 @csrf_exempt        
 @check_user_profile_api()
 def edit_profile(request):
-    print(request.POST)
-    form = UserProfileForm(instance=request.user_profile)
-
     if request.method == 'POST':
+        print(request.POST)
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
-            print("HELLO")
             profile = form.save(commit=False)
             profile.user = request.user  # Associate profile with logged-in user
             profile.save()
@@ -194,22 +203,23 @@ def edit_profile(request):
                 "message": "Form is not valid.",
                 "errors": form.errors
             }, status=400)
+    else:
+        form = UserProfileForm(instance=request.user_profile)
+        context = {
+            'user': request.user,
+            'user_profile': request.user_profile,
+            'image_url': request.image_url,
+            'categories': request.user_profile.categories,
+            'form': form,
+            'show_navbar': True,
+            'show_footer': True
+        }
 
-    context = {
-        'user': request.user,
-        'user_profile': request.user_profile,
-        'image_url': request.image_url,
-        'categories': request.user_profile.categories,
-        'form': form,
-        'show_navbar': True,
-        'show_footer': True
-    }
-
-    return JsonResponse({
-        "status": True,
-        "message": "Profile edit form retrieved successfully.",
-        "data": context
-    }, status=200)
+        return JsonResponse({
+            "status": True,
+            "message": "Profile edit form retrieved successfully.",
+            "data": context
+        }, status=200)
 
 @csrf_exempt
 def delete_profile(request):
