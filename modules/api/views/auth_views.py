@@ -24,9 +24,12 @@ def login(request):
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
-            print('Login sukses!')
+            user_profile = UserProfile.objects.get(user=user)
+            request.is_admin = user_profile.role == 'AD'
+            
             return JsonResponse({
                 "username": user.username,
+                "isAdmin"
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
@@ -173,6 +176,7 @@ def profile(request):
 @check_user_profile_api()
 def edit_profile(request):
     if request.method == 'POST':
+        print(request.POST)
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
             profile = form.save(commit=False)
