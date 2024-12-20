@@ -20,6 +20,11 @@ urlpatterns = [
     path('yogforum', forum_views.search_forum, name='search_forum'),
     path('auth/logout/', auth_views.logout, name='auth_logout'),
     path('auth/profile/', auth_views.profile, name='auth_profile'),
+    # path('cart/', cart_views.main, name='cart'),                 # Halaman utama keranjang (opsional)
+    path('cart/get_cart_data/', cart_views.get_cart_data, name='get_cart_data'),
+    path('cart/update/', cart_views.update_cart, name='update_cart'),  # Untuk memperbarui keranjang
+    path('cart/checkout/', cart_views.checkout, name='checkout'),      # Untuk proses checkout
+    path('cart/empty_cart/', cart_views.empty_cart, name='empty_cart'),      # Untuk mengosongkan keranjang
     path('auth/profile/edit/', auth_views.edit_profile, name='auth_profile_edit'),
     path('auth/onboarding/', auth_views.onboarding, name='auth_onboarding'),
     
@@ -27,4 +32,4 @@ urlpatterns = [
     path('friend/<str:user_id>/', friend_views.main, name='friend_main'),
     path('friend/add/<str:friend_id>', friend_views.add_friend_ajax, name='friend_add'),
     path('friend/remove/<str:friend_id>', friend_views.remove_friend, name='friend_remove'),
-]
+]   
