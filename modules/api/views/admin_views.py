@@ -18,13 +18,13 @@ from modules.authentication.forms import UserProfileForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
+#@login_required(login_url='auth:login')
+#@check_user_profile(is_redirect=False)
 def show_main(request: AuthRequest) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
+    #if request.user_profile.role != 'AD':
+        #return JsonResponse({"status": False, "message": "Access denied."}, status=403)
     
-    user_profiles = UserProfile.objects.values('id', 'name', 'role', 'email')
+    user_profiles = UserProfile.objects.values('id', 'user', 'name', 'role', 'email', 'bio', 'categories')
     return JsonResponse({
         "status": True,
         "message": "Admin data retrieved successfully.",
@@ -42,28 +42,55 @@ def search_users(request: AuthRequest) -> JsonResponse:
         "data": list(users)
     }, status=200)
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
-def see_user(request, user_id) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
-    
-    user = get_object_or_404(User, pk=user_id)
-    user_profile = get_object_or_404(UserProfile, user=user)
-    
-    categories = user_profile.categories.split(',') if user_profile.categories else []
-    
-    return JsonResponse({
-        "status": True,
-        "message": "User profile retrieved successfully.",
-        "data": {
-            "id": user.id,
-            "username": user.username,
-            "email": user_profile.email,
-            "bio": user_profile.bio,
-            "categories": categories
+#@login_required(login_url='auth:login')
+#@check_user_profile(is_redirect=True)
+def see_user(request, username) -> JsonResponse:
+    try:
+        # user = get_object_or_404(User, username=username)
+        # user_profile = get_object_or_404(UserProfile, user=user)
+        #user_info= user_profile.objects.values('id', 'name', 'role', 'email',
+        #            'date_joined', 'bio', 'categories')
+
+        print(f"Looking for user with username: {username}")  # Debug print
+        user = User.objects.filter(username=username).first()
+        if not user:
+            print(f"No user found with username: {username}")  # Debug print
+            return JsonResponse({
+                "status": False,
+                "message": f"User with username {username} not found."
+            }, status=404)
+
+        user_profile = UserProfile.objects.filter(user=user).first()
+        if not user_profile:
+            print(f"No profile found for user: {username}")  # Debug print
+            return JsonResponse({
+                "status": False,
+                "message": f"Profile not found for user {username}"
+            }, status=404)
+        
+        user_data = {
+            'id': user.id,
+            'name': user_profile.name,
+            'role': user_profile.role,
+            'email': user_profile.email,
+            'date_joined': user.date_joined,
+            'bio': user_profile.bio,
+            'categories': user_profile.categories
         }
-    }, status=200)
+
+        return JsonResponse({
+            "status": True,
+            "message": "User profile retrieved successfully.",
+            #"data": list(user_info)  # Wrap in list to match the format
+            "data": [user_data]
+        }, status=200)
+        
+    except Exception as e:
+        print(e)
+        return JsonResponse({
+            "status": False,
+            "message": "User profile not found."
+        }, status=404)
 
 
 @login_required(login_url='auth:login')
