@@ -118,7 +118,6 @@ def get_tickets(request, event_id):
         for ticket in tickets:
             
             if ticket.name is None or ticket.price is None:
-                print(f"Skipping invalid ticket: {ticket.id}")
                 continue
                 
             ticket_dict = {
@@ -161,14 +160,12 @@ def get_tickets(request, event_id):
         })
         
     except Event.DoesNotExist as e:
-        print(f"Event not found error: {str(e)}")
         return JsonResponse({
             'status': 'error',
             'message': 'Event not found'
         }, status=404)
         
     except Exception as e:
-        print(f"Unexpected error: {str(e)}")
         return JsonResponse({
             'status': 'error',
             'message': f'An error occurred: {str(e)}'
@@ -220,7 +217,6 @@ def buy_ticket_flutter(request):
                 },
                 status=400
             )
-        print(ticket)
 
         event_cart = EventCart(user=user, ticket=ticket)
         try:
@@ -254,105 +250,98 @@ def buy_ticket_flutter(request):
 def delete_user_ticket(request):
     if request.method == 'POST':
         try:
+            cart_id = request.POST.get('ticket_id')
             cart_item = EventCart.objects.filter(
                 user=request.user,
-                ticket_id=request.POST.get('ticket_id')
+                id=cart_id 
             ).first()
 
-            if not cart_item:
-                return JsonResponse(
-                    {
-                        'status': False,
-                        'message': 'Ticket not found in cart'
-                    },
-                    status=404
-                )
-
-            # Get the event from this cart item
-            event = cart_item.ticket.event
-            
-            # Delete all cart items for this user and event
-            EventCart.objects.filter(
-                user=request.user,
-                ticket__event=event
-            ).delete()
-            
-            return JsonResponse(
-                {
+            if cart_item:
+                ticket = cart_item.ticket
+                
+                cart_item.delete()
+                
+                user_profile = request.user.userprofile
+                if ticket in user_profile.registeredEvent.all():
+                    user_profile.registeredEvent.remove(ticket)
+                
+                return JsonResponse({
                     'status': True,
-                    'message': 'Ticket removed from cart successfully'
-                },
-                status=200
-            )
+                    'message': 'Payment Completed'
+                })
+            else:
+                try:
+                    user_profile = request.user.userprofile
+                    ticket = TicketPrice.objects.get(id=cart_id)
+                    if ticket in user_profile.registeredEvent.all():
+                        user_profile.registeredEvent.remove(ticket)
+                        return JsonResponse({
+                            'status': True,
+                            'message': 'Cancel Booking'
+                        })
+                except TicketPrice.DoesNotExist:
+                    pass
+                
+                return JsonResponse({
+                    'status': False,
+                    'message': 'Ticket not found'
+                }, status=404)
                 
         except Exception as e:
-            return JsonResponse(
-                {
-                    'status': False,
-                    'message': f'Error deleting ticket: {str(e)}'
-                },
-                status=500
-            )
-    
-    return JsonResponse(
-        {
-            'status': False,
-            'message': 'Invalid request method'
-        },
-        status=405
-    )
-
+            return JsonResponse({
+                'status': False,
+                'message': f'Error deleting ticket: {str(e)}'
+            }, status=500)
+        
 @csrf_exempt
 def get_user_ticket_status(request, event_id):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Please login first'}, status=401)
-        
     try:
         event = Event.objects.get(uuid=event_id)
         user = request.user
         user_profile = user.userprofile
-        cart_item = EventCart.objects.filter(user=user, ticket__event=event).first()
 
+        cart_item = EventCart.objects.filter(
+            user=user, 
+            ticket__event=event
+        ).first()
+        
         registered_ticket = None
         for ticket in user_profile.registeredEvent.all():
-            if ticket.event == event:
+            if ticket.event == event and ticket.isFree():
                 registered_ticket = ticket
                 break
-        
-        has_ticket = cart_item is not None or registered_ticket is not None
-        has_rated = Rating.objects.filter(user=user_profile, rated_event=event).exists()
 
-        # Include ticket data if exists
-        ticket_data = None
         if cart_item:
             ticket_data = {
                 'id': cart_item.ticket.id,
+                'cart_id': cart_item.id,
                 'name': cart_item.ticket.name,
                 'price': float(cart_item.ticket.price),
-                'cart_id': cart_item.id,
                 'event_title': event.title,
-                'is_free': False
+                'is_free': False,
+                'source': 'cart'
             }
         elif registered_ticket:
             ticket_data = {
                 'id': registered_ticket.id,
-                'ticket_id': registered_ticket.id,
                 'name': registered_ticket.name,
                 'price': float(registered_ticket.price),
                 'event_title': event.title,
-                'is_free': True
+                'is_free': True,
+                'source': 'registered'
             }
+        else:
+            ticket_data = None
 
         response = {
             'status': 'success',
-            'has_ticket': has_ticket,
-            'has_rated': has_rated,
+            'has_ticket': bool(ticket_data),
+            'has_rated': Rating.objects.filter(user=user_profile, rated_event=event).exists(),
             'ticket': ticket_data
         }
+        
         return JsonResponse(response)
         
-    except Event.DoesNotExist:
-        return JsonResponse({'error': 'Event not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
