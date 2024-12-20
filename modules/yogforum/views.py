@@ -60,7 +60,7 @@ def dislike_post(request, id):
 
 @login_required
 def like_reply(request, id):
-    reply = get_object_or_404(ForumReply, id=id)
+    reply = get_object_or_404(ForumReply.objects.prefetch_related('like', 'dislike'), id=id)
     user_profile = request.user.userprofile  
 
     liked = False
@@ -150,8 +150,6 @@ def get_forum_by_ajax(request):
         replies_count = ForumReply.objects.filter(forum=post, reply_to=None).order_by('created_at').count()
         user = UserProfile.objects.get(id=post.user.id)
 
-        print(user.user.username)   
-        
         temp.append({
             'id': post.id,
             'title': post.title,

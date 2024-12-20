@@ -130,8 +130,6 @@ def showMerch_json(request, event_id: str):
 def add_items_to_cart(request):
     
     items = json.loads(request.body)['items']
-    print(items)
-    
     merch_cart = MerchCart.objects.filter(user=request.user)
     
     # Make sure theres no duplicate merch in cart
