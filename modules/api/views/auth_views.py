@@ -24,12 +24,22 @@ def login(request):
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
-            user_profile = UserProfile.objects.get(user=user)
-            request.is_admin = user_profile.role == 'AD'
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                request.is_admin = user_profile.role == 'AD'
+                request.image_url = (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            except:
+                request.is_admin = False
+                request.image_url = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
             
             return JsonResponse({
                 "username": user.username,
-                "isAdmin"
+                "isAdmin": request.is_admin,
+                "imageUrl": request.image_url,
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
