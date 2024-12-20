@@ -399,7 +399,7 @@ def edit_event(request, uuid):
         'show_navbar': True,
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
-        'form': form
+        # 'form': form
     }
 
     return render(request, "edit_event.html", context)

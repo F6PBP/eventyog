@@ -18,6 +18,7 @@ urlpatterns = [
     path('yogforum/like_reply/<int:id>/', forum_views.like_reply, name='like_reply'),
     path('yogforum/dislike_reply/<int:id>/', forum_views.dislike_reply, name='dislike_reply'),
     path('yogforum', forum_views.search_forum, name='search_forum'),
+
     path('auth/logout/', auth_views.logout, name='auth_logout'),
     path('auth/profile/', auth_views.profile, name='auth_profile'),
 
@@ -34,9 +35,10 @@ urlpatterns = [
     path('yogevent/cancel-free-booking/', detail_event_views.cancel_free_booking, name='cancel_free_booking'),
     path('yogevent/tickets/<uuid:event_id>/', detail_event_views.get_tickets, name='get_tickets'),
     path('yogevent/user-ticket/<uuid:event_id>/', detail_event_views.get_user_ticket_status, name='get_user_ticket_status'),
+
     path('auth/profile/edit/', auth_views.edit_profile, name='auth_profile_edit'),
     path('auth/onboarding/', auth_views.onboarding, name='auth_onboarding'),
-    
+
     path('friend/list/', friend_views.show_list, name='friend_list'),
     path('friend/<str:user_id>/', friend_views.main, name='friend_main'),
     path('friend/add/<str:friend_id>', friend_views.add_friend_ajax, name='friend_add'),

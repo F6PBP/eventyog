@@ -108,22 +108,15 @@ def add_rating(request, event_id: uuid.UUID):
 @csrf_exempt
 def get_tickets(request, event_id):
     try:
-        # print(f"Processing request for event_id: {event_id}")
         event = Event.objects.get(uuid=event_id)
-        # print(f"Found event: {event.title}")
         
-        # Get all tickets for this event
         tickets = TicketPrice.objects.filter(event=event)
-        # print(f"Number of tickets found: {tickets.count()}")
         
         ticket_data = []
         free_ticket_data = None
         
-        # Process existing tickets
         for ticket in tickets:
-            # print(f"Processing ticket: ID={ticket.id}, Name={ticket.name}, Price={ticket.price}")
             
-            # Skip if ticket is invalid
             if ticket.name is None or ticket.price is None:
                 print(f"Skipping invalid ticket: {ticket.id}")
                 continue
@@ -133,7 +126,7 @@ def get_tickets(request, event_id):
                 'name': ticket.name or 'Standard Ticket',
                 'price': float(ticket.price or 0),
                 'is_free': ticket.isFree(),
-                'event_title': event.title  # Tambahkan ini
+                'event_title': event.title 
             }
             
             if ticket_dict['is_free']:
@@ -141,21 +134,16 @@ def get_tickets(request, event_id):
             else:
                 ticket_data.append(ticket_dict)
         
-        # Add free ticket to list if exists and not already added
         if free_ticket_data and free_ticket_data not in ticket_data:
-            # print("Adding existing free ticket to list")
             ticket_data.append(free_ticket_data)
         
-        # Create new free ticket if no tickets exist
         if not ticket_data:
-            # print("No valid tickets found, creating free ticket")
             try:
                 new_free_ticket = TicketPrice.objects.create(
                     name='Free Ticket',
                     price=0,
                     event=event
                 )
-                # print(f"Created new free ticket with ID: {new_free_ticket.id}")
 
                 ticket_dict = {
                     'id': new_free_ticket.id,
@@ -165,14 +153,7 @@ def get_tickets(request, event_id):
                 }
                 ticket_data.append(ticket_dict)
             except Exception as e:
-                # print(f"Error creating free ticket: {str(e)}")
-                # Continue without creating free ticket if there's an error
                 pass
-
-        # Final debug information
-        # print("Final ticket data:")
-        # for ticket in ticket_data:
-        #     print(f"Ticket ID: {ticket['id']}, Name: {ticket['name']}, Price: {ticket['price']}, Is Free: {ticket['is_free']}")
 
         return JsonResponse({
             'status': 'success',
@@ -199,9 +180,7 @@ def get_tickets(request, event_id):
 def buy_ticket_flutter(request):
     try:
         # Coba ambil ticket_id dari POST data dulu
-        print("Lagi belanja")
         ticket_id = request.POST.get('ticket_id')
-        print(ticket_id)
         
         # Jika tidak ada di POST, coba parse dari JSON body
         if not ticket_id:
@@ -229,7 +208,6 @@ def buy_ticket_flutter(request):
             )
         
         user = request.user
-        print(user.username)
         
         if EventCart.objects.filter(
             user=user, 
@@ -247,14 +225,10 @@ def buy_ticket_flutter(request):
         event_cart = EventCart(user=user, ticket=ticket)
         try:
             event_cart.save()
-            print(f"EventCart saved successfully: {event_cart}")
-            print(f"EventCart ID: {event_cart.id}")
         except Exception as e:
-            print(f"Failed to save EventCart: {e}")
             return JsonResponse({'status': False, 'message': str(e)}, status=500)
 
         # Check if the object exists in the database
-        print(EventCart.objects.filter(user=user))
         response =  JsonResponse({
             'status': True,
             'message': 'Ticket successfully added to cart!',
@@ -268,7 +242,6 @@ def buy_ticket_flutter(request):
                 'is_free': False
             }
         }, status=201)
-        print(response)
         return response
             
     except Exception as e:
@@ -281,22 +254,11 @@ def buy_ticket_flutter(request):
 def delete_user_ticket(request):
     if request.method == 'POST':
         try:
-            print(request.POST.get('ticket_id'))
-            print(request.user)
-
-            print(EventCart.objects.all())
-            for a in EventCart.objects.all():
-                print(a.user.username)
-                print(a.ticket)
-                print(a.ticket.name)
-            
-            # Cari cart berdasarkan user dan ticket event yang sedang aktif
             cart_item = EventCart.objects.filter(
                 user=request.user,
-                ticket_id=request.POST.get('ticket_id')  # ticket_id dari tiket, bukan id cart
+                ticket_id=request.POST.get('ticket_id')
             ).first()
 
-            
             if not cart_item:
                 return JsonResponse(
                     {
@@ -462,11 +424,9 @@ def book_free_ticket_flutter(request):
             ticket = TicketPrice.objects.get(id=ticket_id)
             user_profile = UserProfile.objects.get(user=request.user)
             
-            # Cek apakah user sudah terdaftar di event
             if ticket in user_profile.registeredEvent.all():
-                # Disini kita return data tiket yang sudah ada
                 return JsonResponse({
-                    'status': True,  # Ubah jadi True karena technically user punya tiketnya
+                    'status': True, 
                     'message': 'You have already booked this event.',
                     'has_ticket': True,
                     'ticket': {
