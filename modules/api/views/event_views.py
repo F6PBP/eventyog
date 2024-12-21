@@ -3,10 +3,11 @@ import uuid
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from modules.main.models import Event
+from modules.main.models import Event, UserProfile
 from eventyog.decorators import check_user_profile
 from django.core import serializers
 from django.db.models import Q
+from django.utils import timezone
 
 @check_user_profile(is_redirect=False)
 def main(request: HttpRequest) -> JsonResponse:
@@ -37,6 +38,35 @@ def show_event_json(request):
         return JsonResponse({
             'error': 'Internal server error'
         }, status=500)
+        
+        
+
+def show_upcoming_events(request):
+    try:
+        now = timezone.now()
+        events = Event.objects.all()
+        
+        upcoming_events = events.filter(start_time__lte=now)
+
+        # Take top 6        
+        upcoming_events = upcoming_events[:6]
+        events_json = serializers.serialize("json", upcoming_events)
+        
+        
+        return HttpResponse(events_json, 
+                          content_type="application/json", 
+                          status=200)        
+                          
+    except Event.DoesNotExist:
+        return JsonResponse({
+            'error': 'Events not found'
+        }, status=404)
+        
+    except Exception as e:
+        print(e)
+        return JsonResponse({
+            'error': 'Internal server error'
+        }, status=500)
 
 def show_event_by_id(request, event_id: uuid.UUID):
     try:
@@ -45,9 +75,17 @@ def show_event_by_id(request, event_id: uuid.UUID):
         ratings_data = []
         
         for rating in ratings:
+            user_profile = UserProfile.objects.get(user=rating.user.user)
+            image_url = (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            
             ratings_data.append({
                 'username': rating.user.user.username,
-                'rating': rating.rating,
+                'profile_picture': image_url,
+                'rating': user_profile.profile_picture,
                 'review': rating.review,
                 'created_at': rating.created_at.isoformat(),
                 'updated_at': rating.updated_at.isoformat()
@@ -190,7 +228,9 @@ def edit_event_flutter(request, event_id):
         except Event.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
         except json.JSONDecodeError:
+            print("JSON ERROR")
             return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
         except Exception as e:
+            print(e)
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)

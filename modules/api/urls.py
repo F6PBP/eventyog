@@ -35,6 +35,7 @@ urlpatterns = [
     path('yogevent/cancel-free-booking/', detail_event_views.cancel_free_booking, name='cancel_free_booking'),
     path('yogevent/tickets/<uuid:event_id>/', detail_event_views.get_tickets, name='get_tickets'),
     path('yogevent/user-ticket/<uuid:event_id>/', detail_event_views.get_user_ticket_status, name='get_user_ticket_status'),
+    path('yogevent/upcoming-events/', event_views.show_upcoming_events, name='upcoming_events'),
 
     # path('cart/', cart_views.main, name='cart'),                 # Halaman utama keranjang (opsional)
     path('cart/get_cart_data/', cart_views.get_cart_data, name='get_cart_data'),
