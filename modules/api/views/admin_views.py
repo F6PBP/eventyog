@@ -5,6 +5,9 @@ import json
 def main(request: HttpRequest) -> ApiResponse:
     return ApiResponse(status=200, content="Hello, World!")
 
+from django.views.decorators.csrf import csrf_exempt
+from eventyog.decorators import check_user_profile, check_user_profile_api
+
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from eventyog.decorators import check_user_profile
@@ -64,6 +67,8 @@ def search_users(request: AuthRequest) -> JsonResponse:
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
 def see_user(request, username) -> JsonResponse:
+    if request.user_profile.role != 'AD':
+        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
     try:
         # user = get_object_or_404(User, username=username)
         # user_profile = get_object_or_404(UserProfile, user=user)
@@ -117,31 +122,63 @@ def see_user(request, username) -> JsonResponse:
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
-def edit_user(request, user_id) -> JsonResponse:
+@csrf_exempt        
+def edit_user(request, username) -> JsonResponse:
     if request.user_profile.role != 'AD':
         return JsonResponse({"status": False, "message": "Access denied."}, status=403)
-    
-    user = get_object_or_404(User, pk=user_id)
-    user_profile = get_object_or_404(UserProfile, user=user)
-    
+     
+    print(f"Looking for user with username: {username}")  # Debug print
+    user = User.objects.filter(username=username).first()
+    if not user:
+        print(f"No user found with username: {username}")  # Debug print
+        return JsonResponse({
+            "status": False,
+            "message": f"User with username {username} not found."
+        }, status=404)
+
+    user_profile = UserProfile.objects.filter(user=user).first()
+    if not user_profile:
+        print(f"No profile found for user: {username}")  # Debug print
+        return JsonResponse({
+            "status": False,
+            "message": f"Profile not found for user {username}"
+        }, status=404)
+
     if request.method == 'POST':
-        data = json.loads(request.body)
-        user_profile.name = data.get('name', user_profile.name)
-        user_profile.bio = data.get('bio', user_profile.bio)
-        user_profile.email = data.get('email', user_profile.email)
-        user_profile.wallet = data.get('wallet', user_profile.wallet)
-        user_profile.categories = ','.join(data.get('categories', []))
-        
-        if 'profile_picture' in request.FILES:
-            user_profile.profile_picture = request.FILES['profile_picture']
-        
-        user_profile.save()
-        user.username = data.get('username', user.username)
-        user.save()
-        
-        return JsonResponse({"status": True, "message": "User profile updated successfully."}, status=200)
-    
-    return JsonResponse({"status": False, "message": "Invalid request method."}, status=405)
+        print(request.POST)
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = user  # Associate profile with logged-in user
+            profile.save()
+
+            return JsonResponse({
+                "status": True,
+                "message": "Profile updated successfully."
+            }, status=200)
+        else:
+            return JsonResponse({
+                "status": False,
+                "message": "Form is not valid.",
+                "errors": form.errors
+            }, status=400)
+    else:
+        form = UserProfileForm(instance=user_profile)
+        context = {
+            'user': user,
+            'user_profile': user_profile,
+            'image_url': user.image_url,
+            'categories': user_profile.categories,
+            'form': form,
+            'show_navbar': True,
+            'show_footer': True
+        }
+
+        return JsonResponse({
+            "status": True,
+            "message": "Profile edit form retrieved successfully.",
+            "data": context
+        }, status=200)
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
@@ -187,8 +224,8 @@ def delete_user(request, username) -> JsonResponse:
             "status_code": 500
         }, status=500)
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
+# @login_required(login_url='auth:login')
+# @check_user_profile(is_redirect=True)
 def create_user(request) -> JsonResponse:
     if request.method == 'POST':
         data = json.loads(request.body)
