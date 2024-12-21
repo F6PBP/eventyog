@@ -24,18 +24,36 @@
                 <h2 class="text-2xl font-semibold mb-2">Ratings:</h2>
                 <p id="averageRating">{{ average_rating }} / 5.0</p>
             </div>
-            {% if is_rated and first_rating and is_booked or is_rated and first_rating and is_in_cart %}
-                <div class="your-rating-section mt-4">
-                    <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
-                    <div class="">
-                        <b>
-                            {{first_rating.rating}} / 5.0 
-                        </b>
-                        <span class="text-gray-500">
-                            " {{ first_rating.review }} "
-                        </span>
+
+            {% if latest_rating %}
+            <div class="latest-rating-section mt-4">
+                <h2 class="text-2xl font-semibold mb-2">Review & Ratings</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        {% if latest_rating.user.profile_picture %}
+                            <img src="{{ latest_rating.user.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+                        {% else %}
+                            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                <i class="fa fa-user text-gray-500"></i>
+                            </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-medium">{{ latest_rating.user.user.username }}</span>
+                                    <div class="text-sm text-gray-500">
+                                        {{ latest_rating.created_at|date:"Y-m-d H:i:s" }}
+                                    </div>
+                                </div>
+                                <div class="text-yellow-400">
+                                    {{ latest_rating.rating }}⭐
+                                </div>
+                            </div>
+                            <p class="mt-2 text-gray-600">{{ latest_rating.review }}</p>
+                        </div>
                     </div>
                 </div>
+            </div>
             {% endif %}
 
             <div class="action-buttons space-y-2">
@@ -83,7 +101,6 @@
     function submitRating() {
         console.log("submitRating function called"); 
         const form = document.getElementById("ratingForm");
-        console.log("Form found:", form); 
 
         if (!form) {
             console.error("Rating form not found!");
@@ -127,29 +144,6 @@
                     console.log("Average rating updated");
                 }
 
-                const ratingContainer = document.querySelector('.rating-section');
-                let yourRatingSection = document.querySelector('.your-rating-section');
-                if (!yourRatingSection) {
-                    yourRatingSection = document.createElement('div');
-                    yourRatingSection.className = 'your-rating-section mt-4';
-                    
-                    if (ratingContainer && ratingContainer.nextElementSibling) {
-                        ratingContainer.parentNode.insertBefore(yourRatingSection, ratingContainer.nextElementSibling);
-                    }
-                    console.log("Created new your-rating-section"); // Debug
-                }
-
-                if (yourRatingSection) {
-                    yourRatingSection.innerHTML = `
-                        <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
-                        <div class="bg-gray-50 p-3 rounded-lg">
-                            <b>${data.data.user_rating.rating} / 5.0</b>
-                            <span class="text-gray-500 ml-2">" ${data.data.user_rating.review} "</span>
-                        </div>
-                    `;
-                }
-                console.log("Rating section updated"); // Debug
-
                 // Show success message
                 if (typeof showToast === 'function') {
                     showToast(data.message, 'success');
@@ -166,8 +160,6 @@
                     ratingBtn.style.display = 'none';
                 }
                 
-                // Set timeout before reload to allow logs to appear
-                console.log("All updates completed, reloading in 1 second..."); // Debug
                 setTimeout(() => {
                     location.reload();
                 }, 1000); // Wait 1 second before reload
@@ -175,7 +167,6 @@
                 location.reload();
                 return true;
             } else {
-                console.error("Error in response:", data.error || 'Unknown error'); // Debug
                 if (typeof showToast === 'function') {
                     showToast(data.error || 'Error submitting rating', 'error');
                 } else {

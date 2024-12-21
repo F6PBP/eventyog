@@ -242,6 +242,7 @@ def detail_event(request, uuid):
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets if len(tickets) > 0 else None
     registered_event = user_profile.registeredEvent.all()
+    print(Rating.objects.filter(rated_event=event).order_by('-created_at').query)
     
     if not event.image_urls:
         event.image_urls = 'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2024-06/240602-concert-fans-stock-vl-1023a-9b4766.jpg'
@@ -282,7 +283,9 @@ def detail_event(request, uuid):
     for cart in event_cart:
         if cart.ticket.event == event:
             is_in_cart = True
-            
+    
+    latest_rating = Rating.objects.filter(rated_event=event).order_by("-created_at").first()
+
     context = {
         'user': request.user,
         'user_profile': user_profile,
@@ -300,6 +303,8 @@ def detail_event(request, uuid):
         'is_rated': is_rated,
         'first_rating': first_rating,
         'is_in_cart': is_in_cart,
+        'is_in_cart': is_in_cart,
+        'latest_rating': latest_rating, 
     }
     return render(request, 'detail_event.html', context)
 
@@ -436,6 +441,7 @@ def get_rating_event(request, uuid):
     # Cek rating dari user yang login
     user_profile = UserProfile.objects.get(user=request.user)
     user_rating = rating.filter(user=user_profile).first()
+    latest_rating = Rating.objects.filter(rated_event=event).order_by('-created_at').first()
 
     context = {
         'user_name': user_profile.user.username, 
@@ -444,7 +450,8 @@ def get_rating_event(request, uuid):
         'first_rating': {
             'rating': first_rating.rating,
             'review': first_rating.review
-        } if first_rating else None
+        } if first_rating else None,
+        'latest_rating': latest_rating,
     }
         
     return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
