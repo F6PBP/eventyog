@@ -23,12 +23,31 @@ from django.http import JsonResponse
 def show_main(request: AuthRequest) -> JsonResponse:
     #if request.user_profile.role != 'AD':
         #return JsonResponse({"status": False, "message": "Access denied."}, status=403)
-    
+
+    # Fetch user profiles
     user_profiles = UserProfile.objects.values('id', 'user', 'name', 'role', 'email', 'bio', 'categories')
+    
+    # Fetch usernames and date_joined along with user ids
+    user_details = User.objects.values('username', 'id', 'date_joined')  # Fetch both username and date_joined
+
+    # Convert user details to a dictionary for easy access by user id
+    user_dict = {user['id']: {'username': user['username'], 'date_joined': user['date_joined']} for user in user_details}
+
+    # Now, we merge the username and date_joined into the user profile data
+    merged_profiles = []
+    for profile in user_profiles:
+        user_id = profile['user']
+        user_info = user_dict.get(user_id, {'username': '', 'date_joined': None})  # Default values if no match found
+        
+        # Add the username and date_joined to the profile data
+        profile['username'] = user_info['username']
+        profile['date_joined'] = user_info['date_joined']
+        merged_profiles.append(profile)
+
     return JsonResponse({
         "status": True,
         "message": "Admin data retrieved successfully.",
-        "data": list(user_profiles)
+        "data": merged_profiles
     }, status=200)
 
 
@@ -51,6 +70,8 @@ def see_user(request, username) -> JsonResponse:
         #user_info= user_profile.objects.values('id', 'name', 'role', 'email',
         #            'date_joined', 'bio', 'categories')
 
+        #username = user.data.username
+
         print(f"Looking for user with username: {username}")  # Debug print
         user = User.objects.filter(username=username).first()
         if not user:
@@ -70,6 +91,7 @@ def see_user(request, username) -> JsonResponse:
         
         user_data = {
             'id': user.id,
+            'username': username,
             'name': user_profile.name,
             'role': user_profile.role,
             'email': user_profile.email,

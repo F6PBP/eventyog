@@ -8,6 +8,7 @@ from modules.main.models import UserProfile
 from modules.authentication.forms import UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from eventyog.decorators import check_user_profile, check_user_profile_api
 
 @csrf_exempt
 def login(request):
@@ -164,19 +165,19 @@ def profile(request):
                 'is_admin': request.is_admin,
             }
 
-        return JsonResponse({
-            "status": True,
-            "message": "Profile retrieved successfully.",
-            "data": context
-        }, status=200)
+            return JsonResponse({
+                "status": True,
+                "message": "Profile retrieved successfully.",
+                "data": context
+            }, status=200)
 
-    except Exception as e:
-        print(e)
-        print('User profile not found.')
-        return JsonResponse({
-            "status": False,
-            "message": "User profile not found."
-        }, status=404)
+        except Exception as e:
+            print(e)
+            print('User profile not found.')
+            return JsonResponse({
+                "status": False,
+                "message": "User profile not found."
+            }, status=404)
 
 @csrf_exempt        
 @check_user_profile_api()
