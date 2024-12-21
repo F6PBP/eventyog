@@ -1,17 +1,15 @@
-from django.shortcuts import get_object_or_404, render, redirect, reverse
+from django.shortcuts import get_object_or_404, render, reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
-from modules.yogevent.forms import EventForm, SearchForm
+from modules.yogevent.forms import EventForm
 from modules.main.models import *
 from eventyog.decorators import check_user_profile
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
-from django.db.models import Q
 from django.db.models import Avg
-from django.shortcuts import redirect
 import json
-from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
@@ -155,19 +153,18 @@ def get_events_by_queries(request):
     
     return JsonResponse(response)
 
-@check_user_profile(is_redirect=True)
-@csrf_exempt
-@require_POST
 def create_event_entry_ajax(request):
     try:
+        # Get data from request
         title = strip_tags(request.POST.get('title', '').strip())
         description = strip_tags(request.POST.get('description', '').strip())
         category = request.POST.get('category')
         start_time = request.POST.get('start_time')
-        end_time = request.POST.get('end_time')
+        end_time = request.POST.get('end_time', None)  # Explicitly set default to None
         location = strip_tags(request.POST.get('location', '').strip())
         image_url = request.POST.get('image_url', '').strip()
 
+        # Required fields validation
         if not title:
             return JsonResponse({
                 'status': False,
@@ -189,47 +186,56 @@ def create_event_entry_ajax(request):
                 'message': 'Start time is required'
             })
 
-        if end_time and start_time >= end_time:
-            return JsonResponse({
-                'status': False,
-                'field': 'end_time',
-                'message': 'End time must be later than start time'
-            })
+        # Handle end_time - only try to parse if it's not empty
+        end_time_parsed = None
+        if end_time and end_time.strip():  # Check if end_time exists and is not just whitespace
+            try:
+                start_time_dt = datetime.strptime(start_time, '%Y-%m-%dT%H:%M')
+                end_time_dt = datetime.strptime(end_time, '%Y-%m-%dT%H:%M')
+                
+                if start_time_dt >= end_time_dt:
+                    return JsonResponse({
+                        'status': False,
+                        'field': 'end_time',
+                        'message': 'End time must be later than start time'
+                    })
+                end_time_parsed = end_time
+            except ValueError:
+                return JsonResponse({
+                    'status': False,
+                    'field': 'end_time',
+                    'message': 'Invalid end time format'
+                })
 
-        if image_url and not image_url.endswith(('.jpg', '.jpeg', '.png')):
-            return JsonResponse({
-                'status': False,
-                'field': 'image_url',
-                'message': 'Image URL must end with .jpg, .jpeg, or .png'
-            })
-
-        # Buat event baru
+        # Create event object with cleaned data
         new_event = Event.objects.create(
             title=title,
             description=description,
             category=category,
             start_time=start_time,
-            end_time=end_time,
-            location=location,
-            image_urls=image_url
+            end_time=end_time_parsed,  # This will be None if end_time was empty
+            location=location if location else None,
+            image_urls=image_url if image_url else None
         )
 
         return JsonResponse({
             'status': True,
-            'message': 'Event created successfully'
+            'message': 'Event created successfully',
+            'event_uuid': str(new_event.uuid)  # Return the UUID of created event
         })
     
     except Exception as e:
+        print(f"Debug - Error creating event: {str(e)}")  # Debug print
+        print(f"Debug - Request POST data: {request.POST}")  # Debug print
         return JsonResponse({
             'status': False,
-            'field': 'title',
             'message': f'Error creating event: {str(e)}'
         })
     
 @check_user_profile(is_redirect=False)
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
-    user_profile = UserProfile.objects.get(user=request.user)
+    user_profile = getattr(request.user, 'userprofile', None)
     ratings = Rating.objects.filter(rated_event=event)
     average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
     merchandise = Merchandise.objects.all()
@@ -262,14 +268,13 @@ def detail_event(request, uuid):
     # Check if user has given the rating
     rating = Rating.objects.filter(user=user_profile, rated_event=event)
     
+    is_rated = False
     first_rating = None
-    if rating.exists():
-        is_rated = True
-        first_rating = rating.first()
-    else:
-        is_rated = False
+    if user_profile:
+        user_rating = ratings.filter(user=user_profile).first()
+        is_rated = user_rating is not None
+        first_rating = user_rating
         
-    # Check if this event already in user cart
     event_cart = EventCart.objects.filter(user=request.user)
     
     is_in_cart = False
@@ -310,7 +315,6 @@ def book_event(request):
     tickets = TicketPrice.objects.filter(event=event)
     user_profile = request.user_profile
     
-    # See all ticket
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets.exclude(price=0)
     
@@ -340,9 +344,6 @@ def book_event(request):
 @csrf_exempt
 @require_POST
 def cancel_book(request):
-    body = request.body.decode('utf-8')
-    # body = json.loads(body)
-    
     event_id = request.POST.get('event_uuid')
     event = get_object_or_404(Event, uuid=event_id)
     user_profile = request.user_profile
@@ -387,12 +388,15 @@ def edit_event(request, uuid):
 
 @check_user_profile(is_redirect=True)
 @require_POST
-def add_rating(request, event_id):
+def add_rating(request, event_id):    
     event = get_object_or_404(Event, uuid=event_id)
     rating_value = request.POST.get('rating')
     review = request.POST.get('review', '')
-    user_profile = getattr(request.user, 'userprofile', None)
+    user_profile = UserProfile.objects.get(user=request.user)
 
+    if not review:
+        return JsonResponse({"status" : False, 'error': 'Please write a review'}, status=400)
+    
     try:
         rating_value = int(rating_value)
     except ValueError:
@@ -404,49 +408,60 @@ def add_rating(request, event_id):
         rating=rating_value, 
         review=review
     )
-    new_rating.save()
+    new_rating.save()    
     average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg']
+    rating = Rating.objects.filter(user=user_profile, rated_event=event)
+    is_rated = rating.exists()
+    first_rating = rating.first()
+
     context = {
         'average_rating': round(average_rating, 1),
+        'is_rated': is_rated,
+        'user_rating': {
+            'rating': first_rating.rating,
+            'review': first_rating.review
+        } if first_rating else None
     }
     return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
 
-def create_rating_event(request, event_id):
-    event = get_object_or_404(Event, uuid=event_id)
-    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
-    user_profile = getattr(request.user, 'userprofile', None)
-
-    return render(request, 'create_rating_event.html', {
-        'user': request.user,
-        'user_profile': user_profile,
-        'show_navbar': True,
-        'show_footer': True,
-        'event': event,
-        'average_rating': round(average_rating, 1),
-    })
-
 def get_rating_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
-    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
     user_profile = UserProfile.objects.get(user=request.user)
+
+    average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
+    rating = Rating.objects.filter(user=user_profile, rated_event=event)
+    is_rated = rating.exists()
+    first_rating = rating.first() if is_rated else None
+
+    # Cek rating dari user yang login
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_rating = rating.filter(user=user_profile).first()
 
     context = {
         'user_name': user_profile.user.username, 
         'average_rating': round(average_rating, 1),
+        'is_rated': user_rating is not None,  # Lebih eksplisit dalam pengece
+        'first_rating': {
+            'rating': first_rating.rating,
+            'review': first_rating.review
+        } if first_rating else None
     }
+        
     return JsonResponse({'status': True, 'message': 'Rating submitted successfully!', "data": context})
 
 def load_event_ratings(request, event_id):
     event = get_object_or_404(Event, uuid=event_id)
-    
-    # Get all ratings for the event and calculate the average rating
     ratings = Rating.objects.filter(rated_event=event).values("rating", "review")
     average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
 
-    # Return the ratings data as JSON
+    user_profile = UserProfile.objects.get(user=request.user)
+    rating = Rating.objects.filter(user=user_profile, rated_event=event)
+    is_rated = rating.exists()
+
     return JsonResponse({
         "average_rating": round(average_rating, 1),
         "ratings": list(ratings),
+        'is_rated': is_rated
     })
 
 @check_user_profile(is_redirect=True)
