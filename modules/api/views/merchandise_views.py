@@ -171,6 +171,7 @@ def showMerch_json(request, event_id: str):
         return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
 
 @check_user_profile_api()
+@csrf_exempt
 def add_items_to_cart(request):
     try:
         items = json.loads(request.body)['items']
