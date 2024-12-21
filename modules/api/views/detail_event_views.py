@@ -6,6 +6,7 @@ from modules.main.models import Rating, Event, EventCart, TicketPrice, UserProfi
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Avg
+from modules.api.views.auth_views import profile
 
 @csrf_exempt
 def add_rating(request, event_id: uuid.UUID):
@@ -28,8 +29,14 @@ def add_rating(request, event_id: uuid.UUID):
             else:
                 avg_rating = 0.0
             # Format ratings data
+            
             ratings_data = [{
                 'username': rating.user.user.username,
+                'profile_picture': (    
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if UserProfile.objects.get(user=rating.user.user).profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                ),
                 'rating': rating.rating,
                 'review': rating.review,
                 'created_at': rating.created_at.isoformat()

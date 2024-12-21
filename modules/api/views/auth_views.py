@@ -153,7 +153,7 @@ def profile(request):
         print(request.user)
         try:
             if request.user_profile.categories == '' or request.user_profile.categories == None:
-                categories = None
+                categories = ''
             else:
                 categories = request.user_profile.categories
 
