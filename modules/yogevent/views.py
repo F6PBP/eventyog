@@ -11,25 +11,19 @@ from django.db.models import Q
 from django.db.models import Avg
 from django.shortcuts import redirect
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
 @check_user_profile(is_redirect=True)
 def main(request: HttpRequest) -> HttpResponse:
     user_profile = UserProfile.objects.get(user=request.user)
     events = Event.objects.all()
-
-    # query = request.GET.get('q')
-    category = request.GET.get('category')
-
-    # if query:
-    #     events = events.filter(Q(title__iexact=query))
-    
-    # if category:
-    #     events = events.filter(category=category)
+    categories = [{"code": code, "name": name} for code, name in EventCategory.choices]
     
     for event in events:
         # Set image urls 
         if not event.image_urls:
-            event.image_urls = 'https://via.placeholder.com/'
+            print(event.title)
+            event.image_urls = 'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2024-06/240602-concert-fans-stock-vl-1023a-9b4766.jpg'
         
         event.month = event.start_time.strftime('%B')
         event.day = event.start_time.strftime('%d')
@@ -44,6 +38,19 @@ def main(request: HttpRequest) -> HttpResponse:
             avg_rating = total_rating / rating_count
         event.total_rating = avg_rating
         
+        
+    categories = EventCategory.choices
+    temp = []
+    
+    for category in categories:
+        temp.append({
+            'code': category[0],
+            'name': category[1]
+        })
+        
+    categories = temp
+    
+    
     categories = EventCategory.choices
     temp = []
     
@@ -67,28 +74,6 @@ def main(request: HttpRequest) -> HttpResponse:
 
     return render(request, 'yogevent.html', context)
 
-def event_list(request):
-    form = SearchForm()
-    query = request.GET.get('query')
-    user_profile = UserProfile.objects.get(user=request.user)
-
-    if query:
-        events = Event.objects.filter(Q(title__icontains=query) | Q(category__icontains=query))
-    else:
-        events = Event.objects.all()
-
-    context = {
-        'user': request.user,
-        'user_profile': user_profile,
-        'show_navbar': True,
-        'show_footer': True,
-        'is_admin': user_profile.role == 'AD' if user_profile else False,
-        'events': events,
-        'form': form
-    }
-
-    return render(request, 'yogevent.html', context)
-
 def show_event_xml(request):    
     events = Event.objects.all()
     return HttpResponse(serializers.serialize("xml", events), content_type="application/json") 
@@ -106,31 +91,27 @@ def show_json_event_by_id(request, id):
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 def get_events_by_queries(request):
-    query = request.GET.get('q')
-    category = request.GET.get('category')
-    start_time = request.GET.get('start_date')
-    end_time = request.GET.get('end_date')
+    query = request.GET.get('q', '')
+    category = request.GET.get('category', '')
     events = Event.objects.all()
     
-    if query:
-        events = events.filter(Q(title__icontains=query))
-        
-    if category:
+    if query and not category:
+        events = events.filter(title__icontains=query)
+    elif category and not query:
         events = events.filter(category=category)
-        
-    if start_time:
-        events = events.filter(start_time__gte=start_time)
-    
-    if end_time:
-        events = events.filter(end_time__lte=end_time)
+    elif query and category:
+        events = events.filter(
+            title__icontains=query,
+            category=category
+        )
 
     for event in events:
         if not event.image_urls:
-            event.image_urls = 'https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg'
-        
+            event.image_urls = 'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2024-06/240602-concert-fans-stock-vl-1023a-9b4766.jpg'
+
         event.month = event.start_time.strftime('%B')
         event.day = event.start_time.strftime('%d')
-        
+
         rating_count = Rating.objects.filter(rated_event=event).count()
         avg_rating = 0
         if rating_count > 0:
@@ -178,25 +159,52 @@ def get_events_by_queries(request):
 @csrf_exempt
 @require_POST
 def create_event_entry_ajax(request):
-    title = strip_tags(request.POST.get('title'))
-    description = strip_tags(request.POST.get('description'))
-    category = request.POST.get('category')
-    start_time = request.POST.get('start_time')
-    end_time = request.POST.get('end_time')
-    location = strip_tags(request.POST.get('location'))
-    image_url = request.POST.get('image_url') if request.POST.get('image_url') else ""
-
-    if not title or not category or not start_time:
-        return JsonResponse({'status': False, 'message': 'Invalid input'})
-
-    if end_time and start_time >= end_time:
-        return JsonResponse({'status': False, 'message': 'Acara berakhir sebelum dimulai.'})
-        
-    if image_url and not image_url.endswith(('.jpg', '.jpeg', '.png')):
-        return JsonResponse({'status': False, 'message': "Thumbnail must be a valid image URL (.jpg, .jpeg, .png)."})
-
     try:
-        new_event = Event(
+        title = strip_tags(request.POST.get('title', '').strip())
+        description = strip_tags(request.POST.get('description', '').strip())
+        category = request.POST.get('category')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        location = strip_tags(request.POST.get('location', '').strip())
+        image_url = request.POST.get('image_url', '').strip()
+
+        if not title:
+            return JsonResponse({
+                'status': False,
+                'field': 'title',
+                'message': 'Title is required'
+            })
+            
+        if not description:
+            return JsonResponse({
+                'status': False,
+                'field': 'description',
+                'message': 'Description is required'
+            })
+
+        if not start_time:
+            return JsonResponse({
+                'status': False,
+                'field': 'start_time',
+                'message': 'Start time is required'
+            })
+
+        if end_time and start_time >= end_time:
+            return JsonResponse({
+                'status': False,
+                'field': 'end_time',
+                'message': 'End time must be later than start time'
+            })
+
+        if image_url and not image_url.endswith(('.jpg', '.jpeg', '.png')):
+            return JsonResponse({
+                'status': False,
+                'field': 'image_url',
+                'message': 'Image URL must end with .jpg, .jpeg, or .png'
+            })
+
+        # Buat event baru
+        new_event = Event.objects.create(
             title=title,
             description=description,
             category=category,
@@ -205,23 +213,33 @@ def create_event_entry_ajax(request):
             location=location,
             image_urls=image_url
         )
-        new_event.save()
-        return JsonResponse({'status': True, 'message': 'Event created successfully.'})
+
+        return JsonResponse({
+            'status': True,
+            'message': 'Event created successfully'
+        })
     
     except Exception as e:
-        return JsonResponse({'status': False, 'message': 'Error creating event.'})
-
+        return JsonResponse({
+            'status': False,
+            'field': 'title',
+            'message': f'Error creating event: {str(e)}'
+        })
+    
+@check_user_profile(is_redirect=False)
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
     ratings = Rating.objects.filter(rated_event=event)
     average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
     merchandise = Merchandise.objects.all()
-    
     tickets = TicketPrice.objects.filter(event=event)
     tickets = tickets if len(tickets) > 0 else None
+    registered_event = user_profile.registeredEvent.all()
+    
+    if not event.image_urls:
+        event.image_urls = 'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2024-06/240602-concert-fans-stock-vl-1023a-9b4766.jpg'
 
-    # Remove tickets with 0 price
     if tickets:
         tickets = tickets.exclude(price=0)
     
@@ -234,7 +252,6 @@ def detail_event(request, uuid):
             total_rating += rating.rating
         total_rating = total_rating / len(ratings)
 
-    registered_event = user_profile.registeredEvent.all()
     
     is_booked = False
     for ticket in registered_event:
@@ -343,63 +360,27 @@ def delete_event(request, uuid):
     event.delete()
     return HttpResponseRedirect(reverse('yogevent:main'))
 
+@check_user_profile(is_redirect=False)
 def edit_event(request, uuid):
-    event = Event.objects.get(uuid = uuid)
+    event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
     
-    if request.method == "POST":  
-        event.title = strip_tags(request.POST.get('title'))
-        event.description = strip_tags(request.POST.get('description'))
-        event.category = request.POST.get('category')
-        event.start_time = request.POST.get('start_time')
-        event.end_time = request.POST.get('end_time', '')
-        event.location = strip_tags(request.POST.get('location'))
-        event.image_urls = [request.POST.get('image_url')]
-        event.end_time = event.end_time if event.end_time != "" else None
+    if request.method == "POST":
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            event = form.save()
+            return HttpResponseRedirect(reverse('yogevent:main'))
+    else:
+        form = EventForm(instance=event)
 
-
-        if event.image_urls == [""]:
-            event.image_urls = []
-
-        if event.title == "" or event.category == "":
-            return render(request, "error.html", {
-                "message":"judul atau kategori tidak boleh kosong",
-                'user': request.user,
-                'user_profile': user_profile,
-                'image_url': user_profile.profile_picture,
-                'show_navbar': True,
-                'show_footer': True,
-                'is_admin': user_profile.role == 'AD' if user_profile else False,
-                })
-
-        if event.end_time and event.start_time >= event.end_time:
-            return render(request, "error.html", {
-                "message":"Acara berakhir sebelum dimulai.",
-                'user': request.user,
-                'user_profile': user_profile,
-                'image_url': user_profile.profile_picture,
-                'show_navbar': True,
-                'show_footer': True,
-                'is_admin': user_profile.role == 'AD' if user_profile else False,
-                })
-        
-        event.save()
-        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
-
-    if (len(event.image_urls) == 0 ):
-        event.image_urls = ""
-        
-    event.CATEGORY_CHOICES = EventCategory.choices
-    event.start_time = event.start_time.strftime('%Y-%m-%dT%H:%M')
-    event.end_time = event.end_time.strftime('%Y-%m-%dT%H:%M') if event.end_time else ""
-    
     context = {
         'user': request.user,
         'user_profile': user_profile,
         'show_navbar': True,
         'show_footer': True,
         'is_admin': user_profile.role == 'AD' if user_profile else False,
-        # 'form': form
+        'form': form,
+        'event': event
     }
 
     return render(request, "edit_event.html", context)
@@ -416,8 +397,7 @@ def add_rating(request, event_id):
         rating_value = int(rating_value)
     except ValueError:
         return JsonResponse({"status" : False, 'error': 'Invalid rating input'}, status=400)
-
-    # Create and save the new rating
+    
     new_rating = Rating(
         user=user_profile, 
         rated_event=event, 
@@ -445,8 +425,8 @@ def create_rating_event(request, event_id):
         'average_rating': round(average_rating, 1),
     })
 
-def get_rating_event(request, event_uuid):
-    event = get_object_or_404(Event, uuid=event_uuid)
+def get_rating_event(request, uuid):
+    event = get_object_or_404(Event, uuid=uuid)
     average_rating = Rating.objects.filter(rated_event=event).aggregate(Avg('rating'))['rating__avg'] or 0
     user_profile = UserProfile.objects.get(user=request.user)
 
@@ -469,38 +449,7 @@ def load_event_ratings(request, event_id):
         "ratings": list(ratings),
     })
 
-# @csrf_exempt
-# def ticket_price_list(request, uuid):
-#     if request.method == "POST":
-#         event = get_object_or_404(Event, uuid=uuid)
-#         tickets = TicketPrice.objects.filter(event=event)
-
-#         if tickets.exists():
-#             ticket_data = []
-#             for ticket in tickets:
-#                 ticket_data.append({
-#                     "name" : event.title,
-#                     "uuid" : event.uuid,
-#                     "price": ticket.price,
-#                 })
-
-#             return JsonResponse({
-#                 "success": True,
-#                 "message": "Tickets retrieved successfully.",
-#                 "data": ticket_data
-#             })
-#         else:
-#             return JsonResponse({
-#                 "success": False,
-#                 "message": "No tickets available for this event."
-#             }, status=404)
-
-#     return JsonResponse({
-#         "success": False,
-#         "message": "Invalid request method."
-#     }, status=400)
-
-@check_user_profile()
+@check_user_profile(is_redirect=True)
 def buy_ticket(request):
     body = request.body.decode('utf-8')
     body = json.loads(body)

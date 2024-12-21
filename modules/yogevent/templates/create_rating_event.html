@@ -7,11 +7,11 @@
         <strong>Average Rating:</strong> <span id="average-rating">Loading...</span>
     </div>
     {% if user.is_authenticated %}
-    <form method="post" action="{% url 'yogevent:add_rating' event.uuid %}" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md" id="rating-form">
-        {% csrf_token %}
-        
-        <div class="flex items-center mb-4">
-            <label for="rating" class="mr-2">Rate:</label>
+    
+    <div class="flex items-center mb-4">
+        <label for="rating" class="mr-2">Rate:</label>
+        <form method="post" action="{% url 'yogevent:add_rating' event.uuid %}" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md" id="rating-form">
+            {% csrf_token %}
             <select name="rating" id="rating" class="border rounded p-1" required>
                 <option value="" disabled selected>Select a rating</option>
                 <option value="1">1</option>

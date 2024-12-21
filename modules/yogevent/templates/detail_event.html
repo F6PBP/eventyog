@@ -3,13 +3,7 @@
 <div class="px-10 md:20 lg:px-32 my-48">
     <div class="rounded-lg flex flex-col md:flex-row">
         <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
-            {% if event.image_urls %}
-                <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls }}" alt="{{ event.title }}">==
-            {% else %}
-                <img class="w-full max-w-lg object-cover rounded-lg" 
-                    src="https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg"
-                alt="{{ event.title }}">
-            {% endif %}
+            <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls }}" alt="{{ event.title }}">
         </div>
 
         <div class="md:w-1/2 flex flex-col justify-center pl-0 md:pl-6">
@@ -36,7 +30,7 @@
                     <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
                     <div class="">
                         <b>
-                            {{first_rating.rating}}.0 / 5.0,
+                            {{first_rating.rating}} / 5.0,
                         </b>
                         <span class="text-gray-500">
                             {{first_rating.review}}
@@ -86,34 +80,27 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        console.log("Halosss");
         const messageDisplay = document.getElementById("averageRating");
-        submitButton.addEventListener("click", function() {
-                console.log("Hi aku di dalam buat check, blm fetch sih");
-                fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        messageDisplay.textContent = data.error;
-                        messageDisplay.classList.add("text-red-500");
-                    } else {
-                        messageDisplay.textContent = data.message;
-                        messageDisplay.classList.add("text-green-500");
-                        if (data.average_rating) {
-                            document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
-                        }
-                    }
-                })
-                .catch(error => {
-                    messageDisplay.textContent = "An error occurred. Please try again.";
-                    messageDisplay.classList.add("text-red-500");
-                });
+        if (messageDisplay) {
+            fetch("{% url 'yogevent:get_rating_event' event.uuid %}")  // Remove headers for GET request
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status && data.data) {
+                    messageDisplay.textContent = `${data.data.average_rating} / 5.0`;
+                } else if (data.error) {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching initial rating:", error);
             });
+        }
     });
     
     function onBookFree() {

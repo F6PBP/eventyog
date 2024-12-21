@@ -12,7 +12,7 @@
                 
                 <div class="w-full">
                     <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                    {% include "ds/textarea.html" with id="description" name="description" class="w-full" placeholder="Description goes here" required="True" value=form.description.value class="min-h-[100px] w-full" %}
+                    {% include "ds/textarea.html" with id="description" name="description" class="w-full" placeholder="Description goes here" required="True" value=form.description.value class="w-full min-h-[100px] h-[100px] resize-none focus:outline-none focus:ring-0" %}
                 </div>
                 
                 <!-- Event Category Dropdown -->
@@ -59,65 +59,125 @@
                     {% include "ds/input.html" with type="url" name="image_url" id="image_url" placeholder="https://example.com/image.jpg" %}
                 </div>
 
-                <div id="responseContainer" style="display: none;"></div>
+                <!-- Error Messages Container -->
+                <div id="errorContainer" class="hidden">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span id="errorMessage" class="block sm:inline"></span>
+                    </div>
+                </div>
         </form>
     </div>
 
     <script>
-        function validateEventTimes() {
-            const startTime = document.getElementById('start_time').value;
-            const endTime = document.getElementById('end_time').value;
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            clearFieldError(fieldId);
+            const errorDiv = document.createElement('div');
+            errorDiv.id = `${fieldId}-error`;
+            errorDiv.className = 'text-red-500 text-sm mt-1';
+            errorDiv.textContent = message;
+            field.parentElement.appendChild(errorDiv);
+        }
 
-            if (new Date(startTime) > new Date(endTime)) {
-                alert('Start time cannot be later than end time.');
-                return false;
+        function clearFieldError(fieldId) {
+            const existingError = document.getElementById(`${fieldId}-error`);
+            if (existingError) {
+                existingError.remove();
+            }
+        }
+
+        function validateField(fieldId) {
+            clearFieldError(fieldId);
+            const field = document.getElementById(fieldId);
+            
+            switch(fieldId) {
+                case 'title':
+                    if (!field.value.trim()) {
+                        showFieldError(fieldId, 'Title is required');
+                        return false;
+                    }
+                    break;
+                    
+                case 'description':
+                    if (!field.value.trim()) {
+                        showFieldError(fieldId, 'Description is required');
+                        return false;
+                    }
+                    break;
+                    
+                case 'start_time':
+                case 'end_time':
+                    const startTime = document.getElementById('start_time').value;
+                    const endTime = document.getElementById('end_time').value;
+                    
+                    if (!startTime && fieldId === 'start_time') {
+                        showFieldError('start_time', 'Start time is required');
+                        return false;
+                    }
+                    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
+                        showFieldError('end_time', 'End time must be later than start time');
+                        return false;
+                    }
+                    break;
+                    
+                case 'image_url':
+                    if (field.value && !field.value.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                        showFieldError(fieldId, 'Image URL must end with .jpg, .jpeg, .png, or .gif');
+                        return false;
+                    }
+                    break;
             }
             return true;
         }
 
+        // Event listeners untuk validasi real-time
+        ['title', 'description', 'start_time', 'end_time', 'image_url'].forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            field.addEventListener('input', () => validateField(fieldId));
+            field.addEventListener('change', () => validateField(fieldId));
+        });
+
         function submitCreateEventForm() {
-            event.preventDefault(); 
-            form = document.getElementById('event-form');
-
-            if (form.checkValidity()) {
-                let formData = new FormData(form);
+            // Validasi semua field dulu
+            const fields = ['title', 'description', 'start_time', 'end_time', 'image_url'];
+            let isValid = true;
             
-                fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}",
-                    },
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                    },
-                })
-                .then(response => {
-                    console.log('Response Status:', response.status); 
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Response Data:', data);
-                    if (data.status) {
-                        window.location.href = "{% url 'yogevent:main' %}";
-                    } else {
-                        document.getElementById("responseContainer").style.display = "block";
-                        document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred: ' + error.message);
-                });
-            } else {
-                form.reportValidity();
-                throw new Error('Form is invalid');
-            }
-        }
+            fields.forEach(fieldId => {
+                if (!validateField(fieldId)) {
+                    isValid = false;
+                }
+            });
 
-        document.getElementById("event-form").addEventListener("submit", submitCreateEventForm);
+            // Jika ada yang tidak valid, stop di sini
+            if (!isValid) {
+                return false;
+            }
+
+            // Jika semua valid, lanjut submit
+            const form = document.getElementById('event-form');
+            let formData = new FormData(form);
+            
+            fetch("{% url 'yogevent:create_event_entry_ajax' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    window.location.href = "{% url 'yogevent:main' %}";
+                } else {
+                    showFieldError(data.field, data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFieldError('title', 'An error occurred. Please try again.');
+            });
+            
+            return false;
+        }
     </script>    
 {% endblock %}
