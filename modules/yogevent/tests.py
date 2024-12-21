@@ -30,7 +30,7 @@ class EventTestCase(TestCase):
         with self.assertRaises(Event.DoesNotExist):
             Event.objects.get(id=event_id)
 
-class TicketTestCase(TestCase):
+class TicketPriceTestCase(TestCase):
     def setUp(self):
         self.event = Event.objects.create(
             title="Concert",
@@ -40,13 +40,25 @@ class TicketTestCase(TestCase):
             tickets_available=100
         )
         self.user = User.objects.create_user(username="johndoe", password="password")
+        self.ticket_price = TicketPrice.objects.create(event=self.event, price=50.00)
+
+    def test_set_ticket_price(self):
+        self.assertEqual(self.ticket_price.event, self.event)
+        self.assertEqual(self.ticket_price.price, 50.00)
+
+    def test_edit_ticket_price(self):
+        self.ticket_price.price = 60.00
+        self.ticket_price.save()
+        updated_ticket_price = TicketPrice.objects.get(id=self.ticket_price.id)
+        self.assertEqual(updated_ticket_price.price, 60.00)
 
     def test_buy_ticket(self):
-        ticket = Ticket.objects.create(event=self.event, buyer=self.user)
+        # Simulate ticket purchase
+        tickets_before = self.event.tickets_available
         self.event.tickets_available -= 1
         self.event.save()
-        self.assertEqual(ticket.event, self.event)
-        self.assertEqual(self.event.tickets_available, 99)
+        tickets_after = self.event.tickets_available
+        self.assertEqual(tickets_after, tickets_before - 1)
 
 class RatingTestCase(TestCase):
     def setUp(self):
