@@ -170,8 +170,8 @@ def showMerch_json(request, event_id: str):
     except Event.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
 
-@check_user_profile_api()
 @csrf_exempt
+@check_user_profile_api()
 def add_items_to_cart(request):
     try:
         items = json.loads(request.body)['items']
