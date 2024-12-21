@@ -57,7 +57,7 @@ def get_cart_data(request):
             },
             'cart_events': [
                 {
-                    'image_url': event.ticket.event.image_urls[0] if event.ticket.event.image_urls else None,
+                    'image_url': event.ticket.event.image_urls if event.ticket.event.image_urls else None,
                     'title': event.ticket.event.title,
                     'ticket_name': event.ticket.name,
                     'price': float(event.totalPrice()),

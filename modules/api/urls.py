@@ -22,6 +22,11 @@ urlpatterns = [
     path('auth/profile/', auth_views.profile, name='auth_profile'),
     path('auth/profile/edit/', auth_views.edit_profile, name='auth_profile_edit'),
     path('auth/onboarding/', auth_views.onboarding, name='auth_onboarding'),
+    path('cart/get_cart_data/', cart_views.get_cart_data, name='get_cart_data'),
+    path('cart/update/', cart_views.update_cart, name='update_cart'),  # Untuk memperbarui keranjang
+    path('cart/checkout/', cart_views.checkout, name='checkout'),      # Untuk proses checkout
+    path('cart/empty/', cart_views.empty_cart, name='empty_cart'),      # Untuk mengosongkan keranjang
+    path('cart/empty_cart/', cart_views.empty_cart, name='empty_cart'),      # Untuk mengosongkan keranjang
     
     path('friend/list/', friend_views.show_list, name='friend_list'),
     path('friend/<str:user_id>/', friend_views.main, name='friend_main'),
