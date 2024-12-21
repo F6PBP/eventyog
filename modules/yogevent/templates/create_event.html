@@ -1,7 +1,7 @@
 {% extends "ds/modal.html" %}
 {% block modal_body %}
     <div class="flex flex-col gap-4 overflow-y-scroll overflow-x-auto max-h-[400px]">
-        <form id="event-form">
+        <form method="post" id="event-form">
             {% csrf_token %}
             <div class="p-5 w-full flex flex-col gap-4">
                 <!-- Title Input -->
@@ -48,7 +48,7 @@
                 </div>
 
                 <!-- Event End Time -->
-                    <div class="w-full">
+                <div class="w-full">
                     <label for="end_time" class="block text-gray-700 text-sm font-bold">End Time</label>
                     {% include "ds/input.html" with type="datetime-local" id="end_time" name="end_time" required="True" class="w-full" %}
                 </div>
@@ -60,7 +60,6 @@
                 </div>
 
                 <div id="responseContainer" style="display: none;"></div>
-            </div>
         </form>
     </div>
 
@@ -77,9 +76,7 @@
         }
 
         function submitCreateEventForm() {
-            if (!validateEventTimes()) {
-                return;
-            }
+            event.preventDefault(); 
             form = document.getElementById('event-form');
 
             if (form.checkValidity()) {
@@ -96,20 +93,17 @@
                     },
                 })
                 .then(response => {
-                    console.log("Response: ", response)
-                    console.log("Response status: ", response.status)
+                    console.log('Response Status:', response.status); 
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data);
+                    console.log('Response Data:', data);
                     if (data.status) {
                         window.location.href = "{% url 'yogevent:main' %}";
                     } else {
-                        console.log(data.message)
                         document.getElementById("responseContainer").style.display = "block";
                         document.getElementById("responseContainer").innerHTML = `<p style="color:red">${data.message}</p>`;
                     }
@@ -123,5 +117,7 @@
                 throw new Error('Form is invalid');
             }
         }
+
+        document.getElementById("event-form").addEventListener("submit", submitCreateEventForm);
     </script>    
 {% endblock %}

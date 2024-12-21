@@ -32,10 +32,8 @@ def main(request):
     first_8_events = Event.objects.all()[:8]
     
     for event in first_8_events:
-        if event.image_urls:
-            event.image_urls = event.image_urls[0]
-        else:
-            event.image_urls = 'https://via.placeholder.com/800x400'
+        if not event.image_urls:
+            event.image_urls = 'https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg'
             
         event.month = event.start_time.strftime('%b').upper()
         event.day = event.start_time.strftime('%d')
