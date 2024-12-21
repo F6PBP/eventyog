@@ -49,4 +49,13 @@ urlpatterns = [
     path('friend/<str:user_id>/', friend_views.main, name='friend_main'),
     path('friend/add/<str:friend_id>', friend_views.add_friend_ajax, name='friend_add'),
     path('friend/remove/<str:friend_id>', friend_views.remove_friend, name='friend_remove'),
-]   
+
+    path('merchandise/', merchandise_views.main, name='merchandise_main'),
+    path('merchandise/<int:id>/', merchandise_views.show_merchandise_by_id, name='merchandise_detail'),
+    path('merchandise/create/', merchandise_views.create_merchandise_ajax, name='merchandise_create'),
+    path('merchandise/add-to-cart/', merchandise_views.add_items_to_cart, name='merchandise_add_to_cart'),
+    path('merchandise/edit/<int:id>/', merchandise_views.edit_merchandise, name='merchandise_edit'),
+    path('merchandise/delete/<int:id>/', merchandise_views.delete_merchandise, name='merchandise_delete'),
+    path('merchandise/show/<str:event_id>/', merchandise_views.showMerch_json, name='merchandise_showMerch_json'),
+
+]
