@@ -22,11 +22,21 @@ def main(request: HttpRequest) -> HttpResponse:
 def create_merchandise(request):
     form = MerchandiseForm(request.POST or None)
 
-    if form.is_valid() and request.method == "POST":
-        merchandise = form.save(commit=False)
-        merchandise.user = request.user
-        merchandise.save()
-        return redirect('merchandise:main')
+    if request.method == "POST":
+        if form.is_valid():
+            merchandise = form.save(commit=False)
+            merchandise.user = request.user
+            errors = []
+            if merchandise.quantity <= 0:
+                errors.append('Quantity must be greater than zero.')
+            if merchandise.price <= 0:
+                errors.append('Price must be greater than zero.')
+            if errors:
+                for error in errors:
+                    form.add_error(None, error)
+            else:
+                merchandise.save()
+                return redirect('merchandise:main')
 
     context = {
         'form': form,
@@ -57,29 +67,45 @@ def create_merchandise_ajax(request):
     price = request.POST.get("price")
     image_url = request.POST.get("image_url")
     event_id = request.POST.get("event_id")
+    quantity = request.POST.get("quantity")
+
+    if int(quantity) <= 0:
+        return JsonResponse({"status": "ERROR", "message": "Quantity must be greater than zero."}, status=400)
+    if float(price) <= 0:
+        return JsonResponse({"status": "ERROR", "message": "Price must be greater than zero."}, status=400)
 
     event = Event.objects.get(uuid=event_id)
 
     new_merchandise = Merchandise(
-        name = name, 
-        description = description,
-        price = price,
-        image_url = image_url,
-        related_event = event
+        name=name, 
+        description=description,
+        price=price,
+        image_url=image_url,
+        related_event=event,
+        quantity=quantity
     )
     new_merchandise.save()
 
-    return JsonResponse({"status": "CREATED"}, status = 201)
+    return JsonResponse({"status": "CREATED"}, status=201)
 
 def edit_merchandise(request, id):
-    merchandise = Merchandise.objects.get(pk = id)
+    merchandise = Merchandise.objects.get(pk=id)
     form = MerchandiseForm(request.POST or None, instance=merchandise)
     
-    event = merchandise.related_event
-
-    if form.is_valid() and request.method == "POST":
-        form.save()
-        return HttpResponseRedirect(reverse('yogevent:detail_event', args=[event.uuid]))
+    if request.method == "POST":
+        if form.is_valid():
+            merchandise = form.save(commit=False)
+            errors = []
+            if merchandise.quantity <= 0:
+                errors.append('Quantity must be greater than zero.')
+            if merchandise.price <= 0:
+                errors.append('Price must be greater than zero.')
+            if errors:
+                for error in errors:
+                    form.add_error(None, error)
+            else:
+                merchandise.save()
+                return HttpResponseRedirect(reverse('yogevent:detail_event', args=[merchandise.related_event.uuid]))
 
     context = {
         'form': form,
@@ -87,10 +113,11 @@ def edit_merchandise(request, id):
     }
     return render(request, "edit_merchandise.html", context)
 
+@check_user_profile()
 def delete_merchandise(request, id):
-    merchandise = Merchandise.objects.get(pk = id)
+    merchandise = Merchandise.objects.get(pk=id)
     merchandise.delete()
-    return HttpResponseRedirect(reverse('yogevent:main'))
+    return JsonResponse({"status": "success", "message": "Merchandise deleted successfully", "is_admin": request.is_admin}, status=200)
 
 @check_user_profile()
 def showMerch_json(request, event_id: str):
@@ -131,9 +158,6 @@ def add_items_to_cart(request):
     
     items = json.loads(request.body)['items']
     merch_cart = MerchCart.objects.filter(user=request.user)
-    
-    # Make sure theres no duplicate merch in cart
-    # if duplicate, just update the quantity
     
     for item in items:
         merch = Merchandise.objects.get(pk=item['id'])
