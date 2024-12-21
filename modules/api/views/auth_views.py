@@ -21,9 +21,22 @@ def login(request):
         if user.is_active:
             auth_login(request, user)
             # Status login sukses.
-            print('Login sukses!')
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                request.is_admin = user_profile.role == 'AD'
+                request.image_url = (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            except:
+                request.is_admin = False
+                request.image_url = 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+            
             return JsonResponse({
                 "username": user.username,
+                "isAdmin": request.is_admin,
+                "imageUrl": request.image_url,
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
@@ -99,12 +112,6 @@ def logout(request):
             
 @csrf_exempt
 def onboarding(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            "status": False,
-            "message": "User not authenticated."
-        }, status=401)
-
     profile = UserProfile.objects.filter(user=request.user)
     if profile.exists():
         return JsonResponse({
@@ -124,6 +131,7 @@ def onboarding(request):
                 "message": "Profile created successfully!"
             }, status=200)
         else:
+            print(request.FILES)
             return JsonResponse({
                 "status": False,
                 "message": "Form is not valid.",
@@ -137,11 +145,13 @@ def onboarding(request):
         
 @csrf_exempt        
 def profile(request):
-    try:
-        if request.user_profile.categories == '':
-            categories = None
-        else:
-            categories = request.user_profile.categories.split(',')
+    if request.method == "GET":
+        print(request.user)
+        try:
+            if request.user_profile.categories == '' or request.user_profile.categories == None:
+                categories = None
+            else:
+                categories = request.user_profile.categories
 
             context = {
                 'username': request.user.username,
@@ -169,10 +179,10 @@ def profile(request):
         }, status=404)
 
 @csrf_exempt        
+@check_user_profile_api()
 def edit_profile(request):
-    form = UserProfileForm(instance=request.user_profile)
-
     if request.method == 'POST':
+        print(request.POST)
         form = UserProfileForm(request.POST, request.FILES, instance=request.user_profile)
         if form.is_valid():
             profile = form.save(commit=False)
@@ -189,22 +199,23 @@ def edit_profile(request):
                 "message": "Form is not valid.",
                 "errors": form.errors
             }, status=400)
+    else:
+        form = UserProfileForm(instance=request.user_profile)
+        context = {
+            'user': request.user,
+            'user_profile': request.user_profile,
+            'image_url': request.image_url,
+            'categories': request.user_profile.categories,
+            'form': form,
+            'show_navbar': True,
+            'show_footer': True
+        }
 
-    context = {
-        'user': request.user,
-        'user_profile': request.user_profile,
-        'image_url': request.image_url,
-        'categories': request.user_profile.categories,
-        'form': form,
-        'show_navbar': True,
-        'show_footer': True
-    }
-
-    return JsonResponse({
-        "status": True,
-        "message": "Profile edit form retrieved successfully.",
-        "data": context
-    }, status=200)
+        return JsonResponse({
+            "status": True,
+            "message": "Profile edit form retrieved successfully.",
+            "data": context
+        }, status=200)
 
 @csrf_exempt
 def delete_profile(request):

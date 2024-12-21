@@ -133,6 +133,7 @@
                 window.location.reload();
                 document.getElementById('wallet-balance').innerText = formatPrice(data.new_wallet_balance);
                 document.getElementById('remaining-balance').innerText = formatPrice(data.new_wallet_balance - totalPrice);
+                console.log(data)
             } else {
                 showToast(data.error, "error");
             }
