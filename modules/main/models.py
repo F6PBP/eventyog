@@ -14,13 +14,10 @@ class UserProfile(models.Model):
     bio = models.TextField()
     profile_picture = CloudinaryField('image', null=True, default=None, blank=True)
     categories = models.CharField(max_length=200, null=True, blank=True)
-    
     registeredEvent = models.ManyToManyField('TicketPrice', blank=True)
     boughtMerch = models.ManyToManyField('Merchandise', blank=True)
     friends = models.ManyToManyField('UserProfile', blank=True)
-    
     wallet = models.DecimalField(max_digits=10, decimal_places=2, default=1000000)
-    
     role = models.CharField(
         choices=UserRoles.choices,
         default=UserRoles.USER,
@@ -91,16 +88,13 @@ class Event(models.Model):
         default=EventCategory.LAINNYA,
         max_length=2
     )
-    
     start_time = models.DateTimeField()
-    end_time = models.DateTimeField(null=True, blank=True)
-    
+    end_time = models.DateTimeField(null=True, blank=True)   
     location = models.CharField(max_length=200, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
     user_rating = models.ManyToManyField(Rating, blank=True)
-    image_urls = models.JSONField(null=True, blank=True)
+    image_urls = models.URLField(null=True, blank=True)
     
 class Merchandise(models.Model):
     id = models.AutoField(primary_key=True)
@@ -152,3 +146,4 @@ class ForumReply(models.Model):
 
     def totalDislike(self):
         return self.dislike.all().count()
+    

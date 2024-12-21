@@ -23,7 +23,7 @@ class Command(BaseCommand):
                     if row['category'] in dict(EventCategory.choices):
                         category = row['category']
                         
-                    image_urls = row.get('image', [])
+                    image_urls = row.get('image', '')
                         
                     event = Event.objects.create(
                         title=row['name'],
@@ -53,6 +53,7 @@ class Command(BaseCommand):
                     pass
         
         print('Seeding event done')
+
         
     def seed_merch(self):
         with open(f'{self.path}product-dataset.json', 'r', errors='ignore') as file:
@@ -260,3 +261,4 @@ class Command(BaseCommand):
         except Exception as e:
             print('Error: ', e)
             pass
+        

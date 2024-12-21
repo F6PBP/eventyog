@@ -47,7 +47,7 @@ def fetch_registered_event(request: HttpRequest) -> JsonResponse:
             'month': event.start_time.strftime('%b'),
             'day': event.start_time.strftime('%d'),
             'location': event.location,
-            'image_urls': event.image_urls or ['default_image_url'],
+            'image_urls': event.image_urls or '',
         })
     
     return JsonResponse({'events': event_list})

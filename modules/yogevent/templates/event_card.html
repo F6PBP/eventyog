@@ -1,7 +1,7 @@
 <a href="{% url 'yogevent:detail_event' event.uuid %}">
     <div class="flex flex-col bg-white rounded-xl shadow-xl overflow-hidden h-full">
         <img 
-            src="{{event.image_urls}}" 
+            src="{{ event.image_urls }}" 
             class="h-[200px] object-cover"
             alt="">
         <div class="flex gap-5 p-5 flex-grow">
