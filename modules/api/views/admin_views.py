@@ -18,11 +18,11 @@ from modules.authentication.forms import UserProfileForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 
-#@login_required(login_url='auth:login')
-#@check_user_profile(is_redirect=False)
+@login_required(login_url='auth:login')
+@check_user_profile(is_redirect=False)
 def show_main(request: AuthRequest) -> JsonResponse:
-    #if request.user_profile.role != 'AD':
-        #return JsonResponse({"status": False, "message": "Access denied."}, status=403)
+    if request.user_profile.role != 'AD':
+        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
 
     # Fetch user profiles
     user_profiles = UserProfile.objects.values('id', 'user', 'name', 'role', 'email', 'bio', 'categories')
@@ -61,8 +61,8 @@ def search_users(request: AuthRequest) -> JsonResponse:
         "data": list(users)
     }, status=200)
 
-#@login_required(login_url='auth:login')
-#@check_user_profile(is_redirect=True)
+@login_required(login_url='auth:login')
+@check_user_profile(is_redirect=True)
 def see_user(request, username) -> JsonResponse:
     try:
         # user = get_object_or_404(User, username=username)
@@ -145,31 +145,47 @@ def edit_user(request, user_id) -> JsonResponse:
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
-def delete_user(request, user_id):
+def delete_user(request, username) -> JsonResponse:
     if request.user_profile.role != 'AD':
         return JsonResponse({
             "status": False,
             "message": "You do not have permission to perform this action."
-        }, status=403)
-        
-    if request.method == 'POST':
-        try:
-            user = get_object_or_404(User, pk=user_id)
-            user.delete()
-            return JsonResponse({
-                "status": True,
-                "message": "User account deleted successfully."
-            }, status=200)
-        except Exception as e:
-            return JsonResponse({
-                "status": False,
-                "message": f"An error occurred: {str(e)}"
-            }, status=500)
+        }, status=403)  
+
+    user = User.objects.filter(username=username).first()
+    if not user:
+        print(f"No user found with username: {username}")  # Debug print
+        return JsonResponse({
+            "status": False,
+            "message": f"User with username {username} not found."
+        }, status=404)
+
+    user_profile = UserProfile.objects.filter(user=user).first()
+    if not user_profile:
+        print(f"No profile found for user: {username}")  # Debug print
+        return JsonResponse({
+            "status": False,
+            "message": f"Profile not found for user {username}"
+        }, status=404)
     
-    return JsonResponse({
-        "status": False,
-        "message": "Invalid request method. Only POST is allowed."
-    }, status=400)
+    try:
+       #if request.method == 'POST':
+        user_profile.delete()
+        user.delete()
+        return JsonResponse({
+            "status": True,
+            "message": "Profile deleted successfully.",
+            "status_code": 200
+        }, status=200)
+    
+    except Exception as e:
+        print(e)
+        user.delete()
+        return JsonResponse({
+            "status": False,
+            "message": "Error occurred while deleting profile.",
+            "status_code": 500
+        }, status=500)
 
 @login_required(login_url='auth:login')
 @check_user_profile(is_redirect=True)
