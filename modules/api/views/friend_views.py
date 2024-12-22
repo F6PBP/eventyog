@@ -100,7 +100,6 @@ def main(request: HttpRequest, user_id: int) -> JsonResponse:
     })
     
 @csrf_exempt
-@require_POST
 @check_user_profile_api()
 def add_friend_ajax(request: HttpRequest, friend_id: str) -> JsonResponse:
     try:
@@ -124,7 +123,6 @@ def add_friend_ajax(request: HttpRequest, friend_id: str) -> JsonResponse:
 
 
 @csrf_exempt
-@require_POST
 @check_user_profile(is_redirect=True)
 def remove_friend(request: AuthRequest, friend_id: str) -> JsonResponse:
     try:

@@ -251,7 +251,7 @@ class Command(BaseCommand):
             self.seed_merch()
             self.seed_user()
             self.seed_user_merch_and_event()
-            self.seed_rating()
+            # self.seed_rating()
             self.seed_forum()
             
             os.system('python manage.py runserver')
