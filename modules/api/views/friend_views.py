@@ -25,7 +25,7 @@ def show_list(request):
             request.user_profile.categories = ''
 
         for friend in friends_recommendation:
-            if friend not in friends and (set(friend.categories.split(',')) & set(request.user_profile.categories.split(',')) or friend.categories == ''):
+            if friend not in friends and (set((friend.categories or '').split(',')) & set((request.user_profile.categories or '').split(',')) or friend.categories == ''):
                 temp.append(friend)
 
         friends_recommendation = temp
@@ -37,7 +37,7 @@ def show_list(request):
                 'profile_picture': friend.profile_picture.url if friend.profile_picture else '',
                 'username': friend.user.username,
                 'email': friend.user.email,
-                'categories': friend.categories.split(',') if friend.categories else [],
+                'categories': friend.categories.split(',') if friend.categories is not None else [],
                 'is_friend': True
             } for friend in friends
             ],
@@ -47,11 +47,14 @@ def show_list(request):
                 'profile_picture': friend.profile_picture.url if friend.profile_picture else '',
                 'username': friend.user.username,
                 'email': friend.user.email,
-                'categories': friend.categories.split(',') if friend.categories else [],
+                'categories':friend.categories.split(',') if friend.categories is not None else [],
                 'is_friend': False
             } for friend in friends_recommendation
             ],
         }
+        
+        print('context')
+        print(context)
         
         return JsonResponse({
             'status': True,
@@ -59,6 +62,8 @@ def show_list(request):
             'data': context
         })
     except Exception as e:
+        print('error')
+        print(str(e))
         return JsonResponse({
             'status': False,
             'message': 'Failed to retrieve Friend list',
