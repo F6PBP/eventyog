@@ -27,16 +27,10 @@ def get_cart_data(request):
     API untuk mengambil data pengguna, keranjang acara, dan keranjang barang dagangan,
     termasuk harga total dan saldo yang tersisa.
     """
-    print(request.POST)
-    print(request.GET)
-    
-
     try:
-        print("berhasil")
         # Ambil data keranjang untuk event dan merchandise
         cart_events = EventCart.objects.filter(user=request.user)
         cart_merch = MerchCart.objects.filter(user=request.user)
-        print(cart_events,cart_merch)
         # Ambil profil pengguna
         user_profile = UserProfile.objects.get(user=request.user)
         
@@ -85,7 +79,67 @@ def get_cart_data(request):
             'status': False,
             'message': f'Error retrieving cart data: {str(e)}'
         })
-    
+
+
+@require_GET
+@transaction.atomic
+def get_cart_data_event(request, event_id):
+    """
+    API untuk mengambil data pengguna, keranjang acara, dan keranjang barang dagangan,
+    termasuk harga total dan saldo yang tersisa.
+    """
+    try:
+        # Ambil data keranjang untuk event dan merchandise
+        cart_events = EventCart.objects.filter(user=request.user, ticket__event__id=event_id)
+        cart_merch = MerchCart.objects.filter(user=request.user)
+        # Ambil profil pengguna
+        user_profile = UserProfile.objects.get(user=request.user)
+        
+        # Hitung total harga
+        price_event = sum([event.totalPrice() for event in cart_events])
+        price_merch = sum([merch.totalPrice() for merch in cart_merch])
+        total_price = price_event + price_merch
+        
+        # Dapatkan saldo dompet yang tersisa
+        remaining_balance = user_profile.wallet - total_price
+        
+        # Mengembalikan data dalam format JSON
+        data = {
+            'status': True,
+            'message': 'Cart data retrieved successfully.',
+            'user_profile': {
+                'wallet_balance': float(user_profile.wallet),
+            },
+            'cart_events': [
+                {
+                    'image_url': event.ticket.event.image_urls if event.ticket.event.image_urls else None,
+                    'title': event.ticket.event.title,
+                    'ticket_name': event.ticket.name,
+                    'price': float(event.totalPrice()),
+                    'quantity': event.quantity
+                } for event in cart_events
+            ],
+            'cart_merch': [
+                {
+                    'image_url': merch.merchandise.image_url,
+                    'name': merch.merchandise.name,
+                    'price': float(merch.totalPrice()),
+                    'quantity': merch.quantity
+                } for merch in cart_merch
+            ],
+            'total_price': total_price,
+            'remaining_balance': remaining_balance
+        }
+        safe_cart_data = decimal_to_float(data)
+        return JsonResponse(safe_cart_data)
+
+    except Exception as e:
+        return JsonResponse({
+            'status': False,
+            'message': f'Error retrieving cart data: {str(e)}'
+        })
+   
+ 
 @require_POST
 @transaction.atomic
 def update_cart(request):
@@ -149,12 +203,13 @@ def checkout(request):
         EventCart.objects.filter(user=user).delete()
         MerchCart.objects.filter(user=user).delete()
         # Kurangi saldo pengguna
-        user_profile.wallet -= total_price
+        user_profile.wallet -= Decimal(total_price)
         user_profile.save()
 
         return JsonResponse({'success': True, 'new_wallet_balance': (user_profile.wallet)})
 
     except Exception as e:
+        print(e)
         return JsonResponse({'success': False, 'error': str(e)})
 
 @csrf_exempt

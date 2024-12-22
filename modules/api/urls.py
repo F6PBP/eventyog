@@ -46,6 +46,7 @@ urlpatterns = [
 
     # path('cart/', cart_views.main, name='cart'),                 # Halaman utama keranjang (opsional)
     path('cart/get_cart_data/', cart_views.get_cart_data, name='get_cart_data'),
+    path('cart/get_cart_data_event/<uuid:event_id>/', cart_views.get_cart_data_event, name='get_cart_data_event'),
     path('cart/update/', cart_views.update_cart, name='update_cart'),  # Untuk memperbarui keranjang
     path('cart/checkout/', cart_views.checkout, name='checkout'),      # Untuk proses checkout
     path('cart/empty/', cart_views.empty_cart, name='empty_cart'),      # Untuk mengosongkan keranjang
