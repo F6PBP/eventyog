@@ -31,12 +31,13 @@ urlpatterns = [
     path('yogevent/<uuid:event_id>/', event_views.show_event_by_id, name='show_event_by_id'),   
     path('yogevent/rate/<uuid:event_id>/', detail_event_views.add_rating, name='add_rating'),
     path('yogevent/buy-ticket-flutter/', detail_event_views.buy_ticket_flutter, name='buy_ticket_flutter'),
-    path('yogevent/delete-user-ticket/', detail_event_views.delete_user_ticket, name='delete_user_ticket'),
     path('yogevent/book-free-ticket/', detail_event_views.book_free_ticket_flutter, name='book_free_ticket'),
     path('yogevent/cancel-free-booking/', detail_event_views.cancel_free_booking, name='cancel_free_booking'),
     path('yogevent/tickets/<uuid:event_id>/', detail_event_views.get_tickets, name='get_tickets'),
     path('yogevent/user-ticket/<uuid:event_id>/', detail_event_views.get_user_ticket_status, name='get_user_ticket_status'),
     path('yogevent/upcoming-events/', event_views.show_upcoming_events, name='upcoming_events'),
+    path('yogevent/add-event-to-cart/', detail_event_views.add_event_to_cart, name='add_event_to_cart'),
+    path('yogevent/check-ticket-cart/<uuid:event_id>/', detail_event_views. check_ticket_in_cart, name=' check_ticket_in_cart'),
 
     # path('cart/', cart_views.main, name='cart'),                 # Halaman utama keranjang (opsional)
     path('cart/get_cart_data/', cart_views.get_cart_data, name='get_cart_data'),
