@@ -24,33 +24,40 @@ from django.http import JsonResponse
 #@login_required(login_url='auth:login')
 #@check_user_profile(is_redirect=False)
 def show_main(request: AuthRequest) -> JsonResponse:
-    #if request.user_profile.role != 'AD':
-        #return JsonResponse({"status": False, "message": "Access denied."}, status=403)
-
-    # Fetch user profiles
-    user_profiles = UserProfile.objects.values('id', 'user', 'name', 'role', 'email', 'bio', 'categories')
     
-    # Fetch usernames and date_joined along with user ids
-    user_details = User.objects.values('username', 'id', 'date_joined')  # Fetch both username and date_joined
-
-    # Convert user details to a dictionary for easy access by user id
-    user_dict = {user['id']: {'username': user['username'], 'date_joined': user['date_joined']} for user in user_details}
-
-    # Now, we merge the username and date_joined into the user profile data
-    merged_profiles = []
-    for profile in user_profiles:
-        user_id = profile['user']
-        user_info = user_dict.get(user_id, {'username': '', 'date_joined': None})  # Default values if no match found
+    # Get All User and its userProfile
+    user = User.objects.all()
+    
+    # Serialize the data
+    user_data = []    
+    
+    for u in user:
+        try:
+            user_profile = UserProfile.objects.get(user=u)
+            user_data.append({
+                'id': u.id,
+                'username': u.username,
+                'name': user_profile.name,
+                'email': user_profile.email,
+                'role': user_profile.role,
+                'date_joined': u.date_joined,
+                'bio': user_profile.bio,
+                'categories': user_profile.categories,
+                'profile_picture': (
+                    f'https://res.cloudinary.com/mxgpapp/image/upload/v1728721294/{user_profile.profile_picture}.jpg'
+                    if user_profile.profile_picture
+                    else 'https://res.cloudinary.com/mxgpapp/image/upload/v1729588463/ux6rsms8ownd5oxxuqjr.png'
+                )
+            })
+        except UserProfile.DoesNotExist:
+            continue
         
-        # Add the username and date_joined to the profile data
-        profile['username'] = user_info['username']
-        profile['date_joined'] = user_info['date_joined']
-        merged_profiles.append(profile)
-
+    print(user_data)
+    
     return JsonResponse({
         "status": True,
         "message": "Admin data retrieved successfully.",
-        "data": merged_profiles
+        "data": user_data
     }, status=200)
 
 
