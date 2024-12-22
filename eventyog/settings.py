@@ -38,7 +38,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'https://eventyog.vercel.app','10.0.2.2', 'eventyog.vercel.app', '127.0.0.1', 'andrew-devito-eventyog.pbp.cs.ui.ac.id', 'https://eventyog.andrew-devito.website', 'eventyog.andrew-devito.website', 'localhost:60502', '*']
 
-CSRF_TRUSTED_ORIGINS=['https://eventyog.andrew-devito.website', 'http://eventyog.andrew-devito.website','http://localhost:8000','http://localhost:62170',]
+CSRF_TRUSTED_ORIGINS=['https://eventyog.andrew-devito.website', 'http://eventyog.andrew-devito.website','http://localhost:8000','http://localhost:62170','http://localhost:51254',]
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

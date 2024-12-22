@@ -8,14 +8,15 @@
         </div>
         {% include "ds/input.html" with id="queryInput" placeholder="Search User" class="max-w-[400px]" %}
         
-        <section id="userList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
-        </section>
+        <section id="userList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10"></section>
     </main>
 
     <!-- User Creation Modal -->
     <div id="userCreationModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
             <h2 class="text-xl font-semibold mb-4">Create User</h2>
+            {% include "ds/modal.html" with modal_id="userCreationModal" modal_title="Create User" modal_class="w-full max-w-3xl" onsubmit="submitCreateUserForm" %}
+            {% block modal_body %}
             <form id="createUserForm" action="{% url 'admin_dashboard:create_user' %}" method="POST" enctype="multipart/form-data" class="grid grid-cols-2 gap-4">
                 {% csrf_token %}
                 <!-- Left Column -->
@@ -247,6 +248,7 @@
                     {% include "ds/button.html" with text="Create User" variant="primary"  props="{'type': 'submit'}"%}
                 </div>
             </form>
+            {% endblock modal_body %}
         </div>
     </div>
     

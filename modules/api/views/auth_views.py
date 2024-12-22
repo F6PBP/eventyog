@@ -1,6 +1,5 @@
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate, login as auth_login
-from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -10,7 +9,6 @@ from modules.authentication.forms import UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from eventyog.decorators import check_user_profile, check_user_profile_api
-from django.forms.models import model_to_dict
 
 @csrf_exempt
 def login(request):
@@ -147,7 +145,6 @@ def onboarding(request):
         }, status=400)
         
 @csrf_exempt        
-@check_user_profile_api()
 def profile(request):
     if request.method == "GET":
         print(request.user)
