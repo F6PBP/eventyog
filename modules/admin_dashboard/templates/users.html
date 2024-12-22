@@ -4,7 +4,7 @@
         <div class="flex justify-between items-center">
             <h1 class="font-bold text-3xl mb-2">Admin Dashboard</h1>
             <!-- Add User Button on the far right -->
-            {% include "ds/button.html" with text="Add User" button_type="primary" icon="fas fa-user-plus" class="w-fit add-user-button" onclick="updateModalState(true)" id="addUserButton"%}
+            {% include "ds/button.html" with text="Add User" variant="primary" icon="fas fa-user-plus" class="w-fit add-user-button" onclick="updateModalState(true)" id="addUserButton"%}
         </div>
         {% include "ds/input.html" with id="queryInput" placeholder="Search User" class="max-w-[400px]" %}
         

@@ -144,7 +144,8 @@ def onboarding(request):
             "message": "Invalid request method."
         }, status=400)
         
-@csrf_exempt        
+@csrf_exempt   
+@check_user_profile_api()     
 def profile(request):
     if request.method == "GET":
         print(request.user)
@@ -157,6 +158,7 @@ def profile(request):
             context = {
                 'username': request.user.username,
                 'name': request.user_profile.name,
+                'wallet': request.user_profile.wallet,
                 'email': request.user_profile.email,
                 'date_joined': request.user.date_joined,
                 'bio': request.user_profile.bio,

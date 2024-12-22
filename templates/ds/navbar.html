@@ -51,9 +51,9 @@
 	</ul>
 	{% if user.is_authenticated %}
 	<div class="flex items-center gap-3 sm:gap-5 md:w-[400px] justify-end">
-        <div>
-            <p class="hidden lg:flex">Hello, {{request.user.username}}</p>
-            <p>{{request.wallet}}</p>
+        <div class="flex flex-col items-end gap-1">
+            <p class="hidden lg:flex font-medium">Hello, {{request.user.username}}</p>
+            <p class="hidden lg:flex text-xs">Rp {{user_profile.wallet}}</p>
         </div>
 
 		<div class="w-8 h-8 bg-black rounded-full overflow-hidden">
@@ -77,7 +77,7 @@
 				id="dropdownMenu-{{ nav_id }}"
 				class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg transition-all duration-300 opacity-0 transform scale-95"
 			>
-				<p class="block px-4 py-2 text-xs sm:text-sm text-gray-700 lg:hidden">
+				<p class="block px-4 py-2 text-xs sm:text-sm text-gray-700 lg:hidden font-semibold my-5">
 					Hello, {{request.user.username}}!
 				</p>
 				<a

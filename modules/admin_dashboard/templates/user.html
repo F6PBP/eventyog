@@ -47,11 +47,13 @@
             </div>
             
             {% if is_admin %}
-                <div class="flex items-center justify-left gap-2 w-full">
-                    {% include "ds/button.html" with text="Edit Profile" button_type="primary" icon="fas fa-user-edit" class="w-fit edit-profile-button" onclick="showEditModal()" %}
-                </div>
-                <div class="mt-0 flex justify-left gap-2 w-full">
-                    {% include "ds/button.html" with text="Delete Account" button_type="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" onclick="showDeleteModal()" %}
+                <div class="flex gap-4">
+                    <div class="flex items-center justify-left gap-2">
+                        {% include "ds/button.html" with text="Edit Profile" variant="primary" icon="fas fa-user-edit" class="w-fit edit-profile-button" onclick="showEditModal()" %}
+                    </div>
+                    <div class="mt-0 flex justify-left gap-2">
+                        {% include "ds/button.html" with text="Delete Account" variant="danger" icon="fas fa-user-minus" class="w-fit delete-account-button" onclick="showDeleteModal()" %}
+                    </div>
                 </div>
             {% endif %}
 
