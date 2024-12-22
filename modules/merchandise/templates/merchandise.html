@@ -36,6 +36,7 @@
         </div>
 
         <div id="merchandise_cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10"></div>
+        <p id="no_merchandise_message" class="hidden text-center text-gray-500">No merchandise available.</p>
 
         <div id="loading" class="loading-spinner hidden animate-spin">
         </div>
@@ -59,6 +60,7 @@
 
         async function fetchMerchandiseEntries() {
             const merchandiseCards = document.getElementById("merchandise_cards");
+            const noMerchandiseMessage = document.getElementById("no_merchandise_message");
             const loadingSpinner = document.createElement("loading");
             loadingSpinner.classList.remove("hidden");
             merchandiseCards.innerHTML = ""; // Clear existing cards
@@ -66,41 +68,46 @@
 
             const isAdmin = {{ is_admin|yesno:"true,false" }};
 
-            merchandiseEntries.forEach((item) => {
-                console.log(item);
-                let cardClass = item.quantity === 0 ? 'disabled-card' : '';
-                let cardHTML = `
-                    <div class="relative bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300 ${cardClass}" ${item.quantity > 0 ? `onclick="window.location.href='/merchandise/detail/${item.pk}'"` : ''}>
-                        <div class="absolute top-5 right-5 h-5 w-5 bg-black p-5 text-white rounded-full flex items-center justify-center font-bold hover:scale-105 duration-300">
-                            ${item.quantity}
-                        </div>
-                        <img src="${item.image_url}" alt="${item.name}" class="w-full h-44 object-cover">
-                        <div class="flex flex-col justify-between p-8 flex-grow">
-                            <div>
-                                <h5 class="text-lg font-bold line-clamp-2" title="${item.name}">${item.name}</h5>
-                                <p class="text-gray-700 mb-2 overflow-auto max-h-16 text-xs line-clamp-3">${item.description}</p>
+            if (merchandiseEntries.length === 0) {
+                noMerchandiseMessage.classList.remove("hidden");
+            } else {
+                noMerchandiseMessage.classList.add("hidden");
+                merchandiseEntries.forEach((item) => {
+                    console.log(item);
+                    let cardClass = item.quantity === 0 ? 'disabled-card' : '';
+                    let cardHTML = `
+                        <div class="relative bg-white rounded-xl shadow-xl overflow-hidden relative flex flex-col justify-between cursor-pointer hover:scale-[101%] hover:bg-gray-200 duration-300 ${cardClass}" ${item.quantity > 0 ? `onclick="window.location.href='/merchandise/detail/${item.pk}'"` : ''}>
+                            <div class="absolute top-5 right-5 h-5 w-5 bg-black p-5 text-white rounded-full flex items-center justify-center font-bold hover:scale-105 duration-300">
+                                ${item.quantity}
                             </div>
-                            <div class="flex flex-col items-start mt-auto">
-                                <p class="text-base font-bold">Rp ${item.price}</p>
-                                
-                                <div class="flex justify-between items-center w-full mt-2">
-                                    <div class="flex justify-center w-full gap-2">
-                                        <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>-</button>
-                                        <input type="number" id="quantity-${item.pk}" value="${item.bought_quantity}" min="0" max="${item.quantity}" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.name}', '${item.price}', this.value, ${item.quantity})" ${item.quantity === 0 ? 'disabled' : ''}>
-                                        <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.name}', '${item.price}', ${item.quantity}); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>+</button>
+                            <img src="${item.image_url}" alt="${item.name}" class="w-full h-44 object-cover">
+                            <div class="flex flex-col justify-between p-8 flex-grow">
+                                <div>
+                                    <h5 class="text-lg font-bold line-clamp-2" title="${item.name}">${item.name}</h5>
+                                    <p class="text-gray-700 mb-2 overflow-auto max-h-16 text-xs line-clamp-3">${item.description}</p>
+                                </div>
+                                <div class="flex flex-col items-start mt-auto">
+                                    <p class="text-base font-bold">Rp ${item.price}</p>
+                                    
+                                    <div class="flex justify-between items-center w-full mt-2">
+                                        <div class="flex justify-center w-full gap-2">
+                                            <button type="button" class="font-bold" onclick="decreaseValue('${item.pk}', '${item.name}', '${item.price}'); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>-</button>
+                                            <input type="number" id="quantity-${item.pk}" value="${item.bought_quantity}" min="0" max="${item.quantity}" class="text-center w-[80px] outline-none px-2 bg-[#0047FE] text-white py-2 pl-5" onclick="event.stopPropagation()" oninput="updateQuantity('${item.pk}', '${item.name}', '${item.price}', this.value, ${item.quantity})" ${item.quantity === 0 ? 'disabled' : ''}>
+                                            <button type="button" class="font-bold" onclick="increaseValue('${item.pk}', '${item.name}', '${item.price}', ${item.quantity}); event.stopPropagation();" ${item.quantity === 0 ? 'disabled' : ''}>+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                merchandiseCards.innerHTML += cardHTML;
+                    `;
+                    merchandiseCards.innerHTML += cardHTML;
 
-                // Add items with bought_quantity > 0 to cartItems
-                if (item.bought_quantity > 0) {
-                    cartItems[item.pk] = { name: item.name, price: parseInt(item.price), quantity: item.bought_quantity, id: item.pk };
-                }
-            });
+                    // Add items with bought_quantity > 0 to cartItems
+                    if (item.bought_quantity > 0) {
+                        cartItems[item.pk] = { name: item.name, price: parseInt(item.price), quantity: item.bought_quantity, id: item.pk };
+                    }
+                });
+            }
             loadingSpinner.classList.add("hidden");
             updateCart(); // Update the cart after fetching merchandise entries
         }

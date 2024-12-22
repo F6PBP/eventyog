@@ -82,6 +82,7 @@ def check_user_profile_api():
                 request.user_profile = user_profile
                 request.role = user_profile.role
                 request.is_admin = user_profile.role == 'AD'
+                request.wallet = user_profile.wallet
 
             except UserProfile.DoesNotExist:
                 return JsonResponse({

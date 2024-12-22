@@ -211,6 +211,7 @@ def create_event_entry_ajax(request):
     except Exception as e:
         return JsonResponse({'status': False, 'message': 'Error creating event.'})
 
+@check_user_profile(is_redirect=True)
 def detail_event(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
     user_profile = UserProfile.objects.get(user=request.user)
