@@ -21,11 +21,11 @@ from modules.authentication.forms import UserProfileForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=False)
+#@login_required(login_url='auth:login')
+#@check_user_profile(is_redirect=False)
 def show_main(request: AuthRequest) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
+    #if request.user_profile.role != 'AD':
+        #return JsonResponse({"status": False, "message": "Access denied."}, status=403)
 
     # Fetch user profiles
     user_profiles = UserProfile.objects.values('id', 'user', 'name', 'role', 'email', 'bio', 'categories')
@@ -64,19 +64,12 @@ def search_users(request: AuthRequest) -> JsonResponse:
         "data": list(users)
     }, status=200)
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
+# @login_required(login_url='auth:login')
+# @check_user_profile(is_redirect=True)
 def see_user(request, username) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
+    # if request.user_profile.role != 'AD':
+    #     return JsonResponse({"status": False, "message": "Access denied."}, status=403)
     try:
-        # user = get_object_or_404(User, username=username)
-        # user_profile = get_object_or_404(UserProfile, user=user)
-        #user_info= user_profile.objects.values('id', 'name', 'role', 'email',
-        #            'date_joined', 'bio', 'categories')
-
-        #username = user.data.username
-
         print(f"Looking for user with username: {username}")  # Debug print
         user = User.objects.filter(username=username).first()
         if not user:
@@ -120,12 +113,12 @@ def see_user(request, username) -> JsonResponse:
         }, status=404)
 
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
+# @login_required(login_url='auth:login')
+# @check_user_profile(is_redirect=True)
 @csrf_exempt        
 def edit_user(request, username) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({"status": False, "message": "Access denied."}, status=403)
+    # if request.user_profile.role != 'AD':
+    #     return JsonResponse({"status": False, "message": "Access denied."}, status=403)
      
     print(f"Looking for user with username: {username}")  # Debug print
     user = User.objects.filter(username=username).first()
@@ -180,14 +173,14 @@ def edit_user(request, username) -> JsonResponse:
             "data": context
         }, status=200)
 
-@login_required(login_url='auth:login')
-@check_user_profile(is_redirect=True)
+# @login_required(login_url='auth:login')
+# @check_user_profile(is_redirect=True)
 def delete_user(request, username) -> JsonResponse:
-    if request.user_profile.role != 'AD':
-        return JsonResponse({
-            "status": False,
-            "message": "You do not have permission to perform this action."
-        }, status=403)  
+    # if request.user_profile.role != 'AD':
+    #     return JsonResponse({
+    #         "status": False,
+    #         "message": "You do not have permission to perform this action."
+    #     }, status=403)  
 
     user = User.objects.filter(username=username).first()
     if not user:
@@ -224,29 +217,92 @@ def delete_user(request, username) -> JsonResponse:
             "status_code": 500
         }, status=500)
 
-# @login_required(login_url='auth:login')
-# @check_user_profile(is_redirect=True)
+# # @login_required(login_url='auth:login')
+# # @check_user_profile(is_redirect=True)
+@csrf_exempt
 def create_user(request) -> JsonResponse:
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({
+            "status": False,
+            "message": "Invalid request method."
+        }, status=405)
+
+    try:
         data = json.loads(request.body)
-        user_form = UserCreationForm(data)
-        profile_form = UserProfileForm(data)
-        
-        if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
-            
-            return JsonResponse({"status": True, "message": "User created successfully."}, status=200)
-        else:
+        name = data.get('name')
+        username = data.get('username')
+        email = data.get('email')
+        password1 = data.get('password1')
+        password2 = data.get('password2')
+
+        # Validate required fields
+        if not all([username, email, password1, password2]):
             return JsonResponse({
                 "status": False,
-                "message": "Invalid form data.",
-                "errors": {
-                    "user_form": user_form.errors,
-                    "profile_form": profile_form.errors
-                }
+                "message": "All fields are required."
             }, status=400)
-    
-    return JsonResponse({"status": False, "message": "Invalid request method."}, status=405)
+
+        # Check if passwords match
+        if password1 != password2:
+            return JsonResponse({
+                "status": False,
+                "message": "Passwords do not match."
+            }, status=400)
+
+        # Validate password length
+        if len(password1) < 8:
+            return JsonResponse({
+                "status": False,
+                "message": "Password must be at least 8 characters long."
+            }, status=400)
+
+        # Check if username already exists
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({
+                "status": False,
+                "message": "Username already exists."
+            }, status=400)
+
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({
+                "status": False,
+                "message": "Email already exists."
+            }, status=400)
+
+        # Create the user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1
+        )
+
+        user.save()
+        
+        # Create a basic user profile with only provided fields
+        UserProfile.objects.create(
+            user=user,
+            name=name or '',  # Default to None if not provided
+            email=email,  # From the user creation
+            bio='',  # Optional, defaults to None
+            categories=None,  # Optional, defaults to None
+            profile_picture=''  # Optional, defaults to None
+        )
+
+        return JsonResponse({
+            "status": True,
+            "message": "User and profile created successfully!",
+            "username": user.username,
+            "email": user.email,
+        }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            "status": False,
+            "message": "Invalid JSON format."
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            "status": False,
+            "message": f"Error creating user: {str(e)}"
+        }, status=500)

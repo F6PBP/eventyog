@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/see_user/<str:username>', admin_views.see_user, name='see_user'),
     path('admin/delete_user/<str:username>', admin_views.delete_user, name='delete_user'),
     path('admin/edit_user/<str:username>', admin_views.edit_user, name='edit_user'),
+    path('admin/create_user/', admin_views.create_user, name='create_user'),
 
     path('yogevent/main/', event_views.main, name='yogevent_main'),
     path('yogevent/events/', event_views.show_event_json, name='event_list_json'),
