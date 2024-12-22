@@ -134,7 +134,6 @@ def checkout(request):
     try:
         # Parse JSON request body
         data = json.loads(request.body)
-        print(f"Received data: {data}")  # Log data yang diterima
         updated_events = data.get('event', [])
         updated_merch = data.get('merch', [])
 

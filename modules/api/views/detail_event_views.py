@@ -6,7 +6,6 @@ from modules.main.models import Rating, Event, EventCart, TicketPrice, UserProfi
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Avg
-from modules.api.views.auth_views import profile
 
 @csrf_exempt
 def add_rating(request, event_id: uuid.UUID):
@@ -225,7 +224,7 @@ def buy_ticket_flutter(request):
                 status=400
             )
 
-        event_cart = EventCart(user=user, ticket=ticket)
+        event_cart = EventCart(user=user, ticket=ticket, quantity = 1)
         try:
             event_cart.save()
         except Exception as e:
@@ -254,51 +253,41 @@ def buy_ticket_flutter(request):
         )
     
 @csrf_exempt
-def delete_user_ticket(request):
-    if request.method == 'POST':
-        try:
-            cart_id = request.POST.get('ticket_id')
-            cart_item = EventCart.objects.filter(
+def add_event_to_cart(request):
+    try:
+        ticket_id = request.POST.get('ticket_id')
+        ticket = TicketPrice.objects.get(id=ticket_id)
+        
+        # Cek apakah event sudah ada di cart
+        event_cart = EventCart.objects.filter(
+            user=request.user,
+            ticket=ticket
+        ).first()
+        
+        if not event_cart:
+            # Buat cart item baru jika belum ada
+            event_cart = EventCart(
                 user=request.user,
-                id=cart_id 
-            ).first()
+                ticket=ticket
+            )
+            event_cart.save()
 
-            if cart_item:
-                ticket = cart_item.ticket
-                
-                cart_item.delete()
-                
-                user_profile = request.user.userprofile
-                if ticket in user_profile.registeredEvent.all():
-                    user_profile.registeredEvent.remove(ticket)
-                
-                return JsonResponse({
-                    'status': True,
-                    'message': 'Payment Completed'
-                })
-            else:
-                try:
-                    user_profile = request.user.userprofile
-                    ticket = TicketPrice.objects.get(id=cart_id)
-                    if ticket in user_profile.registeredEvent.all():
-                        user_profile.registeredEvent.remove(ticket)
-                        return JsonResponse({
-                            'status': True,
-                            'message': 'Cancel Booking'
-                        })
-                except TicketPrice.DoesNotExist:
-                    pass
-                
-                return JsonResponse({
-                    'status': False,
-                    'message': 'Ticket not found'
-                }, status=404)
-                
-        except Exception as e:
-            return JsonResponse({
-                'status': False,
-                'message': f'Error deleting ticket: {str(e)}'
-            }, status=500)
+        return JsonResponse({
+            "status": "success",
+            "message": "Event added to cart successfully"
+        }, status=200)
+        
+    except TicketPrice.DoesNotExist:
+        return JsonResponse({
+            "status": "error", 
+            "message": "Ticket not found"
+        }, status=404)
+        
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=400)
         
 @csrf_exempt
 def get_user_ticket_status(request, event_id):
@@ -523,3 +512,22 @@ def cancel_free_booking(request):
         {'status': False, 'message': 'Invalid request method'},
         status=405
     )
+
+@csrf_exempt
+def check_ticket_in_cart(request, event_id):
+    try:
+        cart_item = EventCart.objects.filter(
+            user=request.user,
+            ticket__event__uuid=event_id
+        ).exists()
+        
+        return JsonResponse({
+            'status': True,
+            'in_cart': cart_item
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': False,
+            'message': str(e)
+        }, status=500)

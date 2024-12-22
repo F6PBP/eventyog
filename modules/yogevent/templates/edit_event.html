@@ -1,28 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="flex flex-col gap-2 px-4 py-16 bg-white shadow-lg rounded-lg max-w-lg mx-auto my-10 pt-20 p-4 w-full">
-    <form method="POST" class="text-xl font-bold text-gray-900 text-center mb-4">
-    {% csrf_token %}
-    {% for field in form %}
-    <div class="mb-2">
-        <label for="{{ field.id_for_label }}" class="mb-1 font-medium text-gray-700 block">
-            {{ field.label }}
-        </label>
-        <div class="mb-2">
-            {{ field }}
-        </div>
-        {% if field.help_text %}
-            <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
-        {% endif %}
-        {% for error in field.errors %}
-            <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-        {% endfor %}
+<div class="container mx-auto px-4 mt-32"> 
+    <div class="flex flex-col gap-2 bg-white shadow-lg rounded-lg max-w-lg mx-auto p-6">
+        <h1 class="text-xl font-bold text-gray-900 text-center mb-4">Edit Event</h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-4">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                <div class="mt-1">
+                    {{ field }}
+                </div>
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="history.back()" 
+                    class="bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded text-sm">
+                    Back
+                </button>
+                <button type="submit" 
+                    class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded text-sm">
+                    Save Changes
+                </button>
+            </div>          
+        </form>
     </div>
-    {% endfor %}
-        <div class="flex justify-end gap-2 mt-4">
-            <button type="button" onclick="history.back()" class="bg-gray-500 hover:bg-gray-700 text-white py-1 px-3 rounded text-sm">Back</button>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">Edit Event</button>
-        </div>          
-    </form>
 </div>
 {% endblock %}

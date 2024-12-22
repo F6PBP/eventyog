@@ -22,9 +22,9 @@ def main(request: HttpRequest) -> HttpResponse:
     priceCart = 0
     for i in cart_events:
         if i.ticket.event.image_urls:
-            i.image_url = i.ticket.event.image_urls[0]
+            i.image_url = i.ticket.event.image_urls
         else:
-            i.image_url = None
+            i.image_url = 'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2024-06/240602-concert-fans-stock-vl-1023a-9b4766.jpg'
         priceEvent += i.totalPrice()
     
     for i in cart_merch:

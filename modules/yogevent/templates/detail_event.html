@@ -3,13 +3,7 @@
 <div class="px-10 md:20 lg:px-32 my-48">
     <div class="rounded-lg flex flex-col md:flex-row">
         <div class="md:w-1/2 flex justify-center mb-4 md:mb-0">
-            {% if event.image_urls %}
-                <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls }}" alt="{{ event.title }}">==
-            {% else %}
-                <img class="w-full max-w-lg object-cover rounded-lg" 
-                    src="https://cdn0-production-images-kly.akamaized.net/xYEcqMdBWw6pN0mFBFD5_5uIjz8=/800x450/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/3396365/original/023706600_1615209973-concert-768722_1280.jpg"
-                alt="{{ event.title }}">
-            {% endif %}
+            <img class="w-full max-w-lg object-cover rounded-lg" src="{{ event.image_urls }}" alt="{{ event.title }}">
         </div>
 
         <div class="md:w-1/2 flex flex-col justify-center pl-0 md:pl-6">
@@ -31,20 +25,38 @@
                 <p id="averageRating">{{ average_rating }} / 5.0</p>
             </div>
 
-            {% if is_rated and first_rating and is_booked %}
-                <div class="mt-4">
-                    <h2 class="text-2xl font-semibold mb-2">Your Rating:</h2>
-                    <div class="">
-                        <b>
-                            {{first_rating.rating}}.0 / 5.0,
-                        </b>
-                        <span class="text-gray-500">
-                            {{first_rating.review}}
-                        </span>
+            {% if latest_rating %}
+            <div class="latest-rating-section mt-4">
+                <h2 class="text-2xl font-semibold mb-2">Review & Ratings</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        {% if latest_rating.user.profile_picture %}
+                            <img src="{{ latest_rating.user.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+                        {% else %}
+                            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                <i class="fa fa-user text-gray-500"></i>
+                            </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-medium">{{ latest_rating.user.user.username }}</span>
+                                    <div class="text-sm text-gray-500">
+                                        {{ latest_rating.created_at|date:"Y-m-d H:i:s" }}
+                                    </div>
+                                </div>
+                                <div class="text-yellow-400">
+                                    {{ latest_rating.rating }}⭐
+                                </div>
+                            </div>
+                            <p class="mt-2 text-gray-600">{{ latest_rating.review }}</p>
+                        </div>
                     </div>
                 </div>
+            </div>
             {% endif %}
 
+            <div class="action-buttons space-y-2">
             {% if is_in_cart %}
                 {% if not is_rated %}
                     <div class="flex gap-2">
@@ -78,6 +90,7 @@
                     {% endif %}
                 {% endif %}
             {% endif %}
+            </div>
         </div>
     </div>
     <hr class="my-10">
@@ -85,36 +98,97 @@
     {% include "create_merchandise.html" with modal_id="open-modal-2" modal_title="+ Create Merchandise" modal_class="fixed flex items-center justify-center z-50 bg-white overflow-y-auto" %}
 </div>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    function submitRating() {
+        console.log("submitRating function called"); 
+        const form = document.getElementById("ratingForm");
+
+        if (!form) {
+            console.error("Rating form not found!");
+            return false;
+        }
+
+        const formData = new FormData(form);
         const messageDisplay = document.getElementById("averageRating");
-        submitButton.addEventListener("click", function() {
-                console.log("Hi aku di dalam buat check, blm fetch sih");
-                fetch("{% url 'yogevent:get_rating_event' event.uuid %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        messageDisplay.textContent = data.error;
-                        messageDisplay.classList.add("text-red-500");
-                    } else {
-                        messageDisplay.textContent = data.message;
-                        messageDisplay.classList.add("text-green-500");
-                        if (data.average_rating) {
-                            document.getElementById("averageRating").textContent = `Average Rating: ${data.average_rating}`;
-                        }
-                    }
-                })
-                .catch(error => {
-                    messageDisplay.textContent = "An error occurred. Please try again.";
-                    messageDisplay.classList.add("text-red-500");
-                });
-            });
-    });
+        const review = form.querySelector('textarea[name="review"]').value.trim();
+
+        if (!review) {
+            if (typeof showToast === 'function') {
+                showToast('Please write review', 'error');
+            } else {
+                alert('Please write review');
+            }
+            return false;
+        }
+        
+        fetch(form.action, {
+            method: form.method,
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log("Server response:", response); // Debug
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Response data:", data);
+
+            if (data.status && data.data) {
+                // Update average rating display
+                if (messageDisplay) {
+                    messageDisplay.textContent = `${data.data.average_rating} / 5.0`;
+                    console.log("Average rating updated");
+                }
+
+                // Show success message
+                if (typeof showToast === 'function') {
+                    showToast(data.message, 'success');
+                } else {
+                    alert(data.message);
+                }
+
+                // Reset form
+                form.reset();
+
+                // Sembunyikan tombol "Give Rating" jika ada
+                const ratingBtn = document.querySelector('[specify="give-rating-modal"]');
+                if (ratingBtn) {
+                    ratingBtn.style.display = 'none';
+                }
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1000); // Wait 1 second before reload
+
+                location.reload();
+                return true;
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast(data.error || 'Error submitting rating', 'error');
+                } else {
+                    alert(data.error || 'Error submitting rating');
+                }
+            }
+            return false;
+        })
+        .catch(error => {
+            console.error('Error in AJAX call: ', error);
+            if (typeof showToast === 'function') {
+                showToast('An error occurred. Please try again.', 'error');
+            } else {
+                alert('An error occurred. Please try again.');
+            }
+            return false;
+        });
+
+        return true; // Allow modal to close
+    }
+
+    window.submitRating = submitRating;
     
     function onBookFree() {
         const formData = new FormData();
@@ -174,7 +248,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data.success) {
                 alert('Ticket purchased successfully.');
                 location.reload();
@@ -183,5 +256,21 @@
             }
         });
     }
+
+    // Make sure event listener is attached
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM Content Loaded"); // Debug
+        const ratingForm = document.getElementById("ratingForm");
+        console.log("Rating form found on load:", ratingForm); // Debug
+        
+        if (ratingForm) {
+            ratingForm.addEventListener('submit', function(e) {
+                console.log("Form submit event triggered"); // Debug
+                e.preventDefault();
+                submitRating();
+            });
+        }
+    });
+
 </script>
 {% endblock %}
